@@ -1,7 +1,7 @@
 # Swadit
 A visual editor for Swagger files
 
-[Demo](swadit.misc-net.de).
+[Demo](https://swadit.misc-net.de).
 
 ## Prepare
 Install dependencies:
