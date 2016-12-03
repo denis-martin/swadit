@@ -1,11 +1,11 @@
 # Swadit
-A visual editor for Swagger files
-
-[Demo](https://swadit.misc-net.de).
+A visual editor for Swagger files ([Demo](https://swadit.misc-net.de)).
 
 ## Prepare
-Install dependencies:
+
+Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies:
 ```
+npm install -g bower
 npm install
 bower install
 ```
