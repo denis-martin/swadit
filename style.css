@@ -1,0 +1,360 @@
+
+body {
+	font-family: sans-serif;
+	font-size: 10pt;
+	padding: 0;
+	margin: 0;
+}
+
+h1 {
+	font-size: 120%;
+}
+
+h2 {
+	font-size: 110%;
+}
+
+td {
+	text-align: left;
+}
+
+input[type='text'], input[type='search'], textarea, select {
+	border: 1px solid white;
+	border-radius: 3px;
+	padding: 2px;
+}
+
+textarea {
+	min-height: 12pt;
+	width: 700px;
+	margin-bottom: 0;
+	resize: none;
+}
+
+input[type='text']:hover, input[type='search']:hover, textarea:hover, select:hover {
+	border: 1px solid #ccc;
+}
+
+input[type='file'] {
+	margin-top: 5px;
+}
+
+/* needed because of conflict with bootstrap */
+input[type="search"]::-webkit-search-cancel-button {
+	-webkit-appearance: searchfield-cancel-button;
+}
+
+select {
+	padding-left: -5px;
+	-webkit-appearance: none;
+}
+
+hr {
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+form {
+	display: inline;
+}
+
+.hidden {
+	display: none;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+ 
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+ 
+::-webkit-scrollbar-thumb {
+	background-color: #c8c8c8;
+	outline: 1px solid slategrey;
+}
+
+
+
+.paneHeaderContainer {
+	border-radius: 0;
+	border-bottom: none;
+	border-right: none;
+	border-left: none;
+	box-shadow: 0px 0px 5px #888888;
+	z-index: 100;
+}
+
+.paneLeftContainer {
+	background-color: #f8f8f8;
+    border-color: #e7e7e7;
+	box-shadow: 10px 0px 5px #888888;
+	z-index: 1;
+	padding: 5px;
+}
+
+.paneMain {
+	padding: 5px;
+}
+
+.headerTitle {
+	font-size: 110%;
+	font-weight: bold;
+	padding-left: 5px;
+}
+
+.headerVersion {
+	padding-left: 5px;
+}
+
+.button, .smallButton {
+	border: none;
+	text-transform: uppercase;
+	color: white;
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 90%;
+	padding: 2px;
+	margin: 2px;
+	border-radius: 2px;
+	background-color: grey;
+	cursor: pointer;
+}
+
+button:hover, .button:hover, .smallButton:hover {
+	background-color: black;
+}
+
+.smallButton {
+	font-size: 70%;
+}
+
+.discreet {
+	background-color: #e0e0e0;
+}
+
+.monospace {
+	font-family: monospace;
+}
+
+.methodKey {
+	text-transform: uppercase;
+	color: white;
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 85%;
+	padding: 2px;
+	margin: 2px;
+	border-radius: 2px;
+	background-color: darkgrey;
+}
+
+.methodKey:hover {
+	background-color: black;
+	cursor: pointer;
+}
+
+.unstyled-list {
+	list-style-type: none;
+	list-style-position: inside;
+	margin: 0;
+	padding: 0;
+}
+
+.unstyled-list li {
+	padding: 5px;
+	margin: 0px;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.unstyled-list li:hover {
+	background-color: #ccc;
+}
+
+.panelMain input[type='text'], .panelMain input[type='search'] {
+	width: 300px;
+}
+
+.panelMainHeader {
+	box-shadow: 0px 0px 5px #888888;
+	z-index: 10;
+}
+
+.panelMainFooter {
+	box-shadow: 0 -10px 5px #888888;
+	z-index: 5;
+}
+
+.panelMainContent {
+	padding-top: 10px;
+}
+
+.schemaDescription {
+	width: 30em;
+}
+
+.responseDescription, .parameterDescription {
+	width: 40em;
+}
+
+.typePreview {
+	color: #bbb;
+}
+
+.label-text {
+	font-size: 80%;
+	color: #bbb;
+	text-align: right;
+	vertical-align: top;
+	padding: 4pt 4px 0 4px;
+}
+
+.paddedText {
+	padding-top: 3px;
+	padding-left: 3px;
+}
+
+.bigger {
+	font-size: 110%;
+	font-weight: bold;
+}
+
+#api-info-title {
+	font-size: 120%;
+	font-weight: bold;
+}
+
+.path {
+	padding: 4px;
+	border-radius: 5px;
+}
+
+.path:hover {
+	background-color: #bbbbcc;
+}
+
+.path-selected {
+	background-color: #ffefb8;
+}
+
+.path-active {
+	background-color: #ffcf58;
+}
+
+.methodPathHeader {
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 5px;
+	padding: 3px 0 3px 0;
+	font-size: 110%;
+}
+
+.methodPathHeaderMethod {
+	padding: 5px;
+	border-radius: 5px;
+	text-transform: uppercase;
+	color: white;
+	font-weight: bold;
+	background-color: darkgrey;
+}
+
+.methodPathHeaderPath {
+	padding: 5px;
+	border-radius: 5px;
+}
+
+.methodBorderColor-get {
+	border-color: rgb(35,146,247);
+}
+
+.methodBorderColor-post {
+	border-color: rgb(19,194,15);
+}
+
+.methodBorderColor-put {
+	border-color: rgb(255,144,0);
+}
+
+.methodBorderColor-delete {
+	border-color: rgb(227,0,18);
+}
+
+.methodBgColor-get {
+	background-color: rgb(35,146,247);
+}
+
+.methodBgColor-post {
+	background-color: rgb(19,194,15);
+}
+
+.methodBgColor-put {
+	background-color: rgb(255,144,0);
+}
+
+.methodBgColor-delete {
+	background-color: rgb(227,0,18);
+}
+
+.objectProperty {
+	color: #180092;
+	font-style: italic; 
+}
+
+.swaggerValidationOk {
+	color: green;
+}
+
+.swaggerValidationFailed {
+	color: red;
+}
+
+.validationErrorBox {
+	border-color: red;
+	background-color: #fee;
+	margin-top: 4px;
+}
+
+.panelLeftSourceButton {
+	float: right; 
+	margin-top: 0;
+	background-color: #e5e5e5;
+}
+
+.ace_editor {
+	height: 100%;
+}
+
+.ui-splitbar {
+	z-index: 10;
+}
+
+.deprecated {
+	text-decoration: line-through;
+}
+
+.glyphbutton {
+	color: #ddd
+}
+
+.glyphbutton:hover {
+	color: #000
+}
+
+.showPointer {
+	cursor: pointer;
+}
+
+.border-left {
+	border-left: 1px solid #eeeeee;
+}
+
+.requiredPropertySelected {
+	color: #f99;
+}
+
+.requiredPropertySelected:hover {
+	color: red;
+}

@@ -1,0 +1,24 @@
+{
+  "name": "swadit",
+  "main": "index.html",
+  "window": {
+    "title": "Swadit",
+    "width": 1100,
+    "height": 800
+  },
+  "version": "0.7.0",
+  "description": "A visual editor for Swagger files",
+  "dependencies": {
+    "swagger-parser": "^3.4.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "swagger",
+    "editor"
+  ],
+  "author": "denis",
+  "license": "GPLv3"
+}

@@ -1,0 +1,110 @@
+<table>
+	<tr ng-if="(schema.$ref == undefined || schema.$ref == '')">
+		<td class="label-text">type</td>
+		<td>
+			<table>
+				<tr>
+					<td>
+						<select ng-model="schema.type" ng-change="schemaTypeChanged('{{schema.type}}')">
+							<option value="object">object</option>
+							<option value="string">string</option>
+							<option value="number">number</option>
+							<option value="integer">integer</option>
+							<option value="boolean">boolean</option>
+							<option value="array">array</option>
+						</select>
+					</td>
+					<td ng-if="schema.type != 'object' && schema.type != 'array'" class="label-text">format</td>
+					<td ng-if="schema.type != 'object' && schema.type != 'array'" >
+						<input type="text" 
+							title="Format of type (optional). Examples:&#10;integer: int32, int64&#10;number: float, double&#10;string: byte, binary, date, date-time, password"
+							placeholder="Format (optional)" ng-model="schema.format" ng-trim="true" pu-elastic-input>&nbsp;</td>
+					<td ng-if="!isRootDefinition" class="label-text border-left">or $ref</td>
+					<td ng-if="!isRootDefinition" >
+						<select ng-model="schema.$ref" ng-change="schemaTypeChanged('{{schema.$ref}}', true)">
+							<option value="">(none)</option>
+							<option ng-repeat="(ref, schema) in Swadit.api.definitions" value="#/definitions/{{ref}}">#/definitions/{{ref}}</option>
+						</select>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+	<tr ng-if="(schema.$ref != undefined && schema.$ref != '')">
+		<td class="label-text">$ref</td>
+		<td>
+			<select ng-model="schema.$ref" ng-change="schemaTypeChanged('{{schema.$ref}}', true)">
+				<option value="">(none)</option>
+				<option ng-repeat="(ref, schema) in Swadit.api.definitions" value="#/definitions/{{ref}}">#/definitions/{{ref}}</option>
+			</select>
+		</td>
+	</tr>
+	<tr ng-if="(schema.$ref == undefined || schema.$ref == '')">
+		<td class="label-text">description</td>
+		<td><textarea title="Description (optional)" placeholder="Description (optional)" cols="30" rows="1" class="schemaDescription" ng-model="schema.description" ng-trim="true" msd-elastic></textarea></td>
+	</tr>
+
+	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type != 'object' && schema.type != 'array'">
+		<td class="label-text">default</td>
+		<td>
+			<input type="text" title="Default value (optional)" placeholder="Default value (optional)" ng-trim="true" pu-elastic-input
+				ng-model="schema.default" ng-change="onExampleChange('default')" ng-init="onExampleChange('default')">
+			<span ng-show="verify.default" class="swaggerValidationFailed">{{verify.default}}</span>
+		</td>
+	</tr>
+	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type != 'object' && schema.type != 'array'">
+		<td class="label-text">example</td>
+		<td>
+			<input type="text" title="Example value (optional)" placeholder="Example value (optional)" ng-trim="true" pu-elastic-input
+				ng-model="schema.example" ng-change="onExampleChange('example')" ng-init="onExampleChange('example')">
+			<span ng-show="verify.example" class="swaggerValidationFailed">{{verify.example}}</span>
+		</td>
+	</tr>
+
+	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type == 'array'">
+		<td class="label-text">items</td>
+		<td class="paddedText">
+			<span class="typePreview">{{schema.items.$ref ? schema.items.$ref : schema.items.type}}</span>
+			<span class="smallButton discreet" title="Show/hide the details of the items" 
+				ng-click="itemsVisible?itemsVisible=false:itemsVisible=true">Details</span>
+			<div ng-controller="SwaditSchemaController" ng-init="schema = $parent.schema.items">
+				<div ng-if="itemsVisible" ng-include src="'ui/schemaEditor.html'"></div>
+			</div>
+		</td>
+	</tr>
+	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type == 'object'">
+		<td class="label-text">properties</td>
+		<td>
+			<div ng-repeat="(propKey, propSchema) in schema.properties" ng-init="propName = propKey">
+				<form ng-submit="renameSchemaProperty(propKey, propName)">
+					<span class="glyphbutton glyphicon glyphicon-remove" title="Deletes the property" ng-click="deleteSchemaProperty(propKey)"></span>
+					<span class="glyphbutton glyphicon glyphicon-edit" title="Show/hide the details of the property" ng-click="toggleVisibility(propKey)"></span>
+					<span class="glyphbutton glyphicon glyphicon-asterisk" title="Set/unset this property as required property" ng-click="toggleRequired(propKey)" 
+						ng-class="(schema.required && schema.required.indexOf(propKey)>-1)?'requiredPropertySelected':''"></span>
+					<input type="text" placeholder="Name of property" class="objectProperty" ng-model="propName"
+						title="{{(propSchema.description==undefined || propSchema.description=='')?'Name of property':propSchema.description}}"
+						required ng-trim="true" ng-blur="renameSchemaProperty(propKey, propName)" pu-elastic-input>
+					<button type="submit" class="hidden" title="Renames the property">Rename</button>
+					<span class="showPointer" ng-click="toggleVisibility(propKey)">
+						<span class="typePreview">: {{getPropertyPreview(propSchema)}}</span>
+						<span ng-if="(propSchema.description!=undefined && propSchema.description!='')">
+							{{propSchema.description.length > 40 ? propSchema.description.substr(0,39) + '...' : propSchema.description}}
+						</span>
+					</span>
+				</form>
+				<div ng-controller="SwaditSchemaController" ng-init="schema = propSchema">
+					<div ng-if="$parent.visibility[propKey]" ng-include src="'ui/schemaEditor.html'"></div>
+				</div>
+			</div>
+			<div>
+				<form ng-submit="newSchemaProperty(newPropName)">
+					<input type="text" placeholder="Add a property" ng-model="newPropName"
+						title="Add a new property to the object schema"
+						required ng-trim="true" ng-blur="newPropName = ''">
+					<button type="submit" class="hidden" title="Adds a new property to the object schema">Add</button>
+				</form>
+			</div>
+		</td>
+	</tr>
+</table>
+<hr>

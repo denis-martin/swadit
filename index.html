@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html ng-app="SwaditApp" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Swadit (c) Denis Martin v0.10</title>
+	<script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
+	<script src="bower_components/angular/angular.min.js"></script>
+	<script src="bower_components/angular-ui-layout/src/ui-layout.js"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+	<script src="bower_components/angular-elastic/elastic.js"></script>
+	<script src="bower_components/angular-elastic-input/dist/angular-elastic-input.min.js"></script>
+	<script src="bower_components/angular-ui-ace/ui-ace.js"></script>
+	<script src="bower_components/swagger-parser/dist/swagger-parser.min.js" ng-if="!is_nwjs()" ></script>
+	<script src="node_modules/swagger-parser/dist/swagger-parser.min.js" ng-if="is_nwjs()" ></script>
+	<script src="src/httpStatusCodes.js"></script>
+	<script src="src/main.js"></script>
+	<script src="src/parameterCtrl.js"></script>
+	<script src="src/responseCtrl.js"></script>
+	<script src="src/methodCtrl.js"></script>
+	<script src="src/schemaCtrl.js"></script>
+	<script src="src/fileDialogCtrl.js"></script>
+	<script src="src/selectPathsByDialogCtrl.js"></script>
+	<script src="src/modifyPathsDialogCtrl.js"></script>
+	<link rel="stylesheet" href="bower_components/angular-ui-layout/src/ui-layout.css">
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<datalist id="mimeTypes">
+		<option>application/json</option>
+		<option>application/xml</option>
+		<option>application/x-www-form-urlencoded</option>
+		<option>multipart/form-data</option>
+	</datalist>
+	<div ui-layout="{dividerSize: 0}" ng-controller="SwaditController as Swadit">
+		<div ui-layout-container size="51px" class="navbar navbar-default paneHeaderContainer">
+			<ul class="nav navbar-nav">
+				<li><a href="#" ng-click="Swadit.uiNew();" title="Create a new file">New</a></li>
+				<li><a href="#" ng-click="Swadit.uiOpen();" title="Open a Swagger file">Open</a></li>
+				<li><a href="#" ng-click="Swadit.uiAdd();" title="Add a Swagger file to the currently opened one">Add</a></li>
+				<li><a href="#" ng-click="Swadit.uiSave();" title="Save the current Swagger file">Save</a></li>
+				<li><a href="#" ng-click="Swadit.uiSwagger();" title="Show and edit source">{...}</a></li>
+				<li><a href="#" ng-click="Swadit.uiSwaggerUi();" title="Preview in Swagger UI">Swagger UI</a></li>
+			</ul>
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#" ng-click="Swadit.showPanel('panelHeader')">
+					<span ng-show="Swadit.thinking.length>0">{{Swadit.thinking}}</span>
+					<span ng-hide="Swadit.thinking.length>0">
+						{{Swadit.api.info.title}} 
+						<span ng-show="Swadit.api.info.version != undefined && Swadit.api.info.version.length>0">v{{Swadit.api.info.version}}</span>
+					</span>
+				</a>
+			</div>
+			<!-- <p class="navbar-text navbar-right">{{Swadit.thinking}}</p> -->
+		</div>
+		<div ui-layout-container="central">
+			<div ui-layout="{flow: 'column'}">
+				<div ui-layout-container size="250px" class="paneLeftContainer">
+					<div class="paneLeft">
+						<ul class="unstyled-list">
+							<li ng-click="Swadit.showPanel('panelHeader')">
+								API Info
+								<div class="smallButton panelLeftSourceButton" 
+									ng-click="Swadit.uiSwagger('info:'); $event.stopPropagation();"
+									title="Show source">{...}</div>
+							</li>
+							<li ng-click="Swadit.showPanel('panelParameters')">
+								Parameters
+								<div class="smallButton panelLeftSourceButton" 
+									ng-click="Swadit.uiSwagger('parameters:'); $event.stopPropagation();"
+									title="Show source">{...}</div>
+							</li>
+							<li ng-click="Swadit.showPanel('panelResponses')">
+								Responses
+								<div class="smallButton panelLeftSourceButton" 
+									ng-click="Swadit.uiSwagger('responses:'); $event.stopPropagation();"
+									title="Show source">{...}</div>
+							</li>
+							<li ng-click="Swadit.showPanel('panelDefinitions')">
+								Definitions
+								<div class="smallButton panelLeftSourceButton" 
+									ng-click="Swadit.uiSwagger('definitions:'); $event.stopPropagation();"
+									title="Show source">{...}</div>
+							</li>
+							<li ng-click="Swadit.showPanel('panelPaths'); Swadit.activePath=null;">
+								<b>Paths</b>
+								<input type="search" title="Filter by path name" placeholder="Filter by path name" ng-model="Swadit.filterText['paths']">
+							</li>
+							<li ng-repeat="path in Swadit.getFilteredKeys('paths')" ng-init="methods=Swadit.api.paths[path]" style="cursor: auto;" 
+								ng-class="{'path-active': path==Swadit.activePath, 'path-selected': Swadit.selectedPaths[path] }">
+								<span ng-click="Swadit.showPanel('panelPaths'); Swadit.activePath=path;" style="cursor: pointer">{{path}}</span>
+								<div class="smallButton panelLeftSourceButton" 
+									ng-click="Swadit.activePath=path; Swadit.uiSwagger(path, 'paths'); $event.stopPropagation();"
+									title="Show source">{...}</div>
+								<br>
+								<span ng-repeat="(method, methodObj) in methods">
+									<span ng-if="method != 'parameters'" ng-click="Swadit.pathGoToMethod(path, method)" 
+										class="methodKey"
+										ng-class="methodObj.deprecated ? 'deprecated' : 'methodBgColor-'+method">{{method}}</span>
+								</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div ui-layout-container="central" class="paneMain">
+					<div id="panelSwagger" class="panelMain" ng-hide="!Swadit.isActivePanel('panelSwagger')">
+						<div ui-layout style="margin: 12px">
+							<div ui-layout-container="central">
+								<div ui-layout="{dividerSize: 0}" style="margin: 0">
+									<div ui-layout-container size="32px" class="panelMainHeader">
+										<span ng-class="swaggerModified ? 'button' : 'button discreet'" ng-click="Swadit.validateSwagger(true);" 
+											title="Applies the displayed YAML and refreshes the UI">
+											Commit</span>
+										<span ng-class="swaggerValidation=='' ? 'button' : 'button discreet'" ng-click="Swadit.validateSwagger();" 
+											title="Validates the displayed YAML">
+											Validate</span>
+										<span ng-show="swaggerModified">
+											YAML modified. Unless committed, changes will be lost if switching to another panel.</span>
+									</div>
+									<div ui-layout-container="central" >
+										<div ui-ace="{
+											useWrapMode : true,
+											showGutter: true,
+											theme: 'chrome',
+											mode: 'yaml',
+											firstLineNumber: 1,
+											showLineNumers: true,
+											showFoldWidgets: true,
+											onLoad: aceLoaded,
+											onChange: aceChanged
+										}" ng-model="apiAsString"></div>
+									</div>
+								</div>
+							</div>
+							<div ui-layout-container size="35px" class="panelMainFooter">
+								<span ng-hide="swaggerValidationError!=''" ng-class="swaggerValidationError=='' ? 'swaggerValidationOk' : 'swaggerValidationFailed'">
+									{{swaggerValidation}}</span>
+								<pre ng-hide="swaggerValidationError==''" class="validationErrorBox">{{swaggerValidationError}}</pre>
+							</div>
+						</div>
+					</div>
+
+					<div id="panelSwaggerUi" class="panelMain" ng-if="Swadit.isActivePanel('panelSwaggerUi')">
+						<div ui-layout style="margin: 12px">
+							<iframe ui-layout-container="central" src="swagger-ui/dist/index.html" width="100%" style="border: none"></iframe>
+						</div>
+					</div>
+
+					<div id="panelHeader" class="panelMain" ng-hide="!Swadit.isActivePanel('panelHeader')">
+						<table>
+							<tr>
+								<td class="label-text">title</td>
+								<td><input type="text" id="api-info-title" title="Required. The title of the application."
+									placeholder="Title of API (required)" ng-model="Swadit.api.info.title" required ng-trim="true" pu-elastic-input></td>
+							</tr>
+							<tr>
+								<td class="label-text">version</td>
+								<td><input type="text" id="api-info-version" title="Required. Provides the version of the application API (not to be confused with the specification version)."
+									placeholder="API Version (required)" ng-model="Swadit.api.info.version" required ng-trim="true"></td>
+							</tr>
+							<tr>
+								<td class="label-text">contact</td>
+								<td>
+									<input type="text" title="The identifying name of the contact person/organization."
+										placeholder="Name" ng-model="Swadit.api.info.contact.name" ng-trim="true" pu-elastic-input>
+									<input type="text" title="The email address of the contact person/organization. MUST be in the format of an email address."
+										placeholder="E-Mail" ng-model="Swadit.api.info.contact.email" ng-trim="true" pu-elastic-input>
+									<input type="text" title="The URL pointing to the contact information. MUST be in the format of a URL."
+										placeholder="URL" ng-model="Swadit.api.info.contact.url" ng-trim="true" pu-elastic-input>
+								</td>
+							</tr>
+							<tr>
+								<td class="label-text">description</td>
+								<td><textarea msd-elastic id="api-info-description" title="A short description of the application. GFM syntax can be used for rich text representation."
+									placeholder="API Description" cols="90" rows="1" ng-model="Swadit.api.info.description" ng-trim="true"></textarea></td>
+							</tr>
+							<tr>
+								<td class="label-text">terms of service</td>
+								<td><input type="text" title="The Terms of Service for the API."
+									placeholder="Terms of service" ng-model="Swadit.api.info.termsOfService" ng-trim="true"></td>
+							</tr>
+							<tr>
+								<td class="label-text">license</td>
+								<td>
+									<input type="text" title="The license name used for the API."
+										placeholder="Name of license" ng-model="Swadit.api.info.license.name" ng-trim="true" pu-elastic-input>
+									<input type="text" title="A URL to the license used for the API. MUST be in the format of a URL." 
+										placeholder="URL of license" ng-model="Swadit.api.info.license.url" ng-trim="true" pu-elastic-input>
+									<hr>
+								</td>
+							</tr>
+							<tr>
+								<td class="label-text">base path</td>
+								<td><input type="text" id="api-basePath" title="The base path on which the API is served, which is relative to the host. If it is not included, the API is served directly under the host. The value MUST start with a leading slash (/). The basePath does not support path templating."
+									placeholder="Base path of API" ng-model="Swadit.api.basePath" required ng-trim="true"></td>
+							</tr>
+							<tr>
+								<td class="label-text">host</td>
+								<td><input type="text" id="api-host" title="The host (name or ip) serving the API. This MUST be the host only and does not include the scheme nor sub-paths. It MAY include a port. If the host is not included, the host serving the documentation is to be used (including the port). The host does not support path templating."
+									placeholder="Host for API" ng-model="Swadit.api.host" ng-trim="true"></td>
+							</tr>
+							<tr>
+								<td class="label-text">consumes</td>
+								<td>
+									<div class="paddedText" ng-repeat="consume in Swadit.api.consumes">
+										{{consume}}
+										<span class="smallButton discreet" title="Deletes the MIME type" 
+											ng-click="Swadit.deleteConsume(consume)">Remove</span>
+									</div>
+									<form ng-submit="Swadit.newConsume(newConsumeType)">
+										<input type="text" list="mimeTypes" placeholder="Add MIME type" ng-model="newConsumeType"
+											title="Add a new MIME type"
+											required ng-trim="true" ng-blur="newConsumeType = ''">
+										<button type="submit" class="hidden" title="Add a new MIME type">Add</button>
+									</form>
+								</td>
+							</tr>
+							<tr>
+								<td class="label-text">produces</td>
+								<td>
+									<div class="paddedText" ng-repeat="produce in Swadit.api.produces">
+										{{produce}}
+										<span class="smallButton discreet" title="Deletes the MIME type" 
+											ng-click="Swadit.deleteProduce(produce)">Remove</span>
+									</div>
+									<form ng-submit="Swadit.newProduce(newProduceType)">
+										<input type="text" list="mimeTypes" placeholder="Add MIME type" ng-model="newProduceType"
+											title="Add a new MIME type"
+											required ng-trim="true" ng-blur="newProduceType = ''">
+										<button type="submit" class="hidden" title="Add a new MIME type">Add</button>
+									</form>
+								</td>
+							</tr>
+							<tr>
+								<td class="label-text">tags</td>
+								<td>
+									<div ng-repeat="tag in Swadit.api.tags">
+										<form>
+											<input type="text" title="Tag name" placeholder="Tag name" ng-model="tag.name" ng-trim="true" ng-enter="$event.target.blur()" required pu-elastic-input>
+											<input type="text" title="Tag description" placeholder="Tag description" ng-model="tag.description" ng-trim="true" pu-elastic-input>
+											<button type="submit" class="hidden">Rename</button>
+											<span class="smallButton discreet" title="Deletes tag" 
+												ng-click="Swadit.deleteTag(tag.name)">Remove</span>
+										</form>
+									</div>
+									<form ng-submit="Swadit.newTag(newTagType) ? newTagType='' : newTagType=newTagType">
+										<input type="text" placeholder="Add tag" ng-model="newTagType"
+											title="Add a tag"
+											required ng-trim="true" ng-blur="newTagType = ''">
+										<button type="submit" class="hidden">Add</button>
+									</form>
+									<hr>
+								</td>
+							</tr>
+							<tr>
+								<td class="label-text">external docs</td>
+								<td>
+									<input type="text" title="Description of external documentation" placeholder="Description of external documentation" ng-model="Swadit.api.externalDocs.description" ng-trim="true" pu-elastic-input>
+									<input type="text" title="URL for external documentation" placeholder="URL for external documentation" ng-model="Swadit.api.externalDocs.url" ng-trim="true" required pu-elastic-input>
+								</td>
+							</tr>
+						</table>
+					</div>
+
+					<div id="panelParameters" class="panelMain" ng-hide="!Swadit.isActivePanel('panelParameters')">
+						<div ui-layout="{dividerSize: 0}" style="margin: 12px">
+							<div ui-layout-container size="70px" class="panelMainHeader">
+								<form ng-submit="Swadit.newParameterDefinition(Swadit.newParamKey)">
+									<input type="text" title="Create a new parameter key" placeholder="Create a new parameter key here" 
+										ng-model="Swadit.newParamKey" ng-trim="true" ng-blur="Swadit.newParamKey=''">
+									<button type="submit" class="hidden" title="Creates a new parameter definition" >Create</button>
+								</form>
+								<hr>
+								<input type="search" title="Filter by key name" placeholder="Filter by key name" ng-model="Swadit.filterText['parameters']">
+								<input type="checkbox" title="Display in alphabetical order" ng-model="Swadit.filterSorted['parameters']">Display sorted
+							</div>
+							<div ui-layout-container="central">
+								<div class="panelMainContent">
+									<div ng-repeat="paramKey in Swadit.getFilteredKeys('parameters')" ng-init="param=Swadit.api.parameters[paramKey]; paramName=paramKey"
+										id="parameterContainer-{{paramKey}}">
+										<form ng-submit="renameParameterDefinition(paramKey, paramName)">
+											<span class="button discreet" title="Show source"
+												ng-click="Swadit.uiSwagger(paramKey, 'parameters');">{...}</span>
+											<span class="glyphbutton glyphicon glyphicon-remove" title="Deletes the parameter (references will NOT be deleted)" 
+												ng-click="Swadit.deleteParameterDefinition(paramKey)"></span>
+											<span class="glyphbutton glyphicon glyphicon-edit" title="Show/hide the details of the parameter definition" 
+												ng-click="visible?visible=false:visible=true"></span>
+											<input type="text" id="parameters-{{paramKey}}" ng-model="paramName" class="bigger"
+												title="Name of parameter key (to be used for $ref)" placeholder="Name of parameter key (to be used for $ref)" 
+												required ng-trim="true" ng-blur="renameParameterDefinition(paramKey, paramName)" pu-elastic-input>
+											<button type="submit" class="hidden" title="Renames the parameter (references will NOT be renamed)">Rename</button>
+											<span ng-click="visible?visible=false:visible=true" class="showPointer">
+												<span class="typePreview">in {{param.in}} ({{param.in!='body'?param.type:param.schema.type}})</span>
+												<span ng-if="(param.description!=undefined && param.description!='')">
+													{{param.description.length > 40 ? param.description.substr(0,39) + '...' : param.description}}
+												</span>
+											</span>
+										</form>
+										<span ng-controller="SwaditParameterDefinitionsController" ng-init="param = $parent.param; isRootDefinition = true">
+											<div ng-if="visible" ng-include src="'ui/parameterEditor.html'"></div>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="panelResponses" class="panelMain" ng-hide="!Swadit.isActivePanel('panelResponses')">
+						<div ui-layout="{dividerSize: 0}" style="margin: 12px">
+							<div ui-layout-container size="70px" class="panelMainHeader">
+								<form ng-submit="Swadit.newResponse(Swadit.newResponseKey)">
+									<input type="text" title="Create a new response key" placeholder="Create a new response key here" 
+										ng-model="Swadit.newResponseKey" ng-trim="true" ng-blur="Swadit.newResponseKey=''">
+									<button type="submit" class="hidden" title="Creates a new definition" >Create</button>
+								</form>
+								<hr>
+								<input type="search" title="Filter by key name" placeholder="Filter by key name" ng-model="Swadit.filterText['responses']">
+								<input type="checkbox" title="Display in alphabetical order" ng-model="Swadit.filterSorted['responses']">Display sorted
+							</div>
+							<div ui-layout-container="central">
+								<div class="panelMainContent">
+									<div ng-repeat="respKey in Swadit.getFilteredKeys('responses')" ng-init="responseDef=Swadit.api.responses[respKey]; respName=respKey"
+										id="responseContainer-{{respKey}}">
+										<form ng-submit="renameResponse(respKey, respName)">
+											<span class="button discreet" title="Show source"
+												ng-click="Swadit.uiSwagger(respKey, 'responses');">{...}</span>
+											<span class="glyphbutton glyphicon glyphicon-remove" title="Deletes the response definition (references will NOT be deleted)" 
+												ng-click="Swadit.deleteResponse(respKey)"></span>
+											<span class="glyphbutton glyphicon glyphicon-edit" title="Show/hide the details of the response" 
+												ng-click="visible?visible=false:visible=true"></span>
+											<input type="text" ng-model="respName" class="bigger"
+												title="Name of response key (to be used for $ref)" placeholder="Name of response key (to be used for $ref)" 
+												required ng-trim="true" ng-blur="renameResponse(respKey, respName)" pu-elastic-input>
+											<button type="submit" class="hidden" title="Renames the response key (references will NOT be renamed)">Rename</button>
+											<span class="showPointer" ng-click="visible?visible=false:visible=true">
+												<span ng-if="(responseDef.description!=undefined && responseDef.description!='')">
+													{{responseDef.description.length > 40 ? responseDef.description.substr(0,39) + '...' : responseDef.description}}
+												</span>
+											</span>
+										</form>
+										<span ng-controller="SwaditResponseDefinitionController" ng-init="responseDef = $parent.responseDef; $parent.visible = responseDef.description==undefined">
+											<div ng-if="visible" ng-include src="'ui/responseEditor.html'"></div>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="panelDefinitions" class="panelMain" ng-hide="!Swadit.isActivePanel('panelDefinitions')">
+						<div ui-layout="{dividerSize: 0}" style="margin: 12px">
+							<div ui-layout-container size="70px" class="panelMainHeader">
+								<form ng-submit="Swadit.newDefinition(Swadit.newDefinitionKey)">
+									<input type="text" title="Create a new definition key" placeholder="Create a new definition key here" 
+										ng-model="Swadit.newDefinitionKey" ng-trim="true" ng-blur="Swadit.newDefinitionKey=''">
+									<button type="submit" class="hidden" title="Creates a new definition" >Create</button>
+								</form>
+								<hr>
+								<input type="search" title="Filter by key name" placeholder="Filter by key name" ng-model="Swadit.filterText['definitions']">
+								<input type="checkbox" title="Display in alphabetical order" ng-model="Swadit.filterSorted['definitions']">Display sorted
+							</div>
+							<div ui-layout-container="central">
+								<div class="panelMainContent">
+									<div ng-repeat="defKey in Swadit.getFilteredKeys('definitions')" ng-init="schema=Swadit.api.definitions[defKey]; defName=defKey"
+										id="definitionContainer-{{defKey}}">
+										<form ng-submit="renameDefinition(defKey, defName)">
+											<span class="button discreet" title="Show source"
+												ng-click="Swadit.uiSwagger(defKey, 'definitions');">{...}</span>
+											<span class="glyphbutton glyphicon glyphicon-remove" title="Deletes the definition (references will NOT be deleted)" 
+												ng-click="Swadit.deleteDefinition(defKey)"></span>
+											<span class="glyphbutton glyphicon glyphicon-edit" title="Show/hide the details of the property" 
+												ng-click="visible?visible=false:visible=true"></span>
+											<input type="text" ng-model="defName" class="bigger"
+												title="Name of definition key (to be used for $ref)" placeholder="Name of definition key (to be used for $ref)" 
+												required ng-trim="true" ng-blur="renameDefinition(defKey, defName)" pu-elastic-input>
+											<button type="submit" class="hidden" title="Renames the definition key (references will NOT be renamed)">Rename</button>
+											<span class="showPointer" ng-click="visible?visible=false:visible=true">
+												<span class="typePreview">: {{schema.type}}</span>
+												<span ng-if="(schema.description!=undefined && schema.description!='')">
+													{{schema.description.length > 40 ? schema.description.substr(0,39) + '...' : schema.description}}
+												</span>
+											</span>
+										</form>
+										<span ng-controller="SwaditSchemaController" ng-init="schema = $parent.schema; isRootDefinition = true">
+											<div ng-if="visible" ng-include src="'ui/schemaEditor.html'"></div>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="panelPaths" class="panelMain" ng-hide="!Swadit.isActivePanel('panelPaths')">
+						<div ui-layout="{dividerSize: 0}" style="margin: 12px">
+							<div ui-layout-container size="112px" class="panelMainHeader">
+								<form ng-submit="Swadit.addPath(Swadit.newPath)">
+									<input type="text" title="Create a new path" placeholder="Create a new path here" ng-model="Swadit.newPath" ng-trim="true"
+										ng-blur="Swadit.newPath=''">
+									<button type="submit" class="hidden" title="Creates a new path" >Create</button>
+								</form>
+								<hr>
+								<input type="search" title="Filter by path name" placeholder="Filter by path name" ng-model="Swadit.filterText['paths']">
+								<input type="checkbox" title="Display in alphabetical order" ng-model="Swadit.filterSorted['paths']">Display sorted
+								<hr>
+								<div class="paddedText">
+									Select Paths ({{Swadit.getNumberOfSelectedPaths()}} selected):
+									<div class="btn-group">
+										<button type="button" class="btn btn-default btn-sm" ng-click="Swadit.selectAllPaths()">All</button>
+										<button type="button" class="btn btn-default btn-sm" ng-click="Swadit.deselectAllPaths()">None</button>
+										<button type="button" class="btn btn-default btn-sm" ng-click="Swadit.inverseSelectedPaths()">Invers</button>
+										<button type="button" class="btn btn-default btn-sm" ng-click="Swadit.uiSelectPathsBy()">By...</button>
+									</div>
+									<button type="button" class="btn btn-default btn-sm" ng-click="Swadit.deleteSelectedPaths()">Delete</button>
+									<button type="button" class="btn btn-default btn-sm" ng-click="Swadit.uiModifySelectedPaths()">Modify...</button>
+								</div>
+							</div>
+							<div ui-layout-container="central">
+								<div class="panelMainContent">
+									<div class="path" ng-repeat="path in Swadit.getFilteredKeys('paths')" ng-init="methods=Swadit.api.paths[path]; pathName=path" 
+										ng-class="{'path-active': path==Swadit.activePath, 'path-selected': Swadit.selectedPaths[path] }" id="pathContainer-{{path}}">
+										<form ng-submit="renamePath(path, pathName)">
+											<div style="float: left">
+												<input type="checkbox" ng-checked="Swadit.selectedPaths.hasOwnProperty(path)" 
+													ng-click="Swadit.changeSelectedPath(path, $event)">
+												<input type="text" id="path-{{path}}" ng-model="pathName" class="bigger" title="Path" placeholder="Path" 
+													required ng-trim="true" ng-blur="renamePath(path, pathName)" ng-click="Swadit.activePath=path;" pu-elastic-input>
+												<button type="submit" class="hidden" title="Renames (changes) the path">Rename</button>
+											</div>
+											<div style="float: right">
+												<span ng-repeat="method in Swadit.methods">
+													<input type="checkbox" ng-checked="Swadit.api.paths[path].hasOwnProperty(method)" ng-click="Swadit.changeMethodForPath(path, method, $event)">
+														<span class="methodKey" style="font-size: 100%" 
+															ng-click="Swadit.pathGoToMethod(path, method)"
+															ng-class="Swadit.api.paths[path][method].deprecated ? 'deprecated' : 'methodBgColor-'+method">
+															{{method}}</span>
+												</span>
+											</div>
+										</form>
+										<div style="clear: both"></div>
+									</div>
+									<div id="panelPathsBottom"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="panelMethod" class="panelMain" ng-hide="!Swadit.isActivePanel('panelMethod')">
+						<div ui-layout="{dividerSize: 0}" style="margin: 12px">
+							<div ui-layout-container size="40px" class="panelMainHeader">
+								<div class="methodPathHeader methodBorderColor-{{Swadit.activeMethod}}">
+									<span class="methodPathHeaderMethod methodBgColor-{{Swadit.activeMethod}}">
+										{{Swadit.activeMethod}}</span>
+									<span class="methodPathHeaderPath" ng-class="Swadit.api.paths[Swadit.activePath][Swadit.activeMethod].deprecated ? 'deprecated' : ''">
+										{{Swadit.activePath}}</span>
+									<span class="smallButton discreet panelLeftSourceButton" title="Show source"
+										ng-click="Swadit.uiSwagger(Swadit.activePath, 'paths', Swadit.activeMethod);">
+										{...}</span>
+								</div>
+							</div>
+							<div ui-layout-container="central">
+								<div class="panelMainContent">
+									<span ng-controller="SwaditMethodController">
+										<div ng-include src="'ui/methodEditor.html'"></div>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+  </body>
+</html>

@@ -1,0 +1,73 @@
+<table>
+	<tr ng-if="!isRootDefinition">
+		<td class="label-text">$ref</td>
+		<td>
+			<select ng-model="param.$ref" ng-change="inChanged('{{param.$ref}}', true)">
+				<option value="">(none)</option>
+				<option ng-repeat="(ref, param) in Swadit.api.parameters" value="#/parameters/{{ref}}">#/parameters/{{ref}}</option>
+			</select>
+		</td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '')">
+		<td class="label-text">name</td>
+		<td><input type="text" title="Name of parameter (required)" placeholder="Name of parameter (required)" ng-model="param.name" required ng-trim="true"></td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '')">
+		<td class="label-text">in</td>
+		<td>
+			<select ng-model="param.in" required ng-change="inChanged('{{param.in}}')">
+				<option value="path">path</option>
+				<option value="query">query</option>
+				<option value="header">header</option>
+				<option value="body">body</option>
+				<option value="formData">formData</option>
+			</select>
+		</td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '')">
+		<td class="label-text">description</td>
+		<td><textarea msd-elastic title="Description (optional)" placeholder="Description (optional)" cols="90" rows="1" class="parameterDescription" ng-model="param.description" ng-trim="true"></textarea></td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '')">
+		<td class="label-text">required</td>
+		<td><input type="checkbox" title="Is parameter required? Must be true for path parameters." ng-model="param.required"></td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '') && param.in != 'body'">
+		<td class="label-text">type</td>
+		<td>
+			<select ng-model="param.type">
+				<option value="string">string</option>
+				<option value="number">number</option>
+				<option value="integer">integer</option>
+				<option value="boolean">boolean</option>
+				<option value="array">array</option>
+				<option value="file">file</option>
+			</select>
+		</td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '') && param.in != 'body' && param.type != 'array'">
+		<td class="label-text">format</td>
+		<td><input type="text" title="Format of parameter (optional)" placeholder="Format of parameter (optional)" ng-model="param.format" ng-trim="true"></td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '') && param.in != 'body' && param.type == 'array'">
+		<td class="label-text">items</td>
+		<td>
+			<select ng-model="param.items.type">
+				<option value="string">string</option>
+				<option value="number">number</option>
+				<option value="integer">integer</option>
+				<option value="boolean">boolean</option>
+				<!-- option value="boolean">array</option --> <!-- not yet supported -->
+			</select>
+		</td>
+	</tr>
+	<tr ng-if="(param.$ref == undefined || param.$ref == '') && param.in == 'body'">
+		<td class="label-text">schema</td>
+		<td>
+			<span ng-controller="SwaditSchemaController" ng-init="schema = param.schema">
+				<div ng-include src="'ui/schemaEditor.html'"></div>
+			</span>
+		</td>
+	</tr>
+</table>
+<hr>

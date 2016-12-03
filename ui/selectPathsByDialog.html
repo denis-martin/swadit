@@ -1,0 +1,21 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Select paths by...</h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="form-group">
+        <label for="modalSelectPathByTag">Select by tag:</label>
+        <input type="text" id="modalSelectPathByTag" name="modalSelectPathByTag" class="form-control" placeholder="Enter tag name"
+            ng-model="tag">
+        Note: If at least one method of a path has this tag, the path will be selected. 
+    </div>
+    <div class="form-group">
+        <label for="modalSelectPathByName">Select by name:</label>
+        <textarea id="modalSelectPathByName" name="modalSelectPathByName" class="form-control" placeholder="Enter names here"
+            ng-model="names"></textarea>
+        Please enter one path per line. A path will be selected if it matches one of these paths. 
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>

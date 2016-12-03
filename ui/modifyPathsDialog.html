@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Modify paths...</h3>
+</div>
+<div class="modal-body" id="modal-body">
+    <div class="form-group">
+        <input type="checkbox" id="modalModifyRemoveAllTags" name="modalModifyRemoveAllTags" 
+            ng-model="removeAllTags">
+        <label for="modalModifyRemoveAllTags">Remove all tags</label>
+    </div>
+    <div class="form-group">
+        <label for="modalModifyAddTags">Add tags:</label>
+        <textarea id="modalModifyAddTags" name="modalModifyAddTags" class="form-control" placeholder="Enter one tag per line"
+            ng-model="tagsToAdd"></textarea>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+    <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+</div>
