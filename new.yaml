@@ -1,0 +1,12 @@
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: Hello World
+basePath: /v1
+paths:
+  /helloworld:
+    get:
+      summary: A Hello-World-Example
+      responses:
+        default:
+          description: Default response
