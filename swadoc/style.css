@@ -88,6 +88,14 @@ pre {
 		margin: 10mm 5mm 10mm 5mm;
 		padding: 0;
 	}
+
+	h1, h2, h3, h4, h5, h6 {
+		page-break-after: avoid;
+	}
+
+	.pathlistheading, .pathheading {
+		page-break-before: always;
+	}
 }
 
 .content {
