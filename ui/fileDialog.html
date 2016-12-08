@@ -4,6 +4,7 @@
 <div class="modal-body" id="modal-body">
     <p ng-if="dialogType=='fileOpen'"><input type="file" id="modalFileInput" name="modalFileInput"></p>
     <p ng-if="dialogType=='fileAdd'"><input type="file" id="modalFileInput" name="modalFileInput" multiple></p>
+    <p ng-if="dialogType=='fileAdd'"><input type="checkbox" ng-model="$parent.Swadit.addSource"> Add source file name to path descriptions</p>
     <p ng-if="dialogType=='fileSave'">Click to save Swagger file: <a download="swagger.yaml" ng-href="{{ downloadUrl }}">swagger.yaml</a></p>
     <p ng-if="modalHint!=''" ng-style="modalHintType=='error' && { color: 'red'}">{{modalHint}}</p>
 </div>

@@ -3,6 +3,7 @@ SwaditApp.controller('SwaditUiFileDialogController', function ($scope, $uibModal
 {
 	$scope.dialogType = dialogType;
 	$scope.downloadUrl = Swadit.downloadUrl; // global definition for releasing blob-URL
+	$scope.Swadit = Swadit;
 
 	if (dialogType == "fileOpen") {
 		$scope.modalTitle = "Open Swagger File";

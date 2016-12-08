@@ -34,6 +34,7 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 	Swadit.parser = new SwaggerParser();
 	Swadit.downloadUrl = '';
 	Swadit.blob = null;
+	Swadit.addSource = true;
 	
 	Swadit.uiNew = function() 
 	{
@@ -327,17 +328,17 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 	Swadit.addFile = function(pathName, fobj)
 	{
 		Swadit.thinking = "Loading file...";
-		console.log("addFile", fobj);
+		console.log("addFile", pathName, fobj);
 		if (pathName) {
 			SwaggerParser.parser.parse(pathName)
-				.then(Swadit.mergeSwagger)
+				.then(function(api) { return Swadit.mergeSwagger(api, fobj.name); })
 				.catch(Swadit.swaggerLoadingError);
 		} else {
 			var reader = new FileReader();
 			reader.onload = function(e) {
 				try {
 					SwaggerParser.parse(YAML.parse(e.target.result))
-						.then(Swadit.mergeSwagger)
+						.then(function(api) { return Swadit.mergeSwagger(api, fobj.name); })
 						.catch(Swadit.swaggerLoadingError);
 				} catch (ex) {
 					console.log("addFile ex", fobj);
@@ -366,9 +367,9 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 			Swadit.showText();
 	}
 
-	Swadit.mergeSwagger = function(api)
+	Swadit.mergeSwagger = function(api, sourceName)
 	{
-		console.log("success (add)");
+		console.log("mergeSwagger", api, sourceName);
 		Swadit.thinking = "";
 
 		var addedPath = [];
@@ -391,6 +392,16 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 					console.log("Adding " + element);
 					Swadit.api.paths[element] = api.paths[element];
 					addedPath.push(element);
+				}
+				if (Swadit.addSource && sourceName) {
+					angular.forEach(Swadit.api.paths[element], function(v, k) {
+						if (k != "parameters") {
+							if (!v.description) {
+								v.description = "";
+							}
+							v.description = "Source: " + sourceName + "\n\n" + v.description;
+						}
+					});
 				}
 				Swadit.selectedPaths[element] = true;
 			});
