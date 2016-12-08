@@ -26,7 +26,9 @@
     "angular-elastic-input": "^2.4.0",
     "bootstrap": "^3.3.7",
     "angular-bootstrap": "^2.1.4",
-    "swagger-parser": "^3.4.1",
-    "angular-ui-layout": "^1.4.2"
+    "swagger-parser": "v4.0.0-beta.2",
+    "angular-ui-layout": "^1.4.2",
+    "angular-sanitize": "^1.5.9",
+    "angular-marked": "^1.2.2"
   }
 }

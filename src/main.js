@@ -12,7 +12,7 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 .controller('SwaditController', function($scope, $uibModal, $anchorScroll, $location, $timeout, $window) // root controller
 {
 	Swadit = this;
-	Swadit.version = '0.10';
+	Swadit.version = '0.11';
 	Swadit.thinking = "Loading...";
 	Swadit.methods = ['get', 'post', 'put', 'delete'];
 	Swadit.api = { info: { title: "Swadit" } };
@@ -33,6 +33,7 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 
 	Swadit.parser = new SwaggerParser();
 	Swadit.downloadUrl = '';
+	Swadit.blob = null;
 	
 	Swadit.uiNew = function() 
 	{
@@ -176,6 +177,12 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 		Swadit.showPanel('panelSwaggerUi');
 	}
 
+	Swadit.uiSwadoc = function() 
+	{
+		Swadit.createDownloadUrl();
+		Swadit.showPanel('panelSwadoc');
+	}
+
 	Swadit.uiSelectPathsBy = function() 
 	{
 		var modalInstance = $uibModal.open({
@@ -287,11 +294,11 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 	{
 		this.cleanUp();
 		var content = YAML.stringify(JSON.parse(angular.toJson(this.api))); // need to remove angular's private variables
-		var blob = new Blob([ content ], { type : 'text/plain' });
+		Swadit.blob = new Blob([ content ], { type : 'text/plain' });
 		if (Swadit.downloadUrl != '') {
 			(window.URL || window.webkitURL).revokeObjectURL(Swadit.downloadUrl);
 		}
-		Swadit.downloadUrl = (window.URL || window.webkitURL).createObjectURL(blob);
+		Swadit.downloadUrl = (window.URL || window.webkitURL).createObjectURL(Swadit.blob);
 		console.log("Download URL: " + Swadit.downloadUrl);
 	}
 
@@ -980,8 +987,6 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 		var api = JSON.parse(angular.toJson(this.api)); // need to remove angular's private variables
 		
 		$scope.apiAsString = YAML.stringify(api);
-
-		console.log(api);
 
 		Swadit.thinking = "Validating file...";
 		SwaggerParser.validate(api)

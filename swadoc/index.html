@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html ng-app="SwadocApp" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Swadoc (c) Denis Martin v0.1</title>
+	<script src="highlight/highlight.pack.js"></script>
+	<script src="../bower_components/angular/angular.min.js"></script>
+	<script src="../bower_components/angular-sanitize/angular-sanitize.js"></script>
+	<script src="../bower_components/marked/lib/marked.js"></script>
+	<script src="../bower_components/angular-marked/dist/angular-marked.js"></script>
+	<script src="../bower_components/swagger-parser/dist/swagger-parser.min.js" ng-if="!is_nwjs()" ></script>
+	<script src="../node_modules/swagger-parser/dist/swagger-parser.min.js" ng-if="is_nwjs()" ></script>
+	<script src="code.js"></script>
+	<link rel="stylesheet" href="highlight/styles/default.css">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body ng-controller="SwadocController as Swadoc">
+
+<h1 ng-if="Swadoc.thinking">{{Swadoc.thinking}}</h1>
+
+<div class="content" ng-if="!Swadoc.thinking">
+
+<a class="no-print" href="#" ng-click="Swadoc.print()">Print</a>
+
+<h1>{{Swadoc.api.info.title}}</h1>
+<p>Version: {{Swadoc.api.info.version}}</p>
+<p>Contact: <a href="mailto:{{Swadoc.api.info.contact.email}}">{{Swadoc.api.info.contact.name}}</a></p>
+
+<h2>Introduction</h2>
+<div marked="Swadoc.api.info.description"></div>
+
+<h2>Paths</h2>
+<p>This API supports {{Swadoc.getLength(Swadoc.api.paths)}} paths:</p>
+<table class="pathlist">
+	<tbody>
+		<tr ng-repeat="path in Swadoc.getSortedKeys('paths')">
+			<td>{{path}}</td>
+		</tr>
+	</tbody>
+</table>
+
+<div ng-repeat="path in Swadoc.getSortedKeys('paths')" ng-init="methods = Swadoc.api.paths[path]">
+	<h3 class="pathheading">{{path}}</h3>
+	<p>
+		This path supports the following methods:
+		<span ng-repeat="(method, methodObj) in methods">
+			<span ng-if="method != 'parameters'" class="methodkey" ng-class="methodObj.deprecated ? 'deprecated' : 'methodhighlight-'+method">{{method}}</span>
+		</span>
+	</p>
+	<div ng-repeat="(method, methodObj) in methods" 
+		ng-init="body = Swadoc.getRequestBody(path, method); consumes = Swadoc.getConsumes(path, method); produces = Swadoc.getProduces(path, method)">
+		<div ng-if="method != 'parameters'">
+			<h4 class="methodheading" ng-class="methodObj.deprecated ? 'deprecated' : 'methodhighlight-'+method">
+				<span class="methodkey methodhighlight-{{method}}">{{method}}</span> {{path}}</h4>
+			<div marked="methodObj.summary"></div>
+
+			<h5 ng-if="methodObj.description">Description</h5>
+			<div marked="methodObj.description"></div>
+
+			<h5>Parameters</h5>
+			<table>
+				<thead>
+					<th>Name</th>
+					<th>Type</th>
+					<th>Description</th>
+				</thead>
+				<tbody>
+					<tr ng-repeat="param in Swadoc.getParameters(path, method)">
+						<td ng-if="param.in != 'body'">
+							{{param.name}}<br>
+							<span class="paramproperties">in {{param.in}}<span ng-if="param.required">, required</span><span>
+						</td>
+						<td ng-if="param.in != 'body'" class="type">{{param.type}}</td>
+						<td ng-if="param.in != 'body'">
+							<div marked="param.description"></div>
+							<p ng-if="param.default">Default: <span ng-if="param.type=='string'">"</span>{{param.default}}<span ng-if="param.type=='string'">"</span></p>
+							<p ng-if="param.example">Example: <span ng-if="param.type=='string'">"</span>{{param.example}}<span ng-if="param.type=='string'">"</span></p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div ng-if="body">
+				<h5>Request Body <span ng-repeat="consume in consumes">({{consume}}) </span></h5>
+				<div marked="body.description"></div>
+				<p>Schema: {{body.schema.type}}</p>
+				<div marked="body.schema.description"></div>
+				<div ng-if="body.schema && (body.schema.type=='object' || body.schema.type=='array')">
+					<table>
+						<colgroup>
+							<col style="width:38%">
+							<col style="width:12%">
+							<col style="width:50%">
+						</colgroup>  
+						<thead>
+							<th>Property</th>
+							<th>Type</th>
+							<th>Description</th>
+						</thead>
+						<tbody ng-controller="SwadocSchemaController" ng-init="schema = body.schema; flattenObject(schema, 0)">
+							<tr ng-repeat="p in flatProperties track by $index">
+								<td class="propertycell">
+									<span ng-if="p.level>1">
+										<span ng-repeat="i in getCountArray(p.level-1) track by $index" class="indent">&nbsp;<!-- &#9474; --></span>
+									</span>
+									<span ng-if="p.level>0">&#9493;<!-- &#9500; --></span> 
+									{{p.prop}}
+									<span ng-if="p.required"><br>
+										<span class="paramproperties">
+											<span ng-repeat="i in getCountArray(p.level) track by $index" class="indent">&nbsp;</span>
+											required
+										</span>
+									</span>
+								</td>
+								<td class="type">{{p.def.type}} <span ng-if="p.def.type=='array'">({{p.def.items.type}})</span></td>
+								<td>
+									<div marked="p.def.description"></div>
+									<p ng-if="p.def.default">Default: <span ng-if="p.def.type=='string'">"</span>{{p.def.default}}<span ng-if="p.def.type=='string'">"</span></p>
+									<p ng-if="p.def.example">Example: <span ng-if="p.def.type=='string'">"</span>{{p.def.example}}<span ng-if="p.def.type=='string'">"</span></p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<h5>Responses</h5>
+			<div class="responsebox" ng-repeat="(resp, respObj) in methodObj.responses">
+				<h6 class="responseheading">{{resp}}: {{respObj.description}} </h6>
+				<p ng-if="respObj.schema">Schema: {{respObj.schema.type}}</p>
+				<div marked="respObj.schema.description"></div>
+				<div ng-if="respObj.schema && (respObj.schema.type=='object' || respObj.schema.type=='array')">
+					<table>
+						<colgroup>
+							<col style="width:38%">
+							<col style="width:12%">
+							<col style="width:50%">
+						</colgroup> 
+						<thead>
+							<th>Property</th>
+							<th>Type</th>
+							<th>Description</th>
+						</thead>
+						<tbody ng-controller="SwadocSchemaController" ng-init="schema = respObj.schema; flattenObject(schema, 0)">
+							<tr ng-repeat="p in flatProperties track by $index">
+								<td class="propertycell">
+									<span ng-if="p.level>1">
+										<span ng-repeat="i in getCountArray(p.level-1) track by $index" class="indent">&nbsp;<!-- &#9474; --></span>
+									</span>
+									<span ng-if="p.level>0">&#9493;<!-- &#9500; --></span> 
+									{{p.prop}}
+									<span ng-if="p.required"><br>
+										<span class="paramproperties">
+											<span ng-repeat="i in getCountArray(p.level) track by $index" class="indent">&nbsp;</span>
+											required
+										</span>
+									</span>
+								</td>
+								<td class="type">{{p.def.type}} <span ng-if="p.def.type=='array'">({{p.def.items.type}})</span></td>
+								<td>
+									<div marked="p.def.description"></div>
+									<p ng-if="p.def.default">Default: <span ng-if="p.def.type=='string'">"</span>{{p.def.default}}<span ng-if="p.def.type=='string'">"</span></p>
+									<p ng-if="p.def.example">Example: <span ng-if="p.def.type=='string'">"</span>{{p.def.example}}<span ng-if="p.def.type=='string'">"</span></p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+</div>
+
+</div>
+
+</body>
+</html>

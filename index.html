@@ -2,7 +2,7 @@
 <html ng-app="SwaditApp" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>Swadit (c) Denis Martin v0.10</title>
+	<title>Swadit (c) Denis Martin v0.11</title>
 	<script src="bower_components/ace-builds/src-min-noconflict/ace.js"></script>
 	<script src="bower_components/angular/angular.min.js"></script>
 	<script src="bower_components/angular-ui-layout/src/ui-layout.js"></script>
@@ -41,6 +41,7 @@
 				<li><a href="#" ng-click="Swadit.uiSave();" title="Save the current Swagger file">Save</a></li>
 				<li><a href="#" ng-click="Swadit.uiSwagger();" title="Show and edit source">{...}</a></li>
 				<li><a href="#" ng-click="Swadit.uiSwaggerUi();" title="Preview in Swagger UI">Swagger UI</a></li>
+				<li><a href="#" ng-click="Swadit.uiSwadoc();" title="Generate documentation">Swadoc</a></li>
 			</ul>
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#" ng-click="Swadit.showPanel('panelHeader')">
@@ -143,6 +144,12 @@
 					<div id="panelSwaggerUi" class="panelMain" ng-if="Swadit.isActivePanel('panelSwaggerUi')">
 						<div ui-layout style="margin: 12px">
 							<iframe ui-layout-container="central" src="swagger-ui/dist/index.html" width="100%" style="border: none"></iframe>
+						</div>
+					</div>
+
+					<div id="panelSwadoc" class="panelMain" ng-if="Swadit.isActivePanel('panelSwadoc')">
+						<div ui-layout style="margin: 0">
+							<iframe ui-layout-container="central" src="swadoc/index.html" width="100%" style="border: none"></iframe>
 						</div>
 					</div>
 
