@@ -167,6 +167,61 @@ angular.module('SwadocApp', ['ngSanitize', 'hc.marked'])
 			}
 		});
 	}
+
+	$scope.getExample = function(schema, noReadOnly)
+	{
+		var res;
+		if (schema.type == "string") {
+			if (schema.example) {
+				res = schema.example;
+			} else if (schema.default) {
+				res = schema.default;
+			} else {
+				res = "string";
+			}
+		} else if (schema.type == "boolean") {
+			if (schema.example) {
+				res = schema.example;
+			} else if (schema.default) {
+				res = schema.default;
+			} else {
+				res = false;
+			}
+		} else if (schema.type == "number" || schema.type == "integer") {
+			if (schema.example) {
+				res = schema.example;
+			} else if (schema.default) {
+				res = schema.default;
+			} else {
+				res = 0;
+			}
+		} else if (schema.type == "array") {
+			if (schema.example) {
+				res = schema.example;
+			} else if (schema.default) {
+				res = schema.default;
+			} else {
+				res = [ $scope.getExample(schema.items, noReadOnly) ];
+			}
+		} else if (schema.type == "object") {
+			if (schema.example) {
+				res = schema.example;
+			} else if (schema.default) {
+				res = schema.default;
+			} else {
+				res = {};
+				angular.forEach(schema.properties, function(v, k) {
+					res[k] = $scope.getExample(v, noReadOnly);
+				});
+			}
+		}
+		return res;
+	}
+
+	$scope.getExampleMarked = function(schema, noReadOnly)
+	{
+		return "```json\n" + JSON.stringify($scope.getExample(schema, noReadOnly), null, 2) + "\n```";
+	}
 })
 
 .config(

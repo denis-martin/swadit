@@ -83,9 +83,11 @@
 			<div ng-if="body">
 				<h5>Request Body <span ng-repeat="consume in consumes">({{consume}}) </span></h5>
 				<div marked="body.description"></div>
-				<p>Schema: {{body.schema.type}}</p>
+				<p>Schema: {{body.schema.type}} <span ng-if="body.schema.type=='array'">({{body.schema.items.type}})</span></p>
 				<div marked="body.schema.description"></div>
-				<div ng-if="body.schema && (body.schema.type=='object' || body.schema.type=='array')">
+				<div ng-if="body.schema && (body.schema.type=='object' || (body.schema.type=='array' && body.schema.items.type=='object'))"
+					 ng-controller="SwadocSchemaController" 
+					 ng-init="schema = body.schema.type=='object' ? body.schema : body.schema.items; flattenObject(schema, 0)">
 					<table>
 						<colgroup>
 							<col style="width:38%">
@@ -97,7 +99,7 @@
 							<th>Type</th>
 							<th>Description</th>
 						</thead>
-						<tbody ng-controller="SwadocSchemaController" ng-init="schema = body.schema; flattenObject(schema, 0)">
+						<tbody>
 							<tr ng-repeat="p in flatProperties track by $index">
 								<td class="propertycell">
 									<span ng-if="p.level>1">
@@ -121,15 +123,19 @@
 							</tr>
 						</tbody>
 					</table>
+					<p>Example:</p>
+					<div marked="getExampleMarked(body.schema)"></div>
 				</div>
 			</div>
 
 			<h5>Responses</h5>
 			<div class="responsebox" ng-repeat="(resp, respObj) in methodObj.responses">
 				<h6 class="responseheading">{{resp}}: {{respObj.description}} </h6>
-				<p ng-if="respObj.schema">Schema: {{respObj.schema.type}}</p>
+				<p ng-if="respObj.schema">Schema: {{respObj.schema.type}} <span ng-if="respObj.schema.type=='array'">({{respObj.schema.items.type}})</span></p>
 				<div marked="respObj.schema.description"></div>
-				<div ng-if="respObj.schema && (respObj.schema.type=='object' || respObj.schema.type=='array')">
+				<div ng-if="respObj.schema && (respObj.schema.type=='object' || (respObj.schema.type=='array' && respObj.schema.items.type=='object'))"
+					 ng-controller="SwadocSchemaController" 
+					 ng-init="schema = respObj.schema.type=='object' ? respObj.schema : respObj.schema.items; flattenObject(schema, 0)">
 					<table>
 						<colgroup>
 							<col style="width:38%">
@@ -141,7 +147,7 @@
 							<th>Type</th>
 							<th>Description</th>
 						</thead>
-						<tbody ng-controller="SwadocSchemaController" ng-init="schema = respObj.schema; flattenObject(schema, 0)">
+						<tbody>
 							<tr ng-repeat="p in flatProperties track by $index">
 								<td class="propertycell">
 									<span ng-if="p.level>1">
@@ -165,6 +171,8 @@
 							</tr>
 						</tbody>
 					</table>
+					<p>Example:</p>
+					<div marked="getExampleMarked(respObj.schema)"></div>
 				</div>
 			</div>
 		</div>
