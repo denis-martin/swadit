@@ -12,7 +12,7 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 .controller('SwaditController', function($scope, $uibModal, $anchorScroll, $location, $timeout, $window) // root controller
 {
 	Swadit = this;
-	Swadit.version = '0.12';
+	Swadit.version = '0.13';
 	Swadit.thinking = "Loading...";
 	Swadit.methods = ['get', 'post', 'put', 'delete'];
 	Swadit.api = { info: { title: "Swadit" } };
