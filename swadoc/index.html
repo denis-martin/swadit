@@ -29,18 +29,22 @@
 <h2>Introduction</h2>
 <div marked="Swadoc.api.info.description"></div>
 
-<h2 class="pathlistheading">Paths</h2>
+<h2 class="pathlistheading"><a name="pathlist">Paths</a></h2>
 <p>This API supports {{Swadoc.getLength(Swadoc.api.paths)}} paths:</p>
 <table class="pathlist">
 	<tbody>
 		<tr ng-repeat="path in Swadoc.getSortedKeys('paths')">
-			<td>{{path}}</td>
+			<td><a ng-href="#{{Swadoc.getPathAnchor(path)}}">{{path}}</a></td>
 		</tr>
 	</tbody>
 </table>
 
 <div ng-repeat="path in Swadoc.getSortedKeys('paths')" ng-init="methods = Swadoc.api.paths[path]">
-	<h3 class="pathheading">{{path}}</h3>
+	
+	<h3 class="pathheading">
+		<a name="{{Swadoc.getPathAnchor(path)}}">{{path}}</a>
+		<a href="#pathlist" style="float: right; font-size: 80%; text-decoration: none; color: inherit">&#9776;&nbsp;</a>
+	</h3>
 	<p>
 		This path supports the following methods:
 		<span ng-repeat="(method, methodObj) in methods">
@@ -57,28 +61,30 @@
 			<h5 ng-if="methodObj.description">Description</h5>
 			<div marked="methodObj.description"></div>
 
-			<h5>Parameters</h5>
-			<table>
-				<thead>
-					<th>Name</th>
-					<th>Type</th>
-					<th>Description</th>
-				</thead>
-				<tbody>
-					<tr ng-repeat="param in Swadoc.getParameters(path, method)">
-						<td ng-if="param.in != 'body'">
-							{{param.name}}<br>
-							<span class="paramproperties">in {{param.in}}<span ng-if="param.required">, required</span><span>
-						</td>
-						<td ng-if="param.in != 'body'" class="type">{{param.type}}</td>
-						<td ng-if="param.in != 'body'">
-							<div marked="param.description"></div>
-							<p ng-if="param.default">Default: <span ng-if="param.type=='string'">"</span>{{param.default}}<span ng-if="param.type=='string'">"</span></p>
-							<p ng-if="param.example">Example: <span ng-if="param.type=='string'">"</span>{{param.example}}<span ng-if="param.type=='string'">"</span></p>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+			<div ng-if="Swadoc.hasParameters(path, method)">
+				<h5>Parameters</h5>
+				<table>
+					<thead>
+						<th>Name</th>
+						<th>Type</th>
+						<th>Description</th>
+					</thead>
+					<tbody>
+						<tr ng-repeat="param in Swadoc.getParameters(path, method)">
+							<td ng-if="param.in != 'body'">
+								{{param.name}}<br>
+								<span class="paramproperties">in {{param.in}}<span ng-if="param.required">, required</span><span>
+							</td>
+							<td ng-if="param.in != 'body'" class="type">{{param.type}}</td>
+							<td ng-if="param.in != 'body'">
+								<div marked="param.description"></div>
+								<p ng-if="param.default">Default: <span ng-if="param.type=='string'">"</span>{{param.default}}<span ng-if="param.type=='string'">"</span></p>
+								<p ng-if="param.example">Example: <span ng-if="param.type=='string'">"</span>{{param.example}}<span ng-if="param.type=='string'">"</span></p>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
 			<div ng-if="body">
 				<h5>Request Body <span ng-repeat="consume in consumes">({{consume}}) </span></h5>
@@ -115,7 +121,7 @@
 									</span>
 								</td>
 								<td class="type">{{p.def.type}} <span ng-if="p.def.type=='array'">({{p.def.items.type}})</span></td>
-								<td>
+								<td style="padding-bottom: 0">
 									<div marked="p.def.description"></div>
 									<p ng-if="p.def.default">Default: <span ng-if="p.def.type=='string'">"</span>{{p.def.default}}<span ng-if="p.def.type=='string'">"</span></p>
 									<p ng-if="p.def.example">Example: <span ng-if="p.def.type=='string'">"</span>{{p.def.example}}<span ng-if="p.def.type=='string'">"</span></p>
@@ -123,7 +129,7 @@
 							</tr>
 						</tbody>
 					</table>
-					<p>Example:</p>
+					<p>Request Body Example:</p>
 					<div marked="getExampleMarked(body.schema)"></div>
 				</div>
 			</div>
@@ -171,7 +177,7 @@
 							</tr>
 						</tbody>
 					</table>
-					<p>Example:</p>
+					<p>Response Body Example:</p>
 					<div marked="getExampleMarked(respObj.schema)"></div>
 				</div>
 			</div>

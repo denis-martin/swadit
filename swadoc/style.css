@@ -67,9 +67,13 @@ th {
 	text-align: left;
 }
 
+td {
+	vertical-align: top;
+	padding-bottom: -0.6em;
+}
+
 td p {
-	margin-top: 0.2em;
-	margin-bottom: 0.2em;
+	margin: 0 0 6px 0;
 }
 
 pre {
@@ -186,4 +190,9 @@ h4 .methodkey {
 
 .requiredtag {
 	color: red;
+}
+
+.pathlist a {
+	text-decoration: none;
+	color: inherit;
 }

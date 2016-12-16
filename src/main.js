@@ -12,7 +12,7 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 .controller('SwaditController', function($scope, $uibModal, $anchorScroll, $location, $timeout, $window) // root controller
 {
 	Swadit = this;
-	Swadit.version = '0.11';
+	Swadit.version = '0.12';
 	Swadit.thinking = "Loading...";
 	Swadit.methods = ['get', 'post', 'put', 'delete'];
 	Swadit.api = { info: { title: "Swadit" } };
@@ -35,6 +35,10 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 	Swadit.downloadUrl = '';
 	Swadit.blob = null;
 	Swadit.addSource = true;
+	Swadit.filesToAdd = {};
+	Swadit.filesToAddIndex = 0;
+	
+	document.title = "Swadit (c) Denis Martin v" + Swadit.version;
 	
 	Swadit.uiNew = function() 
 	{
@@ -94,8 +98,11 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 		modalInstance.result.then(function (files) {
 			console.log('uiAdd ', files);
 			Swadit.selectedPaths = {};
-			angular.forEach(files, f => Swadit.addFile(null, f));
-			Swadit.activePanel = 'panelHeader';
+			Swadit.filesToAddIndex = 0;
+			Swadit.filesToAdd = files;
+			Swadit.addFile(null, Swadit.filesToAdd[Swadit.filesToAddIndex]);
+			//angular.forEach(files, f => Swadit.addFile(null, f));
+			//Swadit.activePanel = 'panelHeader';
 		}, function () {
 			// cancel
 		});
@@ -306,6 +313,7 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 	Swadit.openFile = function(pathName, fobj)
 	{
 		Swadit.thinking = "Loading file...";
+		Swadit.api = {};
 		if (pathName) {
 			SwaggerParser.parse(pathName)
 				.then(Swadit.swaggerLoaded)
@@ -352,8 +360,16 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 	Swadit.swaggerLoadingError = function(err)
 	{
 		alert("Error loading YAML: " + err);
-		Swadit.thinking = "";
 		console.log("error loading yaml: ", err)
+		
+		var currentApi = Swadit.api;
+		Swadit.api = { info: { title: "Loading file..." } };
+		$scope.$apply();
+		$timeout(function() {
+			Swadit.api = currentApi;
+			if (Swadit.activePanel == "panelSwagger")
+				Swadit.showText();
+		}, 0);
 	}
 
 	Swadit.swaggerLoaded = function(api)
@@ -446,10 +462,23 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 			console.log("Replaced definitions", replacedDefinitions);
 			console.log("Added definitions", addedDefinitions);
 		}
-
-		$scope.$apply();
-		if (Swadit.activePanel == "panelSwagger")
-			Swadit.showText();
+		
+		Swadit.filesToAddIndex++;
+		if (Swadit.filesToAddIndex < Swadit.filesToAdd.length) {
+			Swadit.addFile(null, Swadit.filesToAdd[Swadit.filesToAddIndex]);
+			
+		} else {
+			Swadit.filesToAdd = {};
+			
+			var currentApi = Swadit.api;
+			Swadit.api = { info: { title: "Loading file..." } };
+			$scope.$apply();
+			$timeout(function() { 
+				Swadit.api = currentApi;
+				if (Swadit.activePanel == "panelSwagger")
+					Swadit.showText();
+			}, 0);
+		}
 	}
 	
 	Swadit.newParameterDefinition = function(paramKey)

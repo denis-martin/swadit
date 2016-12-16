@@ -93,7 +93,32 @@ angular.module('SwadocApp', ['ngSanitize', 'hc.marked'])
 
 		return newArray;
 	}
+	
+	Swadoc.getPathAnchor = function(path)
+	{
+		return path.replace(/\//g, "-");
+	}
 
+	Swadoc.hasParameters = function(path, method)
+	{
+		var param = 0;
+		if (Swadoc.api.paths[path].parameters) {
+			angular.forEach(Swadoc.api.paths[path].parameters, function(v, k) {
+				if (v.in != body) {
+					param += 1;
+				}
+			});
+		}
+		if (Swadoc.api.paths[path][method].parameters) {
+			angular.forEach(Swadoc.api.paths[path][method].parameters, function(v, k) {
+				if (v.in != body) {
+					param += 1;
+				}
+			});
+		}
+		return (param > 0);
+	}
+	
 	Swadoc.getParameters = function(path, method)
 	{
 		var newArray = [];
@@ -227,7 +252,7 @@ angular.module('SwadocApp', ['ngSanitize', 'hc.marked'])
 .config(
 	['$compileProvider', function ($compileProvider) {
 		// whitelist blob:// URLs
-		$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob):/);
+		$compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|tel|file|blob|chrome-extension):/);
 	}]
 )
 
