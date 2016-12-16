@@ -20,6 +20,8 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 	Swadit.activePanel = 'panelHeader';
 	Swadit.activePath = '';
 	Swadit.activeMethod = '';
+	Swadit.lastSwaditPanel = Swadit.activePanel;
+	Swadit.swaditPanels = [ 'panelHeader', 'panelParameters', 'panelResponses', 'panelDefinitions', 'panelPaths', 'panelMethod' ]
 	
 	Swadit.newParamKey = '';
 	Swadit.newDefinitionKey = '';
@@ -139,8 +141,21 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 		});
 	}
 
+	Swadit.uiSwadit = function()
+	{
+		if (Swadit.lastSwaditPanel) {
+			Swadit.activePanel = Swadit.lastSwaditPanel;
+		} else {
+			Swadit.activePanel = 'panelHeader';
+			Swadit.lastSwaditPanel = Swadit.activePanel;
+		}
+	}
+
 	Swadit.uiSwagger = function(lineSearch, section, subsection)
 	{
+		if (Swadit.swaditPanels.indexOf(Swadit.activePanel) > -1) {
+			Swadit.lastSwaditPanel = Swadit.activePanel;
+		}
 		if (Swadit.activePanel  != 'panelSwagger') {
 			Swadit.activePanel = 'panelSwagger';
 			Swadit.showText();
@@ -176,19 +191,40 @@ var SwaditApp = angular.module('SwaditApp', ['ui.layout', 'ui.bootstrap', 'monos
 					});
 				}
 			}, 0);
+		} else if (Swadit.activePath) {
+			Swadit.uiSwagger(Swadit.activePath, 'paths')
 		}
 	}
 
 	Swadit.uiSwaggerUi = function() 
 	{
+		if (Swadit.swaditPanels.indexOf(Swadit.activePanel) > -1) {
+			Swadit.lastSwaditPanel = Swadit.activePanel;
+		}
 		Swadit.createDownloadUrl();
 		Swadit.showPanel('panelSwaggerUi');
 	}
 
 	Swadit.uiSwadoc = function() 
 	{
+		if (Swadit.swaditPanels.indexOf(Swadit.activePanel) > -1) {
+			Swadit.lastSwaditPanel = Swadit.activePanel;
+		}
 		Swadit.createDownloadUrl();
 		Swadit.showPanel('panelSwadoc');
+	}
+
+	Swadit.uiNavigateToPath = function(path)
+	{
+		Swadit.activePath = path;
+
+		if (Swadit.activePanel == "panelSwadoc") {
+			swadocFrame = document.getElementById("swadocFrame");
+			swadocFrame.contentWindow.Swadoc.setPath(Swadit.activePath);
+		} else {
+			Swadit.showPanel('panelPaths');
+		} 
+		
 	}
 
 	Swadit.uiSelectPathsBy = function() 

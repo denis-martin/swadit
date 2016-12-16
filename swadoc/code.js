@@ -63,6 +63,15 @@ angular.module('SwadocApp', ['ngSanitize', 'hc.marked'])
 		document.title = Swadoc.api.info.title;
 		
 		$scope.$apply();
+
+		if (window.parent && window.parent.Swadit && window.parent.Swadit.activePath) {
+			window.location = "#" + Swadoc.getPathAnchor(window.parent.Swadit.activePath);
+		}
+	}
+
+	Swadoc.setPath = function(path)
+	{
+		window.location.hash = "#" + Swadoc.getPathAnchor(path);
 	}
 
 	Swadoc.print = function()
@@ -104,14 +113,14 @@ angular.module('SwadocApp', ['ngSanitize', 'hc.marked'])
 		var param = 0;
 		if (Swadoc.api.paths[path].parameters) {
 			angular.forEach(Swadoc.api.paths[path].parameters, function(v, k) {
-				if (v.in != body) {
+				if (v.in != "body") {
 					param += 1;
 				}
 			});
 		}
 		if (Swadoc.api.paths[path][method].parameters) {
 			angular.forEach(Swadoc.api.paths[path][method].parameters, function(v, k) {
-				if (v.in != body) {
+				if (v.in != "body") {
 					param += 1;
 				}
 			});

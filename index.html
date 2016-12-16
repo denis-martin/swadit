@@ -39,9 +39,6 @@
 				<li><a href="#" ng-click="Swadit.uiOpen();" title="Open a Swagger file">Open</a></li>
 				<li><a href="#" ng-click="Swadit.uiAdd();" title="Add a Swagger file to the currently opened one">Add</a></li>
 				<li><a href="#" ng-click="Swadit.uiSave();" title="Save the current Swagger file">Save</a></li>
-				<li><a href="#" ng-click="Swadit.uiSwagger();" title="Show and edit source">{...}</a></li>
-				<li><a href="#" ng-click="Swadit.uiSwaggerUi();" title="Preview in Swagger UI">Swagger UI</a></li>
-				<li><a href="#" ng-click="Swadit.uiSwadoc();" title="Generate documentation">Swadoc</a></li>
 			</ul>
 			<div class="navbar-header">
 				<a class="navbar-brand" href="#" ng-click="Swadit.showPanel('panelHeader')">
@@ -52,7 +49,16 @@
 					</span>
 				</a>
 			</div>
-			<!-- <p class="navbar-text navbar-right">{{Swadit.thinking}}</p> -->
+			<ul class="nav navbar-nav navbar-right" style="margin-right: 0px">
+				<li ng-class="(Swadit.activePanel!='panelSwadoc' && Swadit.activePanel!='panelSwagger' && Swadit.activePanel!='panelSwaggerUi') ? 'active' : ''">
+					<a href="#" ng-click="Swadit.uiSwadit();" title="Show visual editor">swadit</a></li>
+				<li ng-class="(Swadit.activePanel=='panelSwadoc') ? 'active' : ''">
+					<a href="#" ng-click="Swadit.uiSwadoc();" title="Generate documentation">swadoc</a></li>
+				<li ng-class="(Swadit.activePanel=='panelSwagger') ? 'active' : ''">
+					<a href="#" ng-click="Swadit.uiSwagger();" title="Show and edit source">{...}</a></li>
+				<li ng-class="(Swadit.activePanel=='panelSwaggerUi') ? 'active' : ''">
+					<a href="#" ng-click="Swadit.uiSwaggerUi();" title="Preview in Swagger UI">swagger UI</a></li>
+			</ul>
 		</div>
 		<div ui-layout-container="central">
 			<div ui-layout="{flow: 'column'}">
@@ -89,7 +95,7 @@
 							</li>
 							<li ng-repeat="path in Swadit.getFilteredKeys('paths')" ng-init="methods=Swadit.api.paths[path]" style="cursor: auto;" 
 								ng-class="{'path-active': path==Swadit.activePath, 'path-selected': Swadit.selectedPaths[path] }">
-								<span ng-click="Swadit.showPanel('panelPaths'); Swadit.activePath=path;" style="cursor: pointer">{{path}}</span>
+								<span ng-click="Swadit.uiNavigateToPath(path)" style="cursor: pointer">{{path}}</span>
 								<div class="smallButton panelLeftSourceButton" 
 									ng-click="Swadit.activePath=path; Swadit.uiSwagger(path, 'paths'); $event.stopPropagation();"
 									title="Show source">{...}</div>
@@ -149,7 +155,7 @@
 
 					<div id="panelSwadoc" class="panelMain" ng-if="Swadit.isActivePanel('panelSwadoc')">
 						<div ui-layout style="margin: 0">
-							<iframe ui-layout-container="central" src="swadoc/index.html" width="100%" style="border: none"></iframe>
+							<iframe ui-layout-container="central" src="swadoc/index.html" id="swadocFrame" width="100%" style="border: none"></iframe>
 						</div>
 					</div>
 
