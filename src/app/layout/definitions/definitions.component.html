@@ -24,13 +24,13 @@
 	</div>
 </div>
 
-<div *ngFor="let def of apis.filterList(keys(apis.current.definitions), filterText, sortItems); let index = index" 
+<div *ngFor="let def of apis.filterList(keys(apis.current['definitions']), filterText, sortItems); let index = index" 
 	class="card mb-1">
 	<div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
 		{{def}}
 	</div>
 	<div class="card-block" *ngIf="uncollapsedDef[def]">
-		<swadit-swagger-schema-view [obj]="apis.current.definitions[def]">
+		<swadit-swagger-schema-view [obj]="apis.current['definitions'][def]">
 		</swadit-swagger-schema-view>
 	</div>
 </div>

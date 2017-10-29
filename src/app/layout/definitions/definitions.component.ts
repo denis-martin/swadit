@@ -10,6 +10,8 @@ import { ApisService } from '../../shared/services';
 export class DefinitionsComponent implements OnInit 
 {
 	uncollapsedDef = {};
+	sortItems = false;
+	filterText: string;
 	
 	constructor(public apis: ApisService) 
 	{
@@ -23,5 +25,10 @@ export class DefinitionsComponent implements OnInit
 	{
 		if (!obj) return [];
 		return Object.keys(obj);
+	}
+
+	addItem()
+	{
+		alert("Not yet implemented");
 	}
 }

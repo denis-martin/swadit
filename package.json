@@ -1,7 +1,7 @@
 {
-  "name": "sb-admin-cli-update",
-  "version": "0.0.0",
-  "license": "MIT",
+  "name": "swadit",
+  "version": "1.0.0",
+  "license": "GPLv3",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --ec true --port 4201",

@@ -242,6 +242,11 @@ export class ApisService
         });
 	}
 
+	addFilesModal()
+	{
+		alert('Not yet implemented');
+	}
+
 	filterList(list: Array<string>, filterText: string, sorted: boolean = false): Array<string>
 	{
 		let filteredList = list;

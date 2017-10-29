@@ -61,7 +61,6 @@
 		</ngb-tabset>
 	</div>
 	<div class="modal-footer">
-		<span *ngIf="thinking" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>&nbsp;
 		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">Apply</button>
 		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" [disabled]="!editForm.form.valid">Cancel</button>
 	</div>
