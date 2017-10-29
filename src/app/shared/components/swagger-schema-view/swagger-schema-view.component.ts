@@ -25,4 +25,13 @@ export class SwaggerSchemaViewComponent implements OnInit
 		return Object.keys(obj);
 	}
 
+	isComplex(obj: any): boolean
+	{
+		return !(typeof obj == 'number' || typeof obj == 'string' || typeof obj == 'boolean');
+	}
+
+	toJson(obj: any): string
+	{
+		return JSON.stringify(obj, null, 2);
+	}
 }

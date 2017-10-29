@@ -1,7 +1,7 @@
 # Swadit
 A visual editor for Swagger files. 
 
-This is a complete rewrite of the first version ([Demo](https://swadit.misc-net.de)). Instead of AngularJS and JavaScript, this version is based on TypeScript and Angular4, which are much more suitable for the given tasks. However, it will take some time until feature parity is reached (at least to a certain extend).
+This is a complete rewrite of the first version ([Demo](https://swadit.misc-net.de) of the first version). Instead of AngularJS and JavaScript, this version is based on TypeScript and Angular4, which are much more suitable for the given tasks. However, it will take some time until feature parity is reached (at least to a certain extend).
 
 ## Prepare
 Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies and compile the typescript sources to javascript:

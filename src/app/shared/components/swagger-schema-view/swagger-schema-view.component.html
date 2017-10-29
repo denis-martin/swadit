@@ -4,6 +4,10 @@
 			<td class="label-text">type</td>
 			<td>{{obj['type']}}</td>
 		</tr>
+		<tr *ngIf="obj['format']">
+			<td class="label-text">format</td>
+			<td>{{obj['format']}}</td>
+		</tr>
 		<tr *ngIf="obj['description']">
 			<td class="label-text">description</td>
 			<td class="description"><markdown [data]="obj['description']"></markdown></td>
@@ -47,6 +51,20 @@
 					<swadit-swagger-schema-view [obj]="obj['items']">
 					</swadit-swagger-schema-view>
 				</ng-template>
+			</td>
+		</tr>
+		<tr *ngIf="obj['default']">
+			<td class="label-text">default</td>
+			<td>
+				<span *ngIf="!isComplex(obj['default'])">{{obj['default']}}</span>
+				<pre *ngIf="isComplex(obj['default'])"><code highlight [innerHTML]="toJson(obj['default'])"></code></pre>
+			</td>
+		</tr>
+		<tr *ngIf="obj['example']">
+			<td class="label-text">example</td>
+			<td>
+				<span *ngIf="!isComplex(obj['example'])">{{obj['example']}}</span>
+				<pre *ngIf="isComplex(obj['example'])"><code highlight [innerHTML]="toJson(obj['example'])"></code></pre>
 			</td>
 		</tr>
 	</tbody>

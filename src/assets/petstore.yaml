@@ -643,6 +643,19 @@ definitions:
         type: "string"
       lastName:
         type: "string"
+      address:
+        type: "object"
+        properties:
+          street:
+            type: "string"
+          streetNo:
+            type: "number"
+          city:
+            type: "string"
+        example:
+          street: "Theaterplatz"
+          streetNo: 2
+          city: "Dresden"
       email:
         type: "string"
       password:
