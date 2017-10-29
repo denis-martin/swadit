@@ -1,0 +1,11 @@
+<table>
+	<tbody>
+		<tr *ngFor="let k of getAdditionalKeys(obj)">
+			<td class="label-text">{{k}}</td>
+			<td>
+				<span *ngIf="!isComplex(obj[k])">{{obj[k]}}</span>
+				<pre *ngIf="isComplex(obj[k])"><code highlight [innerHTML]="toYaml(obj[k])"></code></pre>
+			</td>
+		</tr>
+	</tbody>
+</table>

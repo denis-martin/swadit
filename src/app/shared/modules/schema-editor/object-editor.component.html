@@ -1,0 +1,80 @@
+<div [ngClass]="{'card': card}">
+	<div *ngIf="title && (header || schema['description'])" [ngClass]="{'card-header': card, 'header': !card}">{{header || schema['description']}}</div>
+	<div [ngClass]="{'card-block': card}">
+		<div *ngIf="schema['x-swadit-editor-grid']">
+			<div *ngFor="let row of schema['x-swadit-editor-grid']" class="row">
+				<div *ngFor="let p of row" class="form-group col-md-{{schema['x-swadit-editor-grid-cols'][p] ? schema['x-swadit-editor-grid-cols'][p] : 12}}">
+					<label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
+						{{deCamelize(p)}}<span *ngIf="propertyIsRequired(schema, p)" style="color: red">*</span><span *ngIf="collapsed[p]">...</span>
+					</label>
+					<div [ngbCollapse]="collapsed[p]">
+						<swadit-schema-editor [schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p"></swadit-schema-editor>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div *ngIf="!schema['x-swadit-editor-grid']">
+			<div *ngFor="let p of schemaProperties()" class="form-group">
+				<label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
+					{{deCamelize(p)}}<span *ngIf="propertyIsRequired(schema, p)" style="color: red">*</span><span *ngIf="collapsed[p]">...</span>
+				</label>
+				<div [ngbCollapse]="collapsed[p]">
+					<swadit-schema-editor [schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p"></swadit-schema-editor>
+				</div>
+			</div>
+			<div *ngIf="schema.additionalProperties">
+				<div *ngIf="schema.additionalProperties['type']=='object'">
+					<div *ngFor="let p of objectProperties(); let index = index; trackBy:trackByIndex" class="form-group">
+						<div class="input-group input-group-overlapping-border" style="margin-bottom: -1px">
+							<span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
+								<i *ngIf="!collapsed[p]" class="fa fa-caret-down"></i>
+								<i *ngIf="collapsed[p]"  class="fa fa-caret-right"></i>
+							</span>
+							<input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
+								class="form-control" 
+								placeholder="{{schema.additionalProperties['description']}}" 
+								title="{{schema.additionalProperties['description']}}">
+							<span class="input-group-addon clickable" (click)="deleteProperty($event, p)">
+								<i class="fa fa-trash"></i>
+							</span>
+						</div>
+						<div [ngbCollapse]="collapsed[p]">
+							<swadit-schema-editor [schema]="schema.additionalProperties" [(obj)]="obj[p]" [id]="p" class="form-control" style="background-color: #f7f7f9">
+							</swadit-schema-editor>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="schema.additionalProperties['type']!='object'">
+					<div *ngFor="let p of objectProperties(); let index = index; trackBy:trackByIndex" class="row form-group">
+						<div class="col-md-5">
+							<div class="input-group">
+								<span class="input-group-addon">
+									<span class="clickable" (click)="deleteProperty($event, p)"><i class="fa fa-trash"></i></span>
+								</span>
+								<input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
+									class="form-control" 
+									placeholder="{{schema.additionalProperties['description']}}" 
+									title="{{schema.additionalProperties['description']}}">
+							</div>
+						</div>
+						<swadit-primitive-editor [schema]="schema.additionalProperties" [(obj)]="obj[p]" [id]="p" class="col-md-7">
+						</swadit-primitive-editor>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="input-group">
+						<input type="text" [(ngModel)]="propertyToAdd"
+							class="form-control" 
+							placeholder="{{schema.additionalProperties['description']}}" 
+							title="{{schema.additionalProperties['description']}}"
+							(keydown.enter)="addProperty($event)">
+						<span class="input-group-addon clickable" (click)="addProperty($event)">
+							<i class="fa fa-plus"></i>
+						</span>
+					</div>
+					<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

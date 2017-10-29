@@ -1,0 +1,43 @@
+<div *ngIf="schema['items']['type']=='string'">
+	<div *ngFor="let item of obj; let index = index; trackBy:trackByIndex" class="input-group" style="margin-bottom:-1px">
+		<swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap input-wrap-item'" [schema]="schema['items']" [(obj)]="obj[index]">
+		</swadit-primitive-editor>
+		<span class="input-group-addon" style="border-left: 0; width: 5.1rem;">
+			<span>
+				<span class="clickable" (click)="moveItemUp($event, index)" *ngIf="index>0"><i class="fa fa-arrow-up"></i></span>
+				<span class="clickable" (click)="moveItemDown($event, index)" *ngIf="index<(obj.length-1)"><i class="fa fa-arrow-down"></i></span>
+				<span class="clickable" (click)="deleteItem($event, index)"><i class="fa fa-trash"></i></span>
+			</span>
+		</span>
+	</div>
+	<div class="input-group">
+		<swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap'" [schema]="schema['items']" [(obj)]="itemToAdd"
+			(keydown.enter)="addItem($event)">
+		</swadit-primitive-editor>
+		<span class="input-group-addon clickable" style="border-left: 0; width: 5.1rem;" (click)="addItem($event)">
+			<i class="fa fa-plus"></i>
+		</span>
+	</div>
+	<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
+</div>
+
+<div *ngIf="schema['items']['type']=='object'">
+	<div *ngFor="let item of obj; let index = index" style="margin-bottom: 0.6rem" class="input-group">
+		<swadit-object-editor [schema]="schema['items']" [(obj)]="obj[index]" class="form-control" style="background-color: #f7f7f9">
+		</swadit-object-editor>
+		<div class="input-group-addon">
+			<span class="clickable" (click)="deleteItem($event, index)"><i class="fa fa-fw fa-trash"></i></span><br>
+			<span class="clickable" (click)="moveItemUp($event, index)" *ngIf="index>0"><i class="fa fa-fw fa-arrow-up"></i><br></span>
+			<span class="clickable" (click)="moveItemDown($event, index)" *ngIf="index<(obj.length-1)"><i class="fa fa-fw fa-arrow-down"></i></span>
+		</div>
+	</div>
+	<div class="input-group">
+		<swadit-object-editor [schema]="schema['items']" [(obj)]="itemToAdd" class="form-control"
+			(keydown.enter)="addItem($event)">
+		</swadit-object-editor>
+		<div class="input-group-addon clickable" (click)="addItem($event)">
+			<i class="fa fa-plus"></i>
+		</div>
+	</div>
+	<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
+</div>

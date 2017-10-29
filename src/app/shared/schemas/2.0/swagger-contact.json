@@ -1,0 +1,24 @@
+{
+	"title": "A JSON Schema for Swagger 2.0 API.",
+	"id": "http://swagger.io/v2/schema.json#/definitions/contact",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"description": "Contact information for the owners of the API.",
+	"additionalProperties": false,
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The identifying name of the contact person/organization."
+		},
+		"url": {
+			"type": "string",
+			"description": "The URL pointing to the contact information.",
+			"format": "uri"
+		},
+		"email": {
+			"type": "string",
+			"description": "The email address of the contact person/organization.",
+			"format": "email"
+		}
+	}
+}

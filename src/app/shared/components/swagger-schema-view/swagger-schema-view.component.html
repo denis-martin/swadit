@@ -1,0 +1,53 @@
+<table>
+	<tbody>
+		<tr>
+			<td class="label-text">type</td>
+			<td>{{obj['type']}}</td>
+		</tr>
+		<tr *ngIf="obj['description']">
+			<td class="label-text">description</td>
+			<td class="description"><markdown [data]="obj['description']"></markdown></td>
+		</tr>
+		<tr *ngIf="obj['properties']">
+			<td class="label-text">properties</td>
+			<td>
+				<div *ngFor="let p of keys(obj['properties'])">
+					<div class="clickable" (click)="uncollapsed[p] = !uncollapsed[p]">
+						<span class="property">{{p}}</span>
+						<span class="propertyType">: 
+							{{obj['properties'][p]['type'] || obj['properties'][p]['$ref']}}
+							<span *ngIf="obj['properties'][p]['type'] == 'array'">
+								({{obj['properties'][p]['items']['type'] || obj['properties'][p]['items']['$ref']}})
+							</span>
+						</span>
+						<span class="propertyDescription" *ngIf="obj['properties'][p]['description']">
+							{{obj['properties'][p]['description'].length > 40 ? obj['properties'][p]['description'].substr(0,39) + '...' : obj['properties'][p]['description']}}
+						</span>
+					</div>
+					<div *ngIf="uncollapsed[p] && obj['properties'][p]['$ref']; else nonRef">
+						<swadit-swagger-schema-view [obj]="apis.resolveRef(obj['properties'][p]['$ref'])">
+						</swadit-swagger-schema-view>
+					</div>
+					<ng-template #nonRef>
+						<swadit-swagger-schema-view *ngIf="uncollapsed[p]" [obj]="obj['properties'][p]">
+						</swadit-swagger-schema-view>
+					</ng-template>
+					
+				</div>
+			</td>
+		</tr>
+		<tr *ngIf="obj['items']">
+			<td class="label-text">items</td>
+			<td>
+				<div *ngIf="obj['items']['$ref']; else nonRef">
+					<swadit-swagger-schema-view [obj]="apis.resolveRef(obj['items']['$ref'])">
+					</swadit-swagger-schema-view>
+				</div>
+				<ng-template #nonRef>
+					<swadit-swagger-schema-view [obj]="obj['items']">
+					</swadit-swagger-schema-view>
+				</ng-template>
+			</td>
+		</tr>
+	</tbody>
+</table>

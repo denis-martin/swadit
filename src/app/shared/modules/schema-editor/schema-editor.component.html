@@ -1,0 +1,12 @@
+
+<swadit-primitive-editor *ngIf="schema['type']=='string'"
+	[schema]="schema" [(obj)]="obj" [id]="id">
+</swadit-primitive-editor>
+
+<swadit-array-editor *ngIf="schema['type']=='array'"
+	[schema]="schema" [(obj)]="obj" [id]="id">
+</swadit-array-editor>
+
+<swadit-object-editor *ngIf="schema['type']=='object'"
+	[schema]="schema" [(obj)]="obj" [id]="id">
+</swadit-object-editor>

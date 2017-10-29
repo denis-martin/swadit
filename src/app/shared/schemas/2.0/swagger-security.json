@@ -1,0 +1,18 @@
+{
+	"title": "A JSON Schema for Swagger 2.0 API.",
+	"id": "http://swagger.io/v2/schema.json#/definitions/security",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "array",
+	"items": {
+		"type": "object",
+		"additionalProperties": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"uniqueItems": true
+		}
+	},
+	"uniqueItems": true,
+	"description": "List of security requirements"
+}

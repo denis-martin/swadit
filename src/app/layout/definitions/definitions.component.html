@@ -1,0 +1,36 @@
+<div class="edit-section" (click)="addItem()" title="Add item">
+	<i class="fa fa-plus"></i>
+</div>
+<div class="filterBox">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="input-group">
+				<span class="input-group-addon">
+					<i class="fa fa-filter"></i>
+				</span>
+				<input type="text" [(ngModel)]="filterText" name="filterText" class="form-control"
+					placeholder="Filter by key name" title="Filter by key name">
+				<span class="input-group-addon clickable" *ngIf="filterText" (click)="filterText=''">
+					<i class="fa fa-times"></i>
+				</span>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="checkbox">
+				<input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
+				<label for="sortItems" class="mb-0" style="margin-top: 0.4rem">Display sorted</label>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div *ngFor="let def of apis.filterList(keys(apis.current.definitions), filterText, sortItems); let index = index" 
+	class="card mb-1">
+	<div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
+		{{def}}
+	</div>
+	<div class="card-block" *ngIf="uncollapsedDef[def]">
+		<swadit-swagger-schema-view [obj]="apis.current.definitions[def]">
+		</swadit-swagger-schema-view>
+	</div>
+</div>

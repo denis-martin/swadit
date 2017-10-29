@@ -1,0 +1,118 @@
+<div class="edit-section" (click)="edit()">
+	<i class="fa fa-pencil"></i>
+</div>
+
+<div *ngIf="apis.current.info" class="api-info">
+	<h1>{{apis.current.info.title}}
+		<span *ngIf="apis.current.info.version" style="font-size: 70%"> v{{apis.current.info.version}}</span>
+	</h1>
+	<div *ngIf="apis.current.info.contact" class="api-info-element">
+		{{apis.current.info.contact.name}} 
+		<span *ngIf="apis.current.info.contact.email">
+			(<a href="mailto:{{apis.current.info.contact.email}}">{{apis.current.info.contact.email}}</a>)
+		</span>
+		<span *ngIf="apis.current.info.contact.url">{{apis.current.info.contact.url}}</span>
+	</div>
+	<markdown *ngIf="apis.current.info.description" class="api-info-element markdown" 
+		[data]="apis.current.info.description">
+	</markdown>
+	<div *ngIf="apis.current.externalDocs" class="api-info-element">
+		<a href="{{apis.current.externalDocs.url}}" target="_blanc">
+			<span *ngIf="apis.current.externalDocs.description; else 'More'">{{apis.current.externalDocs.description}}</span>
+		</a>
+	</div>
+	<div *ngIf="apis.current.info.termsOfService || apis.current.info.license" class="api-info-element">
+		<p *ngIf="apis.current.info.termsOfService">
+			Terms of service: {{apis.current.info.termsOfService}}
+		</p>
+		<p *ngIf="apis.current.info.license">
+			License: {{apis.current.info.license.name}}
+			<span *ngIf="apis.current.info.license.url">
+				(<a href="{{apis.current.info.license.url}}">{{apis.current.info.license.url}}</a>)
+			</span>
+		</p>
+	</div>
+</div>
+
+<div *ngIf="apis.current.tags" class="api-info api-info-element">
+	<h2>Tags</h2>
+	<table class="tag-table">
+		<tbody>
+			<tr *ngFor="let tag of apis.current.tags">
+				<td style="font-weight: bold">{{tag.name}}</td>
+				<td>
+					<div Markdown>{{tag.description}}</div>
+					<div *ngIf="tag.externalDocs">
+						<a href="{{tag.externalDocs.url}}" target="_blanc">
+							<span *ngIf="tag.externalDocs.description; else more">{{tag.externalDocs.description}}</span>
+							<ng-template #more>More</ng-template>
+						</a>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div *ngIf="apis.current.schemes || apis.current.host || apis.current.basePath || apis.current.consumes || apis.current.produces"
+	class="api-info api-info-element">
+	<h2>General Information</h2>
+	<table>
+		<tbody>
+			<tr *ngIf="apis.current.schemes">
+				<td class="label-text">schemes</td>
+				<td>
+					<span *ngFor="let item of apis.current.schemes">{{item}}&nbsp;</span>
+				</td>
+			</tr>
+			<tr *ngIf="apis.current.host">
+				<td class="label-text">host</td>
+				<td>{{apis.current.host}}</td>
+			</tr>
+			<tr *ngIf="apis.current.basePath" >
+				<td class="label-text">basePath</td>
+				<td>{{apis.current.basePath}}</td>
+			</tr>
+			<tr *ngIf="apis.current.consumes">
+				<td class="label-text">consumes</td>
+				<td>
+					<ul class="list-unstyled">
+						<li *ngFor="let item of apis.current.consumes">{{item}}</li>
+					</ul>
+				</td>
+			</tr>
+			<tr *ngIf="apis.current.produces">
+				<td class="label-text">produces</td>
+				<td>
+					<ul class="list-unstyled">
+						<li *ngFor="let item of apis.current.produces">{{item}}</li>
+					</ul>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div *ngIf="apis.current.securityDefinitions || apis.current.security" class="api-info api-info-element">
+	<h2>Security</h2>
+	<div *ngIf="apis.current.securityDefinitions" class="api-info-element">
+		Security definitions:
+		<pre><code highlight [innerHTML]="apis.toYaml(apis.current.securityDefinitions)"></code></pre>
+	</div>
+	<div *ngIf="apis.current.security" class="api-info-element">
+		Security requirements:
+		<pre><code highlight [innerHTML]="apis.toYaml(apis.current.security)"></code></pre>
+	</div>
+</div>
+
+<div *ngIf="apis.hasExtensions(apis.current) || apis.hasExtensions(apis.current.info)" class="api-info api-info-element">
+	<h2>Extensions</h2>
+	<div *ngIf="apis.hasExtensions(apis.current)" class="api-info-element">
+		At document root:
+		<swadit-extensions-view [obj]="apis.current"></swadit-extensions-view>
+	</div>
+	<div *ngIf="apis.hasExtensions(apis.current.info)" class="api-info-element">
+		At document info:
+		<swadit-extensions-view [obj]="apis.current.info"></swadit-extensions-view>
+	</div>
+</div>

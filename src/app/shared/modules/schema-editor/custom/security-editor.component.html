@@ -1,0 +1,45 @@
+<div *ngFor="let item of obj; let index = index; trackBy:trackByIndex">
+	<div *ngFor="let p of keys(item); let indexp = index; trackBy:trackByIndex" class="form-group">
+		<div class="input-group input-group-overlapping-border" style="margin-bottom: -1px">
+			<span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
+				<i *ngIf="!collapsed[p]" class="fa fa-caret-down"></i>
+				<i *ngIf="collapsed[p]"  class="fa fa-caret-right"></i>
+			</span>
+			<select *ngIf="isSecurityDefinition(p); else noSecDef"
+				id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
+				class="form-control {{schema['x-swadit-input-class'] || ''}}"
+				title="{{schema['description']}}">
+				<option *ngFor="let o of keys(securityDefinitions)">{{o}}</option>
+			</select>
+			<ng-template #noSecDef class="form-control">
+				<input type="text" 
+					id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
+					class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
+					placeholder="{{schema['description']}}" 
+					title="{{schema['description']}}">
+			</ng-template>
+			<span class="input-group-addon clickable" (click)="deleteItem($event, index)">
+				<i class="fa fa-trash"></i>
+			</span>
+		</div>
+		<div [ngbCollapse]="collapsed[p]">
+			<swadit-array-editor
+				[schema]="scopes(p)" [obj]="item[p]" class="form-control" style="background-color: #f7f7f9">
+			</swadit-array-editor>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<div class="input-group">
+		<select 
+			id="{{id}}" [(ngModel)]="propertyToAdd"
+			class="form-control {{schema['x-swadit-input-class'] || ''}}"
+			title="{{schema['description']}}">
+			<option *ngFor="let o of keys(securityDefinitions)">{{o}}</option>
+		</select>
+		<span class="input-group-addon clickable" (click)="addProperty($event)">
+			<i class="fa fa-plus"></i>
+		</span>
+	</div>
+	<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
+</div>

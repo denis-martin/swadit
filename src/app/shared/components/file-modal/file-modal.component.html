@@ -1,0 +1,25 @@
+<form (ngSubmit)="ok()">
+	<div class="modal-header">
+		<h3 class="modal-title" id="modal-title">{{modalTitle}}</h3>
+	</div>
+	<div class="modal-body" id="modal-body">
+		<p *ngIf="dialogType=='fileOpen'"><input type="file" (change)="onFileChange($event)" class="form-control"></p>
+		<p *ngIf="dialogType=='fileAdd'"><input type="file" (change)="onFileChange($event)" multiple class="form-control"></p>
+		<p *ngIf="dialogType=='fileAdd'"><input type="checkbox" [(ngModel)]="addSource" class="form-control"> Add source file name to path descriptions</p>
+		<p *ngIf="dialogType=='fileDownload'">
+			<label for="fileName">File name to download</label>
+			<input type="text" [(ngModel)]="fileName" class="form-control" name="fileName">
+		</p>
+		<p *ngIf="modalHint!=''">{{modalHint}}</p>
+	</div>
+	<div class="modal-footer">
+		<span *ngIf="thinking" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>&nbsp;
+		<button class="btn btn-primary" type="submit" 
+			[disabled]="(dialogType=='fileDownload' && !fileName) || ((dialogType=='fileOpen' || dialogType=='fileAdd') && (!files || files.length==0))">
+			<span *ngIf="dialogType=='fileOpen'">Open</span>
+			<span *ngIf="dialogType=='fileAdd'">Add</span>
+			<span *ngIf="dialogType=='fileDownload'">Download</span>
+		</button>
+		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')">Cancel</button>
+	</div>
+</form>

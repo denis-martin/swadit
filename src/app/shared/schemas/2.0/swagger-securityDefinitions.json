@@ -1,0 +1,84 @@
+{
+	"title": "A JSON Schema for Swagger 2.0 API.",
+	"id": "http://swagger.io/v2/schema.json#/definitions/securityDefinitions",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"additionalProperties": {
+		"type": "object",
+		"additionalProperties": false,
+		"required": [
+			"type"
+		],
+		"x-swadit-editor-grid": [
+			[ "type", "description" ],
+			[ "name", "in" ],
+			[ "flow", "authorizationUrl", "tokenUrl" ],
+			[ "scopes" ]
+		],
+		"x-swadit-editor-grid-cols": {
+			"type": 3, "description": 9,
+			"name": 9, "in": 3,
+			"flow": 2, "authorizationUrl": 5, "tokenUrl": 5,
+			"scopes": 12
+		},
+		"x-swadit-editor-collapse": true,
+		"properties": {
+			"type": {
+				"type": "string",
+				"enum": [
+					"basic",
+					"apiKey",
+					"oauth2"
+				]
+			},
+			"description": {
+				"type": "string"
+			},
+			"name": {
+				"type": "string",
+				"description": "Only for security type 'apiKey'"
+			},
+			"in": {
+				"type": "string",
+				"description": "Only for security type 'apiKey'",
+				"enum": [
+					"header",
+					"query"
+				]
+			},
+			"flow": {
+				"type": "string",
+				"description": "Only for security type 'oauth2'",
+				"enum": [
+					"implicit",
+					"password",
+					"application",
+					"accessCode"
+				]
+			},
+			"scopes": {
+				"type": "object",
+				"description": "Only for security type 'oauth2'",
+				"x-swadit-editor-collapse": true,
+				"additionalProperties": {
+					"type": "string"
+				}
+			},
+			"authorizationUrl": {
+				"type": "string",
+				"format": "uri",
+				"description": "Only for security type 'oauth2'"
+			},
+			"tokenUrl": {
+				"type": "string",
+				"format": "uri",
+				"description": "Only for security type 'oauth2'"
+			}
+		},
+		"patternProperties": {
+			"^x-": {
+				"$ref": "#/definitions/vendorExtension"
+			}
+		}
+	}
+}

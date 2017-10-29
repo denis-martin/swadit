@@ -1,0 +1,32 @@
+<div class="{{wrapClass}}">
+	<!-- simple input string -->
+	<input *ngIf="schema['type']=='string' && !schema['enum'] && !schema['x-swadit-input-multiline']" 
+		type="text" id="{{id}}" [(ngModel)]="obj" 
+		class="form-control {{schema['x-swadit-input-class'] || ''}}" 
+		placeholder="{{schema['description']}}" 
+		title="{{schema['description']}}">
+
+	<!-- textarea input string -->
+	<textarea *ngIf="schema['type']=='string' && !schema['enum'] && schema['x-swadit-input-multiline']" 
+		id="{{id}}" [(ngModel)]="obj"
+		class="form-control {{schema['x-swadit-input-class'] || ''}}"
+		placeholder="{{schema['description']}}" 
+		title="{{schema['description']}}" 
+		rows="{{schema['x-swadit-input-multiline']}}">
+	</textarea>
+
+	<!-- enum input string -->
+	<select *ngIf="schema['type']=='string' && schema['enum'] && isInEnum(obj); else notInEnum"
+		id="{{id}}" [(ngModel)]="obj" 
+		class="form-control {{schema['x-swadit-input-class'] || ''}}"
+		title="{{schema['description']}}">
+		<option *ngFor="let o of schema['enum']">{{o}}</option>
+	</select>
+	<ng-template #notInEnum>
+		<input *ngIf="schema['type']=='string' && schema['enum']"
+			type="text" id="{{id}}" [(ngModel)]="obj" 
+			class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
+			placeholder="{{schema['description']}}" 
+			title="{{schema['description']}}">
+	</ng-template>
+</div>

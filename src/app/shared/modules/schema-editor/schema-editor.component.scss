@@ -1,0 +1,52 @@
+label {
+    font-size: 80%;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: 0.5rem;
+}
+
+.monospace {
+    font-family: monospace;
+}
+
+::-webkit-input-placeholder {
+    color: #ccc;
+}
+
+.header {
+    margin-bottom: 0.3rem;
+}
+
+.input-wrap {
+	display: block;
+	width: 100%;
+    padding: 0;
+}
+
+.input-wrap input, .input-wrap select {
+	display: block;
+    width: 100%;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    border-color: #d9d9d9;
+}
+
+.input-wrap input:focus, .input-wrap select:focus {
+    border-color: #5cb3fd;
+}
+
+.input-group-overlapping-border input, .input-group-overlapping-border .input-group-addon {
+    border-color: #d9d9d9;
+}
+
+.input-group-overlapping-border input:focus {
+    border-color: #5cb3fd;
+}
+
+.form-control {
+    width: 100%;
+}

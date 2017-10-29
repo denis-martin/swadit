@@ -1,0 +1,86 @@
+/* You can add global styles to this file, and also import other style files */
+@import "bootstrap/bootstrap";
+@import "spinner";
+@import "utils";
+@import "rtl";
+@import "responsive";
+
+p, table {
+	margin-bottom: 0.5rem;
+}
+
+h2, h3, h4, h5, h6 {
+	margin-top: 0.8rem;
+}
+
+h1 {
+	font-size: 220%;
+}
+
+h2 {
+	font-size: 200%;
+}
+
+h3 {
+	font-size: 180%;
+}
+
+h4 {
+	font-size: 160%;
+}
+
+h5 {
+	font-size: 140%;
+}
+
+h6 {
+	font-size: 120%;
+}
+
+.markdown table {
+	border-collapse: collapse;
+}
+
+.markdown table, .markdown th, .markdown td {
+	border: 1px solid #ddd;
+}
+
+.markdown th, .markdown td {
+	padding-left: 0.4rem;
+	padding-right: 0.4rem;
+	text-align: left;
+}
+
+.label-text {
+	font-size: 80%;
+	color: #bbb;
+	text-align: right;
+	vertical-align: top;
+	padding: 4pt 4px 0 4px;
+}
+
+.list-unstyled {
+	margin-bottom: 0;
+}
+
+.edit-section {
+	position: fixed;
+	top: 4rem;
+	right: 1rem;
+	font-size: 1.5rem;
+	color: #bbb;
+	cursor: pointer;
+	z-index: 100;
+}
+
+.edit-section:hover {
+	color: black;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.filterBox {
+	margin-bottom: 1rem;
+}

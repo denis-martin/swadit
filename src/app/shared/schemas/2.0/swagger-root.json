@@ -1,0 +1,51 @@
+{
+  "title": "A JSON Schema for Swagger 2.0 API.",
+  "id": "http://swagger.io/v2/schema.json#root",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schemes": {
+      "type": "array",
+      "description": "The transfer protocol of the API.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "host": {
+      "type": "string",
+      "pattern": "^[^{}/ :\\\\]+(?::\\d+)?$",
+      "description": "The host (name or ip) of the API. Example: 'swagger.io'"
+    },
+    "basePath": {
+      "type": "string",
+      "pattern": "^/",
+      "description": "The base path to the API. Example: '/api'."
+    },
+    "consumes": {
+      "description": "A list of MIME types accepted by the API.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "The MIME type of the HTTP message."
+      },
+      "uniqueItems": true
+    },
+    "produces": {
+      "description": "A list of MIME types the API can produce.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "The MIME type of the HTTP message."
+      },
+      "uniqueItems": true
+    }
+  }
+}

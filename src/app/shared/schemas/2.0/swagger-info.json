@@ -1,0 +1,32 @@
+{
+	"title": "A JSON Schema for Swagger 2.0 API.",
+	"id": "http://swagger.io/v2/schema.json#/definitions/info",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"description": "General information about the API.",
+	"additionalProperties": false,
+	"required": [
+		"version",
+		"title"
+	],
+	"properties": {
+		"title": {
+			"type": "string",
+			"description": "A unique and precise title of the API."
+		},
+		"version": {
+			"type": "string",
+			"description": "A semantic version number of the API."
+		},
+		"description": {
+			"type": "string",
+			"description": "A longer description of the API. Should be different from the title.  GitHub Flavored Markdown is allowed.",
+			"x-swadit-input-multiline": 20,
+			"x-swadit-input-class": "monospace"
+		},
+		"termsOfService": {
+			"type": "string",
+			"description": "The terms of service for the API."
+		}
+	}
+}

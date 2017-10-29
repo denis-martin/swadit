@@ -1,0 +1,50 @@
+<div class="pos-f-t fixed-top header">
+    <nav class="navbar navbar-inverse bg-inverse navbar-toggleable-md">
+        <button class="navbar-toggler navbar-toggler-left" (click)="toggleSidebar()">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <span class="navbar-brand">
+            <a href="https://github.com/denis-martin/swadit-ts" target="_blank">swadit</a>
+            <div class="swadit-copyright">
+                &copy; Denis Martin
+            </div>
+            <span style="font-size: 75%; font-weight: bold; color: red">ALPHA</span>
+            <span *ngIf="apis.current != null && apis.current.info != null && apis.current.info.title != null">
+                &ndash; {{apis.current.info.title}}
+            </span>
+        </span>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto mt-2 mt-md-0">
+                <li class="nav-item dropdown" ngbDropdown>
+                    <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                        <i class="fa fa-fw fa-cogs"></i>&nbsp;Settings <b class="caret"></b>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="javascript:void(0)" (click)="apis.newFile()">
+                            <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a>
+                        <a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFileModal()">
+                            <i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a>
+                        <a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()">
+                            <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a>
+                        <a class="dropdown-item" href="javascript:void(0)" (click)="apis.downloadFileModal()">
+                            <i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="javascript:void(0)">
+                            <i class="fa fa-fw fa-cog"></i> {{ 'Settings' | translate }}</a>
+                    </div>
+                </li>
+                <!--
+                <li class="nav-item dropdown" ngbDropdown>
+                    <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                        <i class="fa fa-fw fa-gear"></i>&nbsp;Settings <b class="caret"></b>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}</a>
+                        <a class="dropdown-item" [routerLink]="['/login']" (click)="onLoggedout()"><i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }} </a>
+                    </div>
+                </li>
+                -->
+            </ul>
+        </div>
+    </nav>
+</div>
