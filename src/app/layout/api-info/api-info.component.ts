@@ -47,5 +47,10 @@ export class ApiInfoComponent implements OnInit
         } else {
             return  `with: ${reason}`;
         }
-    }
+	}
+	
+	keys(obj: Object)
+	{
+		return Object.keys(obj);
+	}
 }

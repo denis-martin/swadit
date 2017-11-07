@@ -84,3 +84,13 @@ h6 {
 .filterBox {
 	margin-bottom: 1rem;
 }
+
+.edit-card {
+	float: right;
+	color: #bbb;
+	cursor: pointer;
+}
+
+.edit-card:hover {
+	color: black;
+}

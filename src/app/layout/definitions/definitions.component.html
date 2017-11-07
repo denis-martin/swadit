@@ -1,4 +1,4 @@
-<div class="edit-section" (click)="addItem()" title="Add item">
+<div class="edit-section" (click)="edit($event)" title="Add item">
 	<i class="fa fa-plus"></i>
 </div>
 <div class="filterBox">
@@ -28,6 +28,9 @@
 	class="card mb-1">
 	<div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
 		{{def}}
+		<div class="edit-card" (click)="edit($event, def)">
+			<i class="fa fa-pencil"></i>
+		</div>
 	</div>
 	<div class="card-block" *ngIf="uncollapsedDef[def]">
 		<swadit-swagger-schema-view [obj]="apis.current['definitions'][def]">

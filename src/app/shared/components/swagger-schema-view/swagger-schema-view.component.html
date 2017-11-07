@@ -23,6 +23,9 @@
 							<span *ngIf="obj['properties'][p]['type'] == 'array'">
 								({{obj['properties'][p]['items']['type'] || obj['properties'][p]['items']['$ref']}})
 							</span>
+							<span *ngIf="obj['properties'][p]['format']">
+								({{obj['properties'][p]['format']}})
+							</span>
 						</span>
 						<span class="propertyDescription" *ngIf="obj['properties'][p]['description']">
 							{{obj['properties'][p]['description'].length > 40 ? obj['properties'][p]['description'].substr(0,39) + '...' : obj['properties'][p]['description']}}
@@ -42,7 +45,7 @@
 		</tr>
 		<tr *ngIf="obj['items']">
 			<td class="label-text">items</td>
-			<td>
+			<td style="padding: 0">
 				<div *ngIf="obj['items']['$ref']; else nonRef">
 					<swadit-swagger-schema-view [obj]="apis.resolveRef(obj['items']['$ref'])">
 					</swadit-swagger-schema-view>

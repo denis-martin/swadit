@@ -95,13 +95,62 @@
 
 <div *ngIf="apis.current['securityDefinitions'] || apis.current['security']" class="api-info api-info-element">
 	<h2>Security</h2>
-	<div *ngIf="apis.current['securityDefinitions']" class="api-info-element">
-		Security definitions:
-		<pre><code highlight [innerHTML]="apis.toYaml(apis.current['securityDefinitions'])"></code></pre>
+	<div *ngFor="let def of keys(apis.current['securityDefinitions'])">
+		<p>Security definition: <b>{{def}}</b></p>
+		<table>
+			<tbody>
+				<tr>
+					<td class="label-text">type</td>
+					<td>{{apis.current['securityDefinitions'][def]['type']}}</td>
+				</tr>
+				<tr *ngIf="apis.current['securityDefinitions'][def]['description']">
+					<td class="label-text">description</td>
+					<td><markdown [data]="apis.current['securityDefinitions'][def]['description']"></markdown></td>
+				</tr>
+				<tr *ngIf="apis.current['securityDefinitions'][def]['name']">
+					<td class="label-text">name</td>
+					<td>{{apis.current['securityDefinitions'][def]['name']}}</td>
+				</tr>
+				<tr *ngIf="apis.current['securityDefinitions'][def]['in']">
+					<td class="label-text">in</td>
+					<td>{{apis.current['securityDefinitions'][def]['in']}}</td>
+				</tr>
+				<tr *ngIf="apis.current['securityDefinitions'][def]['flow']">
+					<td class="label-text">flow</td>
+					<td>{{apis.current['securityDefinitions'][def]['flow']}}</td>
+				</tr>
+				<tr *ngIf="apis.current['securityDefinitions'][def]['authorizationUrl']">
+					<td class="label-text">auth URL</td>
+					<td>{{apis.current['securityDefinitions'][def]['authorizationUrl']}}</td>
+				</tr>
+				<tr *ngIf="apis.current['securityDefinitions'][def]['tokenUrl']">
+					<td class="label-text">token URL</td>
+					<td>{{apis.current['securityDefinitions'][def]['tokenUrl']}}</td>
+				</tr>
+				<tr *ngIf="apis.current['securityDefinitions'][def]['scopes']">
+					<td class="label-text">scopes</td>
+					<td>
+						<table>
+							<tbody>
+								<tr *ngFor="let scope of keys(apis.current['securityDefinitions'][def]['scopes'])">
+									<td style="font-weight: bold">{{scope}}</td>
+									<td>{{apis.current['securityDefinitions'][def]['scopes'][scope]}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
-	<div *ngIf="apis.current['security']" class="api-info-element">
-		Security requirements:
-		<pre><code highlight [innerHTML]="apis.toYaml(apis.current['security'])"></code></pre>
+	<div *ngIf="apis.current['security']">
+		<h3>Default Security Requirements</h3>
+		<div *ngFor="let req of apis.current['security']">
+			<p style="font-weight: bold">{{keys(req)[0]}}</p>
+			<ul *ngIf="req[keys(req)[0]].length>0">
+				<li *ngFor="let scope of req[keys(req)[0]]">{{scope}}</li>
+			</ul>
+		</div>
 	</div>
 </div>
 

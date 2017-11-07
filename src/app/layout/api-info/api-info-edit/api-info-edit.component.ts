@@ -103,7 +103,7 @@ export class ApiInfoEditComponent implements OnInit
 
 		console.log(this.apis.current);
 
-		// TODO: security & extension properties
+		// TODO: extension properties
 
 		this.activeModal.close('ok');
 	}
