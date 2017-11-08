@@ -1,0 +1,24 @@
+.swagger-schema-editor {
+	font-family: Arial;
+	font-size: 10pt;
+}
+
+.schema-control {
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 0.25rem;
+	transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+}
+
+.border-left {
+	border-left: 1px solid #eeeeee;
+}
+
+.schema-control input[type="text"],
+.schema-control select {
+	padding: 1px;
+	max-width: 15em;
+}
+
+.schemaDescription {
+	width: 30em;
+}

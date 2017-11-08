@@ -16,12 +16,18 @@ export class DefinitionEditComponent implements OnInit
 		size: "lg"
 	}
 
+	key: string = null;
+	obj: any = null;
+	obj_old: any = null;
+
 	constructor(public activeModal: NgbActiveModal, public apis: ApisService)
-	{ 
-		
+	{	
 	}
 
-	ngOnInit() {
+	ngOnInit() 
+	{
+		this.obj_old = this.obj;
+		this.obj = _.cloneDeep(this.obj_old);
 	}
 
 	ok() {

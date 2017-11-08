@@ -9,6 +9,7 @@ import { PrimitiveEditorComponent } from './primitive-editor.component';
 import { ObjectEditorComponent } from './object-editor.component';
 import { ArrayEditorComponent } from './array-editor.component';
 import { SecurityEditorComponent } from './custom/security-editor.component';
+import { SwaggerSchemaEditorComponent } from './custom/swagger-schema-editor.component';
 
 @NgModule({
 	imports: [
@@ -21,14 +22,16 @@ import { SecurityEditorComponent } from './custom/security-editor.component';
 		PrimitiveEditorComponent,
 		ObjectEditorComponent,
 		ArrayEditorComponent,
-		SecurityEditorComponent
+		SecurityEditorComponent,
+		SwaggerSchemaEditorComponent
 	],
 	exports: [
 		SchemaEditorComponent,
 		PrimitiveEditorComponent,
 		ObjectEditorComponent,
 		ArrayEditorComponent,
-		SecurityEditorComponent
+		SecurityEditorComponent,
+		SwaggerSchemaEditorComponent
 	]
 })
 export class SchemaEditorModule { }

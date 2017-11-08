@@ -82,7 +82,15 @@
 			"default": {}
 		},
 		"type": {
-			"$ref": "http://json-schema.org/draft-04/schema#/properties/type"
+			"anyOf": [
+                { "enum": [ "string", "number", "integer", "boolean", "object", "array", "null" ] },
+                {
+                    "type": "array",
+                    "items": { "enum": [ "string", "number", "integer", "boolean", "object", "array", "null" ] },
+                    "minItems": 1,
+                    "uniqueItems": true
+                }
+            ]
 		},
 		"items": {
 			"anyOf": [

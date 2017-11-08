@@ -13,8 +13,9 @@ import * as Swagger20SchemaContact from '../schemas/2.0/swagger-contact.json';
 import * as Swagger20SchemaLicense from '../schemas/2.0/swagger-license.json';
 import * as Swagger20SchemaExternalDocs from '../schemas/2.0/swagger-externalDocs.json';
 import * as Swagger20SchemaTags from '../schemas/2.0/swagger-tags.json';
-import * as Swagger20SecurityDefinitions from '../schemas/2.0/swagger-securityDefinitions.json';
-import * as Swagger20Security from '../schemas/2.0/swagger-security.json';
+import * as Swagger20SchemaSecurityDefinitions from '../schemas/2.0/swagger-securityDefinitions.json';
+import * as Swagger20SchemaSecurity from '../schemas/2.0/swagger-security.json';
+import * as Swagger20SchemaSchema from '../schemas/2.0/swagger-schema.json';
 
 @Injectable()
 export class ApisService 
@@ -28,8 +29,9 @@ export class ApisService
 			license: Swagger20SchemaLicense,
 			externalDocs: Swagger20SchemaExternalDocs,
 			tags: Swagger20SchemaTags,
-			securityDefinitions: Swagger20SecurityDefinitions,
-			security: Swagger20Security
+			securityDefinitions: Swagger20SchemaSecurityDefinitions,
+			security: Swagger20SchemaSecurity,
+			schema: Swagger20SchemaSchema
 		}
 	};
 
