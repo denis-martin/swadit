@@ -4,6 +4,10 @@ import { FormsModule } from '@angular/forms';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+import { ElasticInputModule } from 'angular2-elastic-input';
+import { ElasticModule } from 'angular2-elastic';
+import { TrimValueAccessorModule } from 'ng-trim-value-accessor';
+
 import { SchemaEditorComponent } from './schema-editor.component';
 import { PrimitiveEditorComponent } from './primitive-editor.component';
 import { ObjectEditorComponent } from './object-editor.component';
@@ -15,7 +19,10 @@ import { SwaggerSchemaEditorComponent } from './custom/swagger-schema-editor.com
 	imports: [
 		CommonModule,
 		FormsModule,
-		NgbModule
+		NgbModule,
+		ElasticInputModule.forRoot(),
+		ElasticModule,
+		TrimValueAccessorModule
 	],
 	declarations: [
 		SchemaEditorComponent,

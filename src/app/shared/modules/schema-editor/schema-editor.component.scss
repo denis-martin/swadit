@@ -39,6 +39,10 @@ label {
     border-color: #5cb3fd;
 }
 
+.input-group-overlapping-border {
+    margin-bottom: -1px;
+}
+
 .input-group-overlapping-border input, .input-group-overlapping-border .input-group-addon {
     border-color: #d9d9d9;
 }

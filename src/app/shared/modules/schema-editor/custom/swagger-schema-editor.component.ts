@@ -5,7 +5,10 @@ import { ApisService } from '../../../services';
 @Component({
 	selector: 'swadit-swagger-schema-editor',
 	templateUrl: './swagger-schema-editor.component.html',
-	styleUrls: ['./swagger-schema-editor.component.scss']
+	styleUrls: [
+		'./../schema-editor.component.scss',
+		'./swagger-schema-editor.component.scss'
+	]
 })
 export class SwaggerSchemaEditorComponent implements OnInit 
 {
@@ -25,13 +28,69 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		this.objChange.emit(this._obj);
 	}
 
+	itemsVisible = false;
+	uncollapsed = [];
+	propertyToAdd: string;
+	addPropertyError = "";
+
 	constructor(public apis: ApisService) { }
 
 	ngOnInit() {
 	}
 
-	keys(obj) {
+	keys(obj) 
+	{
+		if (!obj) return [];
 		return Object.keys(obj);
 	}
 
+	trackByIndex(index: any, item: any) 
+	{
+		return index;
+	}
+
+	addProperty(event: any)
+	{
+		event.preventDefault();
+		console.log("addProperty", this.propertyToAdd);
+		if (!this.propertyToAdd) {
+			this.addPropertyError = "Please enter a property name";
+			return;
+		}
+		if (!this.obj['properties']) {
+			this.obj['properties'] = {};
+		}
+		if (this.obj['properties'].hasOwnProperty(this.propertyToAdd)) {
+			this.addPropertyError = "Property already exists";
+			return;
+		}
+		this.addPropertyError = "";
+		
+		this.obj['properties'][this.propertyToAdd] = { 'type': 'string' };
+		this.propertyToAdd = null;
+	}
+
+	deleteProperty(event: any, propKey: string)
+	{
+		event.preventDefault();
+		console.log("deleteProperty", propKey);
+		delete this.obj['properties'][propKey];
+	}
+
+	propertyIsRequired(propKey)
+	{
+		return this.obj['required'] && this.obj['required'].indexOf(propKey) >= 0;
+	}
+
+	changePropertyIsRequired(propKey)
+	{
+		if (this.propertyIsRequired(propKey)) {
+			this.obj['required'].splice(this.obj['required'].indexOf(propKey), 1);
+		} else {
+			if (!this.obj['required']) {
+				this.obj['required'] = [];
+			}
+			this.obj['required'].push(propKey);
+		}
+	}
 }

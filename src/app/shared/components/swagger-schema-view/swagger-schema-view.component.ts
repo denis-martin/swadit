@@ -34,4 +34,9 @@ export class SwaggerSchemaViewComponent implements OnInit
 	{
 		return JSON.stringify(obj, null, 2);
 	}
+
+	propertyIsRequired(propKey)
+	{
+		return this.obj['required'] && this.obj['required'].indexOf(propKey) >= 0;
+	}
 }

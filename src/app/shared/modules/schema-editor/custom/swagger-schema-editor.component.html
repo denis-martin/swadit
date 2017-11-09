@@ -1,24 +1,32 @@
-<table class="swagger-schema-editor">
+<table class="swagger-schema-editor border-left">
+	<tr *ngIf="obj['$ref']">
+		<td class="label-text">$ref</td>
+		<td>
+			<select [(ngModel)]="obj['$ref']" class="form-control schema-control" style="max-width: 15em"
+				title="Reference to a #/definition">
+				<option value="">(none)</option>
+				<option *ngFor="let def of keys(apis.current['definitions'])" value="#/definitions/{{def}}">
+					{{def}}
+				</option>
+			</select>
+		</td>
+	</tr>
+
 	<tr *ngIf="!obj['$ref']">
 		<td class="label-text">type</td>
-		<td>
+		<td class="no-padding">
 			<table>
 				<tr>
 					<td>
-						<select id="{{id}}" [(ngModel)]="obj['type']" title="Type" class="schema-control">
+						<select id="{{id}}" [(ngModel)]="obj['type']" title="Type" class="form-control schema-control">
 							<option *ngFor="let t of schema['properties']['type']['anyOf'][0]['enum']" value="{{t}}">
 								{{t}}
 							</option>
-						</select>&nbsp;
+						</select>
 					</td>
-					<td *ngIf="obj['type'] != 'object' && obj['type'] != 'array'" class="label-text">format</td>
-					<td *ngIf="obj['type'] != 'object' && obj['type'] != 'array'" >
-						<input type="text" class="schema-control"
-							title="Format of type (optional). Examples:&#10;integer: int32, int64&#10;number: float, double&#10;string: byte, binary, date, date-time, password"
-							placeholder="Format (optional)" [(ngModel)]="obj['format']">&nbsp;</td>
-					<td class="label-text border-left">or $ref</td>
-					<td>
-						<select [(ngModel)]="obj['$ref']" class="schema-control" style="max-width: 15em"
+					<td class="label-text">or $ref</td>
+					<td class="no-padding">
+						<select [(ngModel)]="obj['$ref']" class="form-control schema-control" style="max-width: 15em"
 							title="Reference to a #/definition">
 							<option value="">(none)</option>
 							<option *ngFor="let def of keys(apis.current['definitions'])" value="#/definitions/{{def}}">
@@ -30,88 +38,105 @@
 			</table>
 		</td>
 	</tr>
-	<tr *ngIf="obj['$ref']">
-		<td class="label-text">$ref</td>
-		<td>
-			<select [(ngModel)]="obj['$ref']" class="schema-control" style="max-width: 15em"
-				title="Reference to a #/definition">
-				<option value="">(none)</option>
-				<option *ngFor="let def of keys(apis.current['definitions'])" value="#/definitions/{{def}}">
-					{{def}}
-				</option>
-			</select>
+	<tr *ngIf="!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array'">
+		<td class="label-text">format</td>
+		<td><input type="text" class="form-control schema-control" elastic-input
+				title="Format of type (optional). Examples:&#10;integer: int32, int64&#10;number: float, double&#10;string: byte, binary, date, date-time, password"
+				placeholder="Format (optional)" [(ngModel)]="obj['format']">
 		</td>
 	</tr>
 	
 	<tr *ngIf="!obj['$ref']">
 		<td class="label-text">description</td>
 		<td><textarea title="Description (optional)" placeholder="Description (optional)" cols="30" rows="1" 
-			class="schema-control" 
+			class="form-control schema-control" fz-elastic
 			[(ngModel)]="obj['description']"></textarea></td>
 	</tr>
-	<!--
-	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type != 'object' && schema.type != 'array'">
+	
+	<!-- TODO: validate field -->
+	<tr *ngIf="!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array'">
 		<td class="label-text">default</td>
-		<td>
-			<input type="text" title="Default value (optional)" placeholder="Default value (optional)" ng-trim="true" pu-elastic-input
-				ng-model="schema.default" ng-change="onExampleChange('default')" ng-init="onExampleChange('default')">
-			<span ng-show="verify.default" class="swaggerValidationFailed">{{verify.default}}</span>
+		<td><input type="text" title="Default value (optional)" placeholder="Default value (optional)" elastic-input
+			[(ngModel)]="obj['default']" class="form-control schema-control">
 		</td>
 	</tr>
-	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type != 'object' && schema.type != 'array'">
+	<!-- TODO: validate field -->
+	<tr *ngIf="!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array'">
 		<td class="label-text">example</td>
-		<td>
-			<input type="text" title="Example value (optional)" placeholder="Example value (optional)" ng-trim="true" pu-elastic-input
-				ng-model="schema.example" ng-change="onExampleChange('example')" ng-init="onExampleChange('example')">
-			<span ng-show="verify.example" class="swaggerValidationFailed">{{verify.example}}</span>
+		<td><input type="text" title="Example value (optional)" placeholder="Example value (optional)" elastic-input
+				[(ngModel)]="obj['example']" class="form-control schema-control">
 		</td>
 	</tr>
 
-	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type == 'array'">
-		<td class="label-text">items</td>
-		<td class="paddedText">
-			<span class="typePreview">{{schema.items.$ref ? schema.items.$ref : schema.items.type}}</span>
-			<span class="smallButton discreet" title="Show/hide the details of the items" 
-				ng-click="itemsVisible?itemsVisible=false:itemsVisible=true">Details</span>
-			<div ng-controller="SwaditSchemaController" ng-init="schema = $parent.schema.items">
-				<div ng-if="itemsVisible" ng-include src="'ui/schemaEditor.html'"></div>
+	<tr *ngIf="!obj['$ref'] && obj['type'] == 'array'">
+		<td class="label-text clickable" (click)="itemsVisible = !itemsVisible" title="Show/hide the details of the items">
+			<i *ngIf="obj['items'] && !obj['items']['$ref'] && !itemsVisible" class="fa fa-caret-right"></i>
+			<i *ngIf="obj['items'] && !obj['items']['$ref'] && itemsVisible" class="fa fa-caret-down"></i>
+			items
+		</td>
+		<td class="no-padding">
+			<button *ngIf="!obj['items'] || (!obj['items']['$ref'] && !obj['items']['type'])" 
+				class="btn"
+				(click)="obj['items'] = { 'type': 'string'}; itemsVisible = true">
+				add
+			</button>
+			<div *ngIf="obj['items'] && !obj['items']['$ref'] && obj['items']['type'] && !itemsVisible" 
+				class="typePreview clickable" (click)="itemsVisible = !itemsVisible" title="Show/hide the details of the items">
+				{{obj['items']['type']}}
 			</div>
+			<swadit-swagger-schema-editor *ngIf="obj['items'] && (itemsVisible || obj['items']['$ref'])"
+				[schema]="apis.schemas['schema']" [(obj)]="obj['items']" [id]="'itemSchema'">
+			</swadit-swagger-schema-editor>
 		</td>
 	</tr>
-	<tr ng-if="(schema.$ref == undefined || schema.$ref == '') && schema.type == 'object'">
+	
+	<tr *ngIf="!obj['$ref'] && obj['type'] == 'object'">
 		<td class="label-text">properties</td>
-		<td>
-			<div ng-repeat="(propKey, propSchema) in schema.properties" ng-init="propName = propKey">
-				<form ng-submit="renameSchemaProperty(propKey, propName)">
-					<span class="glyphbutton glyphicon glyphicon-remove" title="Deletes the property" ng-click="deleteSchemaProperty(propKey)"></span>
-					<span class="glyphbutton glyphicon glyphicon-edit" title="Show/hide the details of the property" ng-click="toggleVisibility(propKey)"></span>
-					<span class="glyphbutton glyphicon glyphicon-asterisk" title="Set/unset this property as required property" ng-click="toggleRequired(propKey)" 
-						ng-class="(schema.required && schema.required.indexOf(propKey)>-1)?'requiredPropertySelected':''"></span>
-					<input type="text" placeholder="Name of property" class="objectProperty" ng-model="propName"
-						title="{{(propSchema.description==undefined || propSchema.description=='')?'Name of property':propSchema.description}}"
-						required ng-trim="true" ng-blur="renameSchemaProperty(propKey, propName)" pu-elastic-input>
-					<button type="submit" class="hidden" title="Renames the property">Rename</button>
-					<span class="showPointer" ng-click="toggleVisibility(propKey)">
-						<span class="typePreview">: {{getPropertyPreview(propSchema)}}</span>
-						<span ng-if="(propSchema.description!=undefined && propSchema.description!='')">
-							{{propSchema.description.length > 40 ? propSchema.description.substr(0,39) + '...' : propSchema.description}}
+		<td class="no-padding-right">
+			<div *ngFor="let propKey of keys(obj['properties']); let index = index; trackBy:trackByIndex">
+				<div class="input-group input-group-overlapping-border">
+					<span class="input-group-addon clickable propertyTypeAddon" (click)="uncollapsed[propKey] = !uncollapsed[propKey]">
+						<span>
+							<i *ngIf="!uncollapsed[propKey]" class="fa fa-fw-sm fa-caret-right"></i>
+							<i *ngIf="uncollapsed[propKey]" class="fa fa-fw-sm fa-caret-down"></i>
+							<span *ngIf="!obj['properties'][propKey]['$ref'] && obj['properties'][propKey]['type']">
+								{{obj['properties'][propKey]['type']}}</span>
+							<span *ngIf="obj['properties'][propKey]['$ref']">
+								$ref</span>
 						</span>
 					</span>
-				</form>
-				<div ng-controller="SwaditSchemaController" ng-init="schema = propSchema">
-					<div ng-if="$parent.visibility[propKey]" ng-include src="'ui/schemaEditor.html'"></div>
+					<span class="input-group-addon clickable propertyRequired" 
+						[ngClass]="{'propertyIsRequired': propertyIsRequired(propKey)}"
+						title="Set property as required property"
+						(click)="changePropertyIsRequired(propKey)">
+						<i class="fa fa-asterisk"></i>
+					</span>
+					<input type="text" placeholder="Name of property" title="Name of property" 
+						class="form-control schema-control" 
+						[ngModel]="propKey"
+						(ngModelChange)="changeProperty($event, index, propKey)"
+						(keydown.enter)="changeProperty($event, index, propKey)">
+					<span class="input-group-addon clickable" (click)="deleteProperty($event, propKey)">
+						<i class="fa fa-fw fa-trash"></i>
+					</span>
+				</div>
+				<div *ngIf="uncollapsed[propKey]" style="margin-top: 2px; margin-bottom: 1px">
+					<swadit-swagger-schema-editor
+						[schema]="apis.schemas['schema']" [(obj)]="obj['properties'][propKey]" [id]="'propSchema'">
+					</swadit-swagger-schema-editor>
 				</div>
 			</div>
-			<div>
-				<form ng-submit="newSchemaProperty(newPropName)">
-					<input type="text" placeholder="Add a property" ng-model="newPropName"
-						title="Add a new property to the object schema"
-						required ng-trim="true" ng-blur="newPropName = ''">
-					<button type="submit" class="hidden" title="Adds a new property to the object schema">Add</button>
-				</form>
+			<div class="input-group" [ngClass]="{'propertyAddMargin': keys(obj['properties']).length>0}">
+				<div class="input-group-addon" title="{{addPropertyError}}" *ngIf="addPropertyError">
+					<i class="fa fa-fw-sm fa-exclamation" style="color: red"></i>
+				</div>
+				<input type="text" placeholder="Name of property to add" title="Name of property to add" 
+					class="form-control schema-control" 
+					[(ngModel)]="propertyToAdd" (keydown.enter)="addProperty($event)">
+				<div class="input-group-addon clickable" (click)="addProperty($event)" title="Adds a new property to the object schema">
+					<i class="fa fa-fw fa-plus"></i>
+				</div>
 			</div>
 		</td>
 	</tr>
-	-->
 </table>
-<hr>

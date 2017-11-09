@@ -17,7 +17,7 @@
 			<td>
 				<div *ngFor="let p of keys(obj['properties'])">
 					<div class="clickable" (click)="uncollapsed[p] = !uncollapsed[p]">
-						<span class="property">{{p}}</span>
+						<span class="property">{{p}}<span *ngIf="propertyIsRequired(p)" style="color: red">*</span></span>
 						<span class="propertyType">: 
 							{{obj['properties'][p]['type'] || obj['properties'][p]['$ref']}}
 							<span *ngIf="obj['properties'][p]['type'] == 'array'">

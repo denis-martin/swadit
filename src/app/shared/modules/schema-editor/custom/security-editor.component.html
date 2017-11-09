@@ -1,6 +1,6 @@
 <div *ngFor="let item of obj; let index = index; trackBy:trackByIndex">
 	<div *ngFor="let p of keys(item); let indexp = index; trackBy:trackByIndex" class="form-group">
-		<div class="input-group input-group-overlapping-border" style="margin-bottom: -1px">
+		<div class="input-group input-group-overlapping-border">
 			<span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
 				<i *ngIf="!collapsed[p]" class="fa fa-caret-down"></i>
 				<i *ngIf="collapsed[p]"  class="fa fa-caret-right"></i>
