@@ -5,7 +5,7 @@ import * as YAML from 'js-yaml';
 @Component({
 	selector: 'swadit-extensions-view',
 	templateUrl: './extensions-view.component.html',
-	styleUrls: ['./extensions-view.component.scss']
+	styleUrls: ['./../schema-view.component.scss']
 })
 export class ExtensionsViewComponent implements OnInit {
 	@Input() obj: any;

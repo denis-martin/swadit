@@ -1,11 +1,11 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
-import { ApisService } from '../../../shared/services';
+import { ApisService } from '../../../services';
 
 @Component({
 	selector: 'swadit-swagger-schema-view',
 	templateUrl: './swagger-schema-view.component.html',
-	styleUrls: ['./swagger-schema-view.component.scss']
+	styleUrls: ['./../schema-view.component.scss']
 })
 export class SwaggerSchemaViewComponent implements OnInit 
 {

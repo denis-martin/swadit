@@ -6,8 +6,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MarkdownModule } from 'angular2-markdown';
 import { HighlightModule } from 'ngx-highlightjs';
 
-import { ExtensionsViewComponent } from '../../shared/components/extensions-view/extensions-view.component';
-
+import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
 import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
 
 import { ApiInfoRoutingModule } from './api-info-routing.module';
@@ -21,11 +20,11 @@ import { ApiInfoEditComponent } from './api-info-edit/api-info-edit.component';
 		NgbModule.forRoot(),
 		MarkdownModule.forRoot(),
 		HighlightModule.forRoot(),
+		SchemaViewModule,
 		SchemaEditorModule,
 		ApiInfoRoutingModule,
 	],
 	declarations: [
-		ExtensionsViewComponent,
 		ApiInfoComponent, 
 		ApiInfoEditComponent
 	],

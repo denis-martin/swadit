@@ -7,11 +7,11 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MarkdownModule } from 'angular2-markdown';
 import { HighlightModule } from 'ngx-highlightjs';
 
+import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
 import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
 
 import { DefinitionsRoutingModule } from './definitions-routing.module';
 import { DefinitionsComponent } from './definitions.component';
-import { SwaggerSchemaViewComponent } from './../../shared/components/swagger-schema-view/swagger-schema-view.component';
 import { DefinitionEditComponent } from './definition-edit/definition-edit.component';
 
 @NgModule({
@@ -21,13 +21,14 @@ import { DefinitionEditComponent } from './definition-edit/definition-edit.compo
 		NgbModule,
 		MarkdownModule.forRoot(),
 		HighlightModule.forRoot(),
+		SchemaViewModule,
 		SchemaEditorModule,
 		DefinitionsRoutingModule
 	],
 	declarations: [
-		DefinitionsComponent, 
-		SwaggerSchemaViewComponent, 
-		DefinitionEditComponent],
+		DefinitionsComponent,
+		DefinitionEditComponent
+	],
 	entryComponents: [DefinitionEditComponent]
 })
 export class DefinitionsModule { }
