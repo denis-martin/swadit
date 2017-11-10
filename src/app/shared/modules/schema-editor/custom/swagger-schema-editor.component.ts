@@ -77,6 +77,13 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		delete this.obj['properties'][propKey];
 	}
 
+	changeProperty(newPropKey: any, propKey: string)
+	{
+		if (newPropKey && newPropKey != propKey) {
+			this.apis.renameObjectKey(this.obj['properties'], propKey, newPropKey);
+		}
+	}
+
 	propertyIsRequired(propKey)
 	{
 		return this.obj['required'] && this.obj['required'].indexOf(propKey) >= 0;

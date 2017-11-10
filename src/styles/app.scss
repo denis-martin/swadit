@@ -98,3 +98,8 @@ h6 {
 .fa-fw-sm {
 	width: 0.75em;
 }
+
+.form-control.ng-dirty.ng-invalid
+{
+    border:1px solid #f00;
+}

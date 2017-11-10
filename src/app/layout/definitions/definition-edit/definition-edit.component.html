@@ -1,13 +1,25 @@
 <form (ngSubmit)="ok()" #editForm="ngForm">
+	<!--
 	<div class="modal-header">
 		<h3 class="modal-title" id="modal-title">Definition</h3>
 	</div>
+	-->
 	<div class="modal-body" id="modal-body">
-		<swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'schema'">
+		<div class="form-group">
+			<label for="definitionKey">Name of definition</label>
+			<input type="text" id="definitionKey" name="definitionKey" [(ngModel)]="key" required
+				class="form-control" placeholder="Enter name for definition" title="Name of definition">
+		</div>
+		<label for="definitionSchema">Schema</label>
+		<swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'definitionSchema'">
 		</swadit-swagger-schema-editor>
 	</div>
 	<div class="modal-footer">
-		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">Apply</button>
-		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" [disabled]="!editForm.form.valid">Cancel</button>
+		<button *ngIf="key_orig" class="btn btn-danger mr-auto" (click)="deleteDefinition()" title="Delete definition">
+			Delete</button>
+		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
+			Apply</button>
+		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+			Cancel</button>
 	</div>
 </form>

@@ -114,8 +114,8 @@
 					<input type="text" placeholder="Name of property" title="Name of property" 
 						class="form-control schema-control" 
 						[ngModel]="propKey"
-						(ngModelChange)="changeProperty($event, index, propKey)"
-						(keydown.enter)="changeProperty($event, index, propKey)">
+						(ngModelChange)="changeProperty($event, propKey)"
+						(keydown.enter)="changeProperty($event, propKey)">
 					<span class="input-group-addon clickable" (click)="deleteProperty($event, propKey)">
 						<i class="fa fa-fw fa-trash"></i>
 					</span>

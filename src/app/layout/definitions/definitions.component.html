@@ -29,7 +29,7 @@
 	<div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
 		{{def}}
 		<div class="edit-card" (click)="edit($event, def)">
-			<i class="fa fa-pencil"></i>
+			<i class="fa fa-fw fa-pencil"></i>
 		</div>
 	</div>
 	<div class="card-block" *ngIf="uncollapsedDef[def]">

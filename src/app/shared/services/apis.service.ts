@@ -4,6 +4,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 import { Spec as Swagger } from 'swagger-schema-official';
 import * as SwaggerParser from 'swagger-parser';
 import * as YAML from 'js-yaml';
+import * as _ from "lodash";
 
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
 
@@ -154,6 +155,7 @@ export class ApisService
 						delete api[p];
 					}
 				});
+			// TODO: properties AND additionalProperties
 			} else if (schema['additionalProperties']) {
 				Object.keys(api).forEach(p => {
 					if (api[p] != null) {
@@ -169,6 +171,26 @@ export class ApisService
 				this.cleanUp(schema['items'], item);
 			});
 		}
+	}
+
+	cleanUpSwaggerSchema(obj: any)
+	{
+		this.cleanUp(this.schemas.schema, obj);
+
+		if (obj['type'] == "array") {
+			delete obj['properties'];
+			delete obj['format'];
+
+		} else if (obj['type'] == "object") {
+			delete obj['items'];
+			delete obj['format'];
+
+		} else {
+			delete obj['items'];
+			delete obj['properties'];
+
+		}
+		// todo: check for additional optional attributes
 	}
 
 	createBlobUrl()
@@ -274,5 +296,19 @@ export class ApisService
 			return this.current['definitions'][refParts[2]];
 		}
 		return null;
+	}
+
+	renameObjectKey(obj: any, key: string, newKey: string) 
+	{
+		var newObj = _.clone(obj);
+		Object.keys(obj).forEach(k => delete obj[k]);
+		Object.keys(newObj).forEach(k => {
+			if (k != key) {
+				obj[k] = newObj[k];
+			} else {
+				obj[newKey] = newObj[key];
+			}
+		});
+		return obj;
 	}
 }

@@ -639,6 +639,7 @@ definitions:
         format: "int64"
       username:
         type: "string"
+        x-swadit-test-string: "test"
       firstName:
         type: "string"
       lastName:

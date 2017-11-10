@@ -40,7 +40,7 @@ export class DefinitionsComponent implements OnInit
 
 		this.editModal = this.modalService.open(DefinitionEditComponent, DefinitionEditComponent.modalOptions);
 		this.editModal.componentInstance.key = def;
-		this.editModal.componentInstance.obj = this.apis.current['definitions'][def];
+		this.editModal.componentInstance.obj = def ? this.apis.current['definitions'][def] : {};
 		this.editModal.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 			console.info("edit(): " + this.closeResult);
