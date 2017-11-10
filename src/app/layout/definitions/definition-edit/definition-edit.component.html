@@ -10,9 +10,11 @@
 			<input type="text" id="definitionKey" name="definitionKey" [(ngModel)]="key" required
 				class="form-control" placeholder="Enter name for definition" title="Name of definition">
 		</div>
-		<label for="definitionSchema">Schema</label>
-		<swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'definitionSchema'">
-		</swadit-swagger-schema-editor>
+		<div class="form-group">
+			<label for="definitionSchema">Schema</label>
+			<swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'definitionSchema'">
+			</swadit-swagger-schema-editor>
+		</div>
 	</div>
 	<div class="modal-footer">
 		<button *ngIf="key_orig" class="btn btn-danger mr-auto" (click)="deleteDefinition()" title="Delete definition">

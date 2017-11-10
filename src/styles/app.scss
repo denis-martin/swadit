@@ -99,7 +99,8 @@ h6 {
 	width: 0.75em;
 }
 
-.form-control.ng-dirty.ng-invalid
+.form-control.ng-dirty.ng-invalid,
+.form-control.schema-control.ng-dirty.ng-invalid
 {
-    border:1px solid #f00;
+    border: 1px solid #f00;
 }
