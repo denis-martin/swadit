@@ -1,0 +1,38 @@
+<div class="edit-section" (click)="edit($event)" title="Add item">
+	<i class="fa fa-plus"></i>
+</div>
+<div class="filterBox">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="input-group">
+				<span class="input-group-addon">
+					<i class="fa fa-filter"></i>
+				</span>
+				<input type="text" [(ngModel)]="filterText" name="filterText" class="form-control"
+					placeholder="Filter by key name" title="Filter by key name">
+				<span class="input-group-addon clickable" *ngIf="filterText" (click)="filterText=''">
+					<i class="fa fa-times"></i>
+				</span>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="checkbox">
+				<input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
+				<label for="sortItems" class="mb-0" style="margin-top: 0.4rem">Display sorted</label>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div *ngFor="let param of apis.filterList(keys(apis.current['parameters']), filterText, sortItems); let index = index" 
+	class="card mb-1">
+	<div class="card-header clickable" (click)="uncollapsed[param] = !uncollapsed[param]">
+		{{param}}
+		<div class="edit-card" (click)="edit($event, param)">
+			<i class="fa fa-fw fa-pencil"></i>
+		</div>
+	</div>
+	<div class="card-block" *ngIf="uncollapsed[param]">
+		tbd
+	</div>
+</div>

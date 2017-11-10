@@ -1,0 +1,26 @@
+<form (ngSubmit)="ok()" #editForm="ngForm">
+	<!--
+	<div class="modal-header">
+		<h3 class="modal-title" id="modal-title">Parameter</h3>
+	</div>
+	-->
+	<div class="modal-body" id="modal-body">
+		<div class="form-group">
+			<label for="parameterKey">Name of parameter</label>
+			<input type="text" id="parameterKey" name="parameterKey" [(ngModel)]="key" required
+				class="form-control" placeholder="Enter name for parameter" title="Name of parameter">
+		</div>
+		<div class="form-group">
+			<label for="parameterSchema">Parameter</label>
+			tbd
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button *ngIf="key_orig" class="btn btn-danger mr-auto" (click)="deleteParameter()" title="Delete parameter">
+			Delete</button>
+		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
+			Apply</button>
+		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+			Cancel</button>
+	</div>
+</form>
