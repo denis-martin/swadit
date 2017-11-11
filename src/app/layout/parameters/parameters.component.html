@@ -33,6 +33,13 @@
 		</div>
 	</div>
 	<div class="card-block" *ngIf="uncollapsed[param]">
-		tbd
+		<swadit-schema-view *ngIf="apis.current['parameters'][param]['in']=='body'; else nonBodyParameter"
+			[schema]="apis.schemas.parameterBody" [obj]="apis.current['parameters'][param]">
+		</swadit-schema-view>
+		<ng-template #nonBodyParameter>
+			<swadit-schema-view
+				[schema]="apis.schemas.parameterNonBody" [obj]="apis.current['parameters'][param]">
+			</swadit-schema-view>
+		</ng-template>
 	</div>
 </div>

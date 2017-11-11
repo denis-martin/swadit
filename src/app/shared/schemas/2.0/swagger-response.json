@@ -1,0 +1,32 @@
+{
+	"title": "A JSON Schema for Swagger 2.0 API.",
+	"id": "http://swagger.io/v2/schema.json#/definitions/response",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"required": [
+		"description"
+	],
+	"properties": {
+		"description": {
+			"type": "string",
+			"x-swadit-markdown": true
+		},
+		"schema": {
+			"$ref": "#/definitions/schema",
+			"x-swadit-view-swagger-schema": true
+		},
+		"headers": {
+			"$ref": "#/definitions/headers"
+		},
+		"examples": {
+			"type": "object",
+			"additionalProperties": true
+		}
+	},
+	"additionalProperties": false,
+	"patternProperties": {
+		"^x-": {
+			"$ref": "#/definitions/vendorExtension"
+		}
+	}
+}

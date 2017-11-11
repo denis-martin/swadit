@@ -17,6 +17,9 @@ import * as Swagger20SchemaTags from '../schemas/2.0/swagger-tags.json';
 import * as Swagger20SchemaSecurityDefinitions from '../schemas/2.0/swagger-securityDefinitions.json';
 import * as Swagger20SchemaSecurity from '../schemas/2.0/swagger-security.json';
 import * as Swagger20SchemaSchema from '../schemas/2.0/swagger-schema.json';
+import * as Swagger20SchemaParameterBody from '../schemas/2.0/swagger-parameterBody.json';
+import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-parameterNonBody.json';
+import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
 
 @Injectable()
 export class ApisService 
@@ -32,7 +35,10 @@ export class ApisService
 			tags: Swagger20SchemaTags,
 			securityDefinitions: Swagger20SchemaSecurityDefinitions,
 			security: Swagger20SchemaSecurity,
-			schema: Swagger20SchemaSchema
+			schema: Swagger20SchemaSchema,
+			parameterBody: Swagger20SchemaParameterBody,
+			parameterNonBody: Swagger20SchemaParameterNonBody,
+			response: Swagger20SchemaResponse
 		}
 	};
 

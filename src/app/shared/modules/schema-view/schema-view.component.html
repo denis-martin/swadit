@@ -1,0 +1,33 @@
+<table *ngIf="schema['type'] && schema['type'] == 'object'; else jsonView">
+	<tbody>
+		<tr *ngFor="let key of getKeys()">
+			<td class="label-text">{{key}}</td>
+			<td *ngIf="schema['properties'] && schema['properties'][key]"
+				[ngClass]="{ 'no-padding': isComplex(obj[key]) }">
+				<markdown *ngIf="schema['properties'][key]['x-swadit-markdown']; else nonMarkdown"
+					[data]="obj[key]"></markdown>
+				<ng-template #nonMarkdown>
+					<swadit-swagger-schema-view 
+						*ngIf="schema['properties'][key]['x-swadit-view-swagger-schema']; else schemaView"
+						[obj]="obj[key]">
+					</swadit-swagger-schema-view>
+					<ng-template #schemaView>
+						<span *ngIf="!isComplex(obj[key]); else recursiveView">{{obj[key]}}</span>
+						<ng-template #recursiveView>
+							<swadit-schema-view [schema]="schema['properties'][key]" [obj]="obj[key]">
+							</swadit-schema-view>
+						</ng-template>
+					</ng-template>
+				</ng-template>
+			</td>
+			<td *ngIf="!schema['properties'] || !schema['properties'][key]"
+				[ngClass]="{ 'no-padding': isComplex(obj[key]) }">
+				<span *ngIf="!isComplex(obj[key])">{{obj[key]}}</span>
+				<pre *ngIf="isComplex(obj[key])"><code highlight [innerHTML]="obj[key] | json"></code></pre>
+			</td>
+		</tr>
+	</tbody>
+</table>
+<ng-template #jsonView>
+	<pre><code highlight [innerHTML]="obj[key] | json"></code></pre>
+</ng-template>

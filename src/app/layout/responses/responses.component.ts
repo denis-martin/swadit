@@ -12,7 +12,7 @@ import { ResponseEditComponent } from './response-edit/response-edit.component';
 })
 export class ResponsesComponent implements OnInit 
 {
-	uncollapsedDef = {};
+	uncollapsed = {};
 	sortItems = false;
 	filterText: string;
 

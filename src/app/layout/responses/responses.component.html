@@ -24,15 +24,17 @@
 	</div>
 </div>
 
-<div *ngFor="let def of apis.filterList(keys(apis.current['responses']), filterText, sortItems); let index = index" 
+<div *ngFor="let resp of apis.filterList(keys(apis.current['responses']), filterText, sortItems); let index = index" 
 	class="card mb-1">
-	<div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
-		{{def}}
-		<div class="edit-card" (click)="edit($event, def)">
+	<div class="card-header clickable" (click)="uncollapsed[resp] = !uncollapsed[resp]">
+		{{resp}}
+		<div class="edit-card" (click)="edit($event, resp)">
 			<i class="fa fa-fw fa-pencil"></i>
 		</div>
 	</div>
-	<div class="card-block" *ngIf="uncollapsedDef[def]">
-		tbd
+	<div class="card-block" *ngIf="uncollapsed[resp]">
+		<swadit-schema-view
+			[schema]="apis.schemas.response" [obj]="apis.current['responses'][resp]">
+		</swadit-schema-view>
 	</div>
 </div>

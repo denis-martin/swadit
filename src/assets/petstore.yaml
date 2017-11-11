@@ -44,6 +44,37 @@ security:
 - petstore_auth:
   - "write:pets"
   - "read:pets"
+parameters:
+  skipParam:
+    name: skip
+    in: query
+    description: number of items to skip
+    type: integer
+    format: int32
+    required: true
+  limitParam:
+    name: limit
+    in: query
+    type: integer
+  bodyParam:
+    name: limit
+    in: body
+    schema:
+      type: object
+      properties:
+        myCommandCode:
+          type: integer
+responses:
+  myResponse:
+    description: My first response object
+    schema:
+      type: object
+      properties:
+        myResponseCode:
+          type: integer
+    examples:
+      application/json:
+        myResponseCode: 42
 paths:
   /pet:
     post:
