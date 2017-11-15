@@ -305,7 +305,13 @@ export class ApisService
 			});
 		}
 		if (sorted) {
-			return filteredList.sort();
+			return filteredList.sort((a, b) => {
+				a = a.toLowerCase();
+				b = b.toLowerCase();
+				if (a == b) return 0;
+				if (a > b) return 1;
+				return -1;
+			});
 		} else {
 			return filteredList;
 		}
