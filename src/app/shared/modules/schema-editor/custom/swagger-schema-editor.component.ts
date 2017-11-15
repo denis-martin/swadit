@@ -52,7 +52,11 @@ export class SwaggerSchemaEditorComponent implements OnInit
 
 	constructor(public apis: ApisService) { }
 
-	ngOnInit() {
+	ngOnInit() 
+	{
+		if (!this.schema) {
+			this.schema = this.apis.schemas.schema;
+		}
 	}
 
 	keys(obj) 

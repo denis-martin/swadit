@@ -23,21 +23,31 @@
 	-->
 	<div class="modal-body" id="modal-body">
 		<div class="form-group">
-			<label for="parameterKey">Name of parameter</label>
+			<label for="parameterKey">Name of parameter definition</label>
 			<input type="text" id="parameterKey" name="parameterKey" [(ngModel)]="key" required
 				class="form-control" placeholder="Enter name for parameter" title="Name of parameter">
 		</div>
 		<div class="form-group">
-			<label for="parameterSchema">Parameter</label>
-			tbd
+			<label for="parameterSchema">Parameter definition</label>
+			<swadit-object-editor *ngIf="obj['in'] != 'body'"
+				[id]="'parameterSchema'" 
+				[schema]="apis.schemas.parameterNonBody" [(obj)]="obj" [title]="false">
+			</swadit-object-editor>
+			<swadit-object-editor *ngIf="obj['in'] == 'body'"
+				[id]="'parameterSchema'" 
+				[schema]="apis.schemas.parameterBody" [(obj)]="obj" [title]="false">
+			</swadit-object-editor>
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button *ngIf="key_orig" class="btn btn-danger mr-auto" (click)="deleteParameter()" title="Delete parameter">
+		<button *ngIf="key_orig" class="btn btn-danger mr-auto" type="button" (click)="deleteParameter()" title="Delete parameter">
 			Delete</button>
+		<span *ngIf="errorStr" style="color: red">
+			{{errorStr}}
+		</span>
 		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
 			Apply</button>
-		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
 			Cancel</button>
 	</div>
 </form>

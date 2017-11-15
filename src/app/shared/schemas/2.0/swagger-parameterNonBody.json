@@ -14,6 +14,16 @@
 			"$ref": "#/definitions/vendorExtension"
 		}
 	},
+	"x-swadit-editor-grid": [
+		[ "name", "in", "required" ],
+		[ "type", "format" ],
+		[ "description" ]
+	],
+	"x-swadit-editor-grid-cols": {
+		"name": 5, "in": 5, "required": 2,
+		"type": 6, "format": 6,
+		"description": 12
+	},
 	"properties": {
 		"name": {
 			"type": "string",
@@ -33,7 +43,9 @@
 		"description": {
 			"type": "string",
 			"description": "A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.",
-			"x-swadit-markdown": true
+			"x-swadit-markdown": true,
+			"x-swadit-input-multiline": 5,
+			"x-swadit-input-class": "monospace"
 		},
 		"required": {
 			"type": "boolean",
@@ -45,13 +57,15 @@
 			"enum": [
 				"string",
 				"number",
-				"boolean",
 				"integer",
-				"array"
+				"boolean",
+				"array",
+				"file"
 			]
 		},
 		"format": {
-			"type": "string"
+			"type": "string",
+			"description": "Format of type (optional). Examples: \ninteger: int32, int64 \nnumber: float, double \nstring: byte, binary, date, date-time, password"
 		},
 		"items": {
 			"$ref": "#/definitions/primitivesItems"

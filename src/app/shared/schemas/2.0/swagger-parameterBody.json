@@ -13,6 +13,16 @@
 			"$ref": "#/definitions/vendorExtension"
 		}
 	},
+	"x-swadit-editor-grid": [
+		[ "name", "in", "required" ],
+		[ "description" ],
+		[ "schema" ]
+	],
+	"x-swadit-editor-grid-cols": {
+		"name": 6, "in": 4, "required": 2,
+		"description": 12,
+		"schema": 12
+	},
 	"properties": {
 		"name": {
 			"type": "string",
@@ -32,7 +42,9 @@
 		"description": {
 			"type": "string",
 			"description": "A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.",
-			"x-swadit-markdown": true
+			"x-swadit-markdown": true,
+			"x-swadit-input-multiline": 5,
+			"x-swadit-input-class": "monospace"
 		},
 		"required": {
 			"type": "boolean",
@@ -41,7 +53,7 @@
 		},
 		"schema": {
 			"$ref": "#/definitions/schema",
-			"x-swadit-view-swagger-schema": true
+			"x-swadit-swagger-schema": true
 		}
 	},
 	"additionalProperties": false

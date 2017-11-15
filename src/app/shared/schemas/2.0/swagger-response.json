@@ -9,17 +9,21 @@
 	"properties": {
 		"description": {
 			"type": "string",
-			"x-swadit-markdown": true
+			"description": "A brief description of the response. This could contain examples of use.  GitHub Flavored Markdown is allowed.",
+			"x-swadit-markdown": true,
+			"x-swadit-input-multiline": 5,
+			"x-swadit-input-class": "monospace"
 		},
 		"schema": {
 			"$ref": "#/definitions/schema",
-			"x-swadit-view-swagger-schema": true
+			"x-swadit-swagger-schema": true
 		},
 		"headers": {
 			"$ref": "#/definitions/headers"
 		},
 		"examples": {
 			"type": "object",
+			"description": "An example of the response message. \n\nThe name of the property MUST be one of the Operation produces values (either implicit or inherited). The value SHOULD be an example of what such a response would look like.",
 			"additionalProperties": true
 		}
 	},

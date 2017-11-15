@@ -48,29 +48,39 @@ export class ResponseEditComponent implements OnInit
 	{
 		this.key_orig = this.key;
 		this.obj_orig = this.obj;
+		if (!this.obj_orig) this.obj_orig = {};
 		this.obj = _.cloneDeep(this.obj_orig);
+		if (!this.obj['schema']) this.obj['schema'] = { type: 'object' };
 	}
 
 	ok() 
 	{
 		console.log("ResponseEditComponent.ok()");
 
-		if (!this.key) {
-			this.errorStr = "Please enter a name for this response";
+		if (!this.key || !this.key.trim()) {
+			this.errorStr = "Please enter a key name.";
 			return;
 		}
+		this.key = this.key.trim();
 
 		let o = _.cloneDeep(this.obj);
-		this.apis.cleanUpSwaggerSchema(o);
+		this.apis.cleanUp(this.apis.schemas.response, o);
+		this.apis.cleanUpSwaggerSchema(o['schema']);
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);
 		Object.keys(o).forEach(k => this.obj_orig[k] = o[k]);
 		console.log("response-edit", o);
 
-		if (this.key != this.key_orig) {
+		if (!this.key_orig) {
+			if (!this.apis.current['responses']) {
+				this.apis.current['responses'] = {};
+			}
+			this.apis.current['responses'][this.key] = this.obj_orig;
+		} else if (this.key != this.key_orig) {
 			this.apis.renameObjectKey(this.apis.current['responses'], this.key_orig, this.key);
 		}
 
+		this.errorStr = "";
 		this.activeModal.close('ok');
 	}
 	

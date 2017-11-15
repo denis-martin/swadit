@@ -23,21 +23,27 @@
 	-->
 	<div class="modal-body" id="modal-body">
 		<div class="form-group">
-			<label for="responseKey">Name of response</label>
+			<label for="responseKey">Name of response definition</label>
 			<input type="text" id="responseKey" name="responseKey" [(ngModel)]="key" required
 				class="form-control" placeholder="Enter name for response" title="Name of response">
 		</div>
 		<div class="form-group">
-			<label for="responseSchema">Response</label>
-			tbd
+			<label for="responseSchema">Response definition</label>
+			<swadit-object-editor
+				[id]="'responseSchema'" 
+				[schema]="apis.schemas.response" [(obj)]="obj" [title]="false">
+			</swadit-object-editor>
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button *ngIf="key_orig" class="btn btn-danger mr-auto" (click)="deleteResponse()" title="Delete response">
+		<button *ngIf="key_orig" class="btn btn-danger mr-auto" type="button" (click)="deleteResponse()" title="Delete response">
 			Delete</button>
+		<span *ngIf="errorStr" style="color: red">
+			{{errorStr}}
+		</span>
 		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
 			Apply</button>
-		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
 			Cancel</button>
 	</div>
 </form>

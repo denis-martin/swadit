@@ -15,14 +15,20 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<swadit-primitive-editor *ngIf="schema['type']=='string'"
-	[schema]="schema" [(obj)]="obj" [id]="id">
-</swadit-primitive-editor>
+<swadit-swagger-schema-editor *ngIf="schema['x-swadit-swagger-schema']; else nonSwaggerSchema"
+	[(obj)]="obj" [id]="id">
+</swadit-swagger-schema-editor>
 
-<swadit-array-editor *ngIf="schema['type']=='array'"
-	[schema]="schema" [(obj)]="obj" [id]="id">
-</swadit-array-editor>
-
-<swadit-object-editor *ngIf="schema['type']=='object'"
-	[schema]="schema" [(obj)]="obj" [id]="id">
-</swadit-object-editor>
+<ng-template #nonSwaggerSchema>
+	<swadit-primitive-editor *ngIf="schema['type']=='string' || schema['type']=='boolean'"
+		[schema]="schema" [(obj)]="obj" [id]="id">
+	</swadit-primitive-editor>
+	
+	<swadit-array-editor *ngIf="schema['type']=='array'"
+		[schema]="schema" [(obj)]="obj" [id]="id">
+	</swadit-array-editor>
+	
+	<swadit-object-editor *ngIf="schema['type']=='object'"
+		[schema]="schema" [(obj)]="obj" [id]="id">
+	</swadit-object-editor>
+</ng-template>

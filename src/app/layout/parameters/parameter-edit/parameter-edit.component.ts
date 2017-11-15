@@ -48,34 +48,80 @@ export class ParameterEditComponent implements OnInit
 	{
 		this.key_orig = this.key;
 		this.obj_orig = this.obj;
+		if (!this.obj_orig) this.obj_orig = {};
 		this.obj = _.cloneDeep(this.obj_orig);
+		if (!this.obj['schema']) this.obj['schema'] = { type: 'object' };
 	}
 
 	ok() 
 	{
 		console.log("ParameterEditComponent.ok()");
 
-		if (!this.key) {
-			this.errorStr = "Please enter a name for this parameter";
+		if (!this.key || !this.key.trim()) {
+			this.errorStr = "Please enter a key name.";
+			return;
+		}
+		this.key = this.key.trim();
+
+		if (this.key != this.key_orig && this.apis.current['parameters'][this.key]) {
+			this.errorStr = "Key name already exists.";
+			return;
+		}
+
+		if (!this.obj['name']) {
+			this.errorStr = "Please enter a name.";
+			return;
+		}
+
+		if (!this.obj['in']) {
+			this.errorStr = "Please enter a parameter type ('in').";
+			return;
+		}
+
+		if (this.obj['in'] != 'body' && !this.obj['type']) {
+			this.errorStr = "Please enter a type.";
+			return;
+		}
+
+		if (this.obj['in'] == 'body' && !this.obj['schema']) {
+			this.errorStr = "Please define a schema.";
+			return;
+		}
+
+		if (this.obj['in'] == 'path' && !this.obj['required']) {
+			this.errorStr = "Path parameter must be 'required'.";
 			return;
 		}
 
 		let o = _.cloneDeep(this.obj);
-		this.apis.cleanUpSwaggerSchema(o);
+		if (o['in'] == "body") {
+			this.apis.cleanUp(this.apis.schemas.parameterBody, o);
+			this.apis.cleanUpSwaggerSchema(o['schema']);
+		} else {
+			this.apis.cleanUp(this.apis.schemas.parameterNonBody, o);
+		}
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);
 		Object.keys(o).forEach(k => this.obj_orig[k] = o[k]);
 		console.log("parameter-edit", o);
 
-		if (this.key != this.key_orig) {
+		if (!this.key_orig) {
+			if (!this.apis.current['parameters']) {
+				this.apis.current['parameters'] = {};
+			}
+			this.apis.current['parameters'][this.key] = this.obj_orig;
+		} else if (this.key != this.key_orig) {
 			this.apis.renameObjectKey(this.apis.current['parameters'], this.key_orig, this.key);
 		}
 
+		this.errorStr = "";
 		this.activeModal.close('ok');
 	}
 	
 	deleteParameter()
 	{
+		console.log("ParameterEditComponent.deleteParameter()");
+
 		if (!this.key_orig) return;
 		delete this.apis.current['parameters'][this.key_orig];
 		this.activeModal.close('ok');

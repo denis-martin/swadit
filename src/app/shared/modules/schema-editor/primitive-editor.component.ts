@@ -48,6 +48,9 @@ export class PrimitiveEditorComponent implements OnInit
 
 	ngOnInit() 
 	{
+		if (this.schema['type'] == "boolean" && this.schema['default'] != undefined && this.obj == undefined) {
+			this._obj = this.schema['default']
+		}
 	}
 
 	isInEnum(s: any): boolean

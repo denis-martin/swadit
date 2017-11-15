@@ -48,6 +48,7 @@ export class DefinitionEditComponent implements OnInit
 	{
 		this.key_orig = this.key;
 		this.obj_orig = this.obj;
+		if (!this.obj_orig) this.obj_orig = {};
 		this.obj = _.cloneDeep(this.obj_orig);
 	}
 
@@ -55,8 +56,19 @@ export class DefinitionEditComponent implements OnInit
 	{
 		console.log("DefinitionEditComponent.ok()");
 
-		if (!this.key) {
-			this.errorStr = "Please enter a name for this definition";
+		if (!this.key || !this.key.trim()) {
+			this.errorStr = "Please enter a key name.";
+			return;
+		}
+		this.key = this.key.trim();
+
+		if (this.key != this.key_orig && this.apis.current['definitions'][this.key]) {
+			this.errorStr = "Key name already exists.";
+			return;
+		}
+
+		if (!this.obj['type'] && !this.obj['$ref']) {
+			this.errorStr = "Please enter a type or $ref.";
 			return;
 		}
 
@@ -67,15 +79,22 @@ export class DefinitionEditComponent implements OnInit
 		Object.keys(o).forEach(k => this.obj_orig[k] = o[k]);
 		console.log("definition-edit", o);
 
-		if (this.key != this.key_orig) {
+		if (!this.key_orig) {
+			if (!this.apis.current['definitions']) {
+				this.apis.current['definitions'] = {};
+			}
+			this.apis.current['definitions'][this.key] = this.obj_orig;
+		} else if (this.key != this.key_orig) {
 			this.apis.renameObjectKey(this.apis.current['definitions'], this.key_orig, this.key);
 		}
 
+		this.errorStr = "";
 		this.activeModal.close('ok');
 	}
 	
 	deleteDefinition()
 	{
+		console.log("DefinitionEditComponent.deleteDefinition()");
 		if (!this.key_orig) return;
 		delete this.apis.current['definitions'][this.key_orig];
 		this.activeModal.close('ok');

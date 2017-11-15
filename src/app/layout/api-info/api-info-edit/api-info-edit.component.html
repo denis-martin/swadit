@@ -79,6 +79,6 @@
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">Apply</button>
-		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" [disabled]="!editForm.form.valid">Cancel</button>
+		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" [disabled]="!editForm.form.valid">Cancel</button>
 	</div>
 </form>

@@ -44,12 +44,18 @@
 <div *ngFor="let def of apis.filterList(keys(apis.current['definitions']), filterText, sortItems); let index = index" 
 	class="card mb-1">
 	<div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
-		<div class="edit-card" (click)="edit($event, def)">
-			<i class="fa fa-fw fa-pencil"></i>
+		<div class="row">
+			<div class="col-md-11 preview">
+				{{def}}
+				<span *ngIf="apis.current['definitions'][def]['type']" class="headerType">({{apis.current['definitions'][def]['type']}})</span>
+				<span *ngIf="apis.current['definitions'][def]['description']">{{apis.current['definitions'][def]['description']}}</span>
+			</div>
+			<div class="col-md-1">
+				<div class="edit-card" (click)="edit($event, def)">
+					<i class="fa fa-fw fa-pencil"></i>
+				</div>
+			</div>
 		</div>
-		{{def}}
-		<span *ngIf="apis.current['definitions'][def]['type']" class="headerType">({{apis.current['definitions'][def]['type']}})</span>
-		<span *ngIf="apis.current['definitions'][def]['description']">{{apis.current['definitions'][def]['description']}}</span>
 	</div>
 	<div class="card-block" *ngIf="uncollapsedDef[def]">
 		<swadit-swagger-schema-view [obj]="apis.current['definitions'][def]">

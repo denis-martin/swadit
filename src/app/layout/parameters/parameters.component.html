@@ -44,14 +44,19 @@
 <div *ngFor="let param of apis.filterList(keys(apis.current['parameters']), filterText, sortItems); let index = index" 
 	class="card mb-1">
 	<div class="card-header clickable" (click)="uncollapsed[param] = !uncollapsed[param]">
-		<div class="edit-card" (click)="edit($event, param)">
-			<i class="fa fa-fw fa-pencil"></i>
+		<div class="row">
+			<div class="col-md-11 preview">
+				{{param}}
+				<span *ngIf="apis.current['parameters'][param]['in']" class="headerType">in {{apis.current['parameters'][param]['in']}}</span>
+				<span *ngIf="apis.current['parameters'][param]['type']" class="headerType">({{apis.current['parameters'][param]['type']}})</span>
+				<span *ngIf="apis.current['parameters'][param]['description']">{{apis.current['parameters'][param]['description']}}</span>
+			</div>
+			<div class="col-md-1">
+				<div class="edit-card" (click)="edit($event, param)">
+					<i class="fa fa-fw fa-pencil"></i>
+				</div>
+			</div>
 		</div>
-		{{param}}
-		<span *ngIf="apis.current['parameters'][param]['in']" class="headerType">in {{apis.current['parameters'][param]['in']}}</span>
-		<span *ngIf="apis.current['parameters'][param]['type']" class="headerType">({{apis.current['parameters'][param]['type']}})</span>
-		<span *ngIf="apis.current['parameters'][param]['description']">{{apis.current['parameters'][param]['description']}}</span>
-		
 	</div>
 	<div class="card-block" *ngIf="uncollapsed[param]">
 		<swadit-schema-view *ngIf="apis.current['parameters'][param]['in']=='body'; else nonBodyParameter"

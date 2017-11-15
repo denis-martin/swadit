@@ -15,8 +15,11 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- .card-header {
-	padding: 0.5rem;
+.card-header {
+	padding: 0.5em 0.75em;
+}
+
+.preview {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	overflow: hidden;

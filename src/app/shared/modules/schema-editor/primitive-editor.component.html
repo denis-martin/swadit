@@ -46,4 +46,14 @@
 			placeholder="{{schema['description']}}" 
 			title="{{schema['description']}}">
 	</ng-template>
+
+	<!-- boolean input -->
+	<select *ngIf="schema['type']=='boolean'"
+		id="{{id}}" [(ngModel)]="obj" 
+		class="form-control {{schema['x-swadit-input-class'] || ''}}"
+		title="{{schema['description']}}">
+		<option [ngValue]="undefined" *ngIf="schema['default'] == undefined">(not set)</option>
+		<option [ngValue]="true">yes</option>
+		<option [ngValue]="false">no</option>
+	</select>
 </div>

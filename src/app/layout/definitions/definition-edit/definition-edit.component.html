@@ -23,22 +23,25 @@
 	-->
 	<div class="modal-body" id="modal-body">
 		<div class="form-group">
-			<label for="definitionKey">Name of definition</label>
+			<label for="definitionKey">Name of schema definition</label>
 			<input type="text" id="definitionKey" name="definitionKey" [(ngModel)]="key" required
 				class="form-control" placeholder="Enter name for definition" title="Name of definition">
 		</div>
 		<div class="form-group">
-			<label for="definitionSchema">Schema</label>
+			<label for="definitionSchema">Schema definition</label>
 			<swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'definitionSchema'">
 			</swadit-swagger-schema-editor>
 		</div>
 	</div>
 	<div class="modal-footer">
-		<button *ngIf="key_orig" class="btn btn-danger mr-auto" (click)="deleteDefinition()" title="Delete definition">
+		<button *ngIf="key_orig" class="btn btn-danger mr-auto" type="button" (click)="deleteDefinition()" title="Delete definition">
 			Delete</button>
+		<span *ngIf="errorStr" style="color: red">
+			{{errorStr}}
+		</span>
 		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
 			Apply</button>
-		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
 			Cancel</button>
 	</div>
 </form>

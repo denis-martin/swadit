@@ -25,7 +25,7 @@
 					[data]="obj[key]"></markdown>
 				<ng-template #nonMarkdown>
 					<swadit-swagger-schema-view 
-						*ngIf="schema['properties'][key]['x-swadit-view-swagger-schema']; else schemaView"
+						*ngIf="schema['properties'][key]['x-swadit-swagger-schema']; else schemaView"
 						[obj]="obj[key]">
 					</swadit-swagger-schema-view>
 					<ng-template #schemaView>

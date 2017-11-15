@@ -37,6 +37,7 @@ import * as Swagger20SchemaSchema from '../schemas/2.0/swagger-schema.json';
 import * as Swagger20SchemaParameterBody from '../schemas/2.0/swagger-parameterBody.json';
 import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-parameterNonBody.json';
 import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
+import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
 
 @Injectable()
 export class ApisService 
@@ -55,7 +56,8 @@ export class ApisService
 			schema: Swagger20SchemaSchema,
 			parameterBody: Swagger20SchemaParameterBody,
 			parameterNonBody: Swagger20SchemaParameterNonBody,
-			response: Swagger20SchemaResponse
+			response: Swagger20SchemaResponse,
+			header: Swagger20SchemaHeader
 		}
 	};
 
@@ -170,7 +172,7 @@ export class ApisService
 							}
 						}
 						if (schema['properties'][p]['type'] == 'string') {
-							if (api[p] == "") {
+							if (api[p] == "" && !this.propertyIsRequired(schema, p)) {
 								delete api[p];
 							}
 						}
@@ -178,6 +180,13 @@ export class ApisService
 						delete api[p];
 					}
 				});
+				if (!schema['additionalProperties']) {
+					Object.keys(api).forEach(p => {
+						if (!p.startsWith("x-") && !schema['properties'][p]) {
+							delete api[p];
+						}
+					});
+				}
 			// TODO: properties AND additionalProperties
 			} else if (schema['additionalProperties']) {
 				Object.keys(api).forEach(p => {
