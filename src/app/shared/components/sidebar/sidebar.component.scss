@@ -4,9 +4,9 @@ $topnav-background-color: #222;
     position: fixed;
     z-index: 1000;
     top: 55px;
-    left: 235px;
-    width: 235px;
-    margin-left: -235px;
+    left: 275px;
+    width: 275px;
+    margin-left: -275px;
     border: none;
     border-radius: 0;
     overflow-y: auto;
@@ -21,7 +21,7 @@ $topnav-background-color: #222;
             transition: all 0.2s ease-in-out;
     // border-top: 1px solid rgba(255,255,255,0.3);
     .list-group{
-        a.list-group-item {
+        a.list-group-item, div.list-group-item {
             background: $topnav-background-color;
             border: 0;
             border-radius: 0;
@@ -71,7 +71,7 @@ $topnav-background-color: #222;
             background: darken($topnav-background-color, 5%);
         }
         .panel-collapse {
-            border-radious :0;
+            border-radius :0;
             border : none;
             .panel-body {
                 .list-group-item {
