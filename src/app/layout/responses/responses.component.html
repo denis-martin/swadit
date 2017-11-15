@@ -1,3 +1,20 @@
+<!--
+	Copyright 2017 Denis Martin.  This file is part of swadit.
+
+	swadit is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	swadit is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
 <div class="edit-section" (click)="edit($event)" title="Add item">
 	<i class="fa fa-plus"></i>
 </div>
@@ -27,10 +44,12 @@
 <div *ngFor="let resp of apis.filterList(keys(apis.current['responses']), filterText, sortItems); let index = index" 
 	class="card mb-1">
 	<div class="card-header clickable" (click)="uncollapsed[resp] = !uncollapsed[resp]">
-		{{resp}}
 		<div class="edit-card" (click)="edit($event, resp)">
 			<i class="fa fa-fw fa-pencil"></i>
 		</div>
+		{{resp}}
+		<span *ngIf="apis.current['responses'][resp]['schema'] && apis.current['responses'][resp]['schema']['type']" class="headerType">({{apis.current['responses'][resp]['schema']['type']}})</span>
+		<span *ngIf="apis.current['responses'][resp]['description']">{{apis.current['responses'][resp]['description']}}</span>
 	</div>
 	<div class="card-block" *ngIf="uncollapsed[resp]">
 		<swadit-schema-view

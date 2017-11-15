@@ -6,11 +6,16 @@
             </a>
             <li class="nested" [class.expand]="showMenu === 'settings'">
                 <ul class="submenu">
-                    <li><a href="javascript:void(0)"><i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a></li>
-                    <li><a href="javascript:void(0)"><i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a></li>
-                    <li><a href="javascript:void(0)"><i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>
-                    <li><a href="javascript:void(0)"><i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a></li>
-                    <li><a href="javascript:void(0)"><i class="fa fa-fw fa-cog"></i> {{ 'Settings' | translate }}</a></li>
+                    <li><a href="javascript:void(0)" (click)="apis.newFile()">
+                        <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a></li>
+                    <li><a href="javascript:void(0)" (click)="apis.openFileModal()">
+                        <i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a></li>
+                    <li><a href="javascript:void(0)" (click)="apis.addFilesModal()">
+                        <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>
+                    <li><a href="javascript:void(0)" (click)="apis.downloadFileModal()">
+                        <i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a></li>
+                    <li><a href="javascript:void(0)" (click)="apis.settingsModal()">
+                        <i class="fa fa-fw fa-cog"></i> {{ 'Settings' | translate }}</a></li>
                 </ul>
             </li>
         </div>

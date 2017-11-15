@@ -29,3 +29,20 @@ ng serve
 ## Acknowledgements
 
 The template is based on [SB-Admin-BS4-Angular-4](https://github.com/start-angular/SB-Admin-BS4-Angular-4). This is also a good source for more information on how to set up the development environment. If you are new to Angular 2+, I'd recommend to visit the [Getting Started Guide at angular.io](https://angular.io/guide/quickstart).
+
+## Copyright & License
+
+Copyright 2017 Denis Martin.
+
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
