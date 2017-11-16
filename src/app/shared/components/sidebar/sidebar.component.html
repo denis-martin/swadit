@@ -1,10 +1,10 @@
 <nav class="sidebar" [ngClass]="{sidebarPushRight: isActive}">
     <ul class="list-group">
         <div class="nested-menu when-collapsed">
-            <a class="list-group-item" (click)="addExpandClass('settings')">
-                <span><i class="fa fa-fw fa-cogs"></i> {{ 'Settings' | translate }}</span>
+            <a class="list-group-item" (click)="addExpandClass('file')">
+                <span><i class="fa fa-fw fa-folder-open"></i> {{ 'File' | translate }}</span>
             </a>
-            <li class="nested" [class.expand]="showMenu === 'settings'">
+            <li class="nested" [class.expand]="showMenu === 'file'">
                 <ul class="submenu">
                     <li><a href="javascript:void(0)" (click)="apis.newFile()">
                         <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a></li>
@@ -33,10 +33,10 @@
         </a>
 
         <div class="list-group-item">
-            <input type="text" class="form-control" placeholder="Filter paths">
+            <input type="text" class="form-control" placeholder="Filter paths" [(ngModel)]="filterText">
         </div>
 
-        <a class="list-group-item" style="font-size: 80%" *ngFor="let p of apis.keys(apis.current['paths'])">
+        <a class="list-group-item" style="font-size: 80%" *ngFor="let p of apis.filterList(apis.keys(apis.current['paths']), filterText, true); let index = index">
             {{p}}
         </a>
 

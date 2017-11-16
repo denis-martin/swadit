@@ -68,24 +68,25 @@ export class ParameterEditComponent implements OnInit
 			return;
 		}
 
-		if (!this.obj['name']) {
-			this.errorStr = "Please enter a name.";
-			return;
-		}
+		if (this.obj['in'] == 'body') {
+			let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterBody, this.obj);
+			if (missing.length > 0) {
+				this.errorStr = "Missing required properties: ";
+				missing.forEach(p => {
+					this.errorStr += p + " ";
+				});
+				return;
+			}
 
-		if (!this.obj['in']) {
-			this.errorStr = "Please enter a parameter type ('in').";
-			return;
-		}
-
-		if (this.obj['in'] != 'body' && !this.obj['type']) {
-			this.errorStr = "Please enter a type.";
-			return;
-		}
-
-		if (this.obj['in'] == 'body' && !this.obj['schema']) {
-			this.errorStr = "Please define a schema.";
-			return;
+		} else {
+			let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterNonBody, this.obj);
+			if (missing.length > 0) {
+				this.errorStr = "Missing required properties: ";
+				missing.forEach(p => {
+					this.errorStr += p + " ";
+				});
+				return;
+			}
 		}
 
 		if (this.obj['in'] == 'path' && !this.obj['required']) {

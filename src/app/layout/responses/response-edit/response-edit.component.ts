@@ -63,6 +63,15 @@ export class ResponseEditComponent implements OnInit
 		}
 		this.key = this.key.trim();
 
+		let missing = this.apis.missingRequiredProperties(this.apis.schemas.response, this.obj);
+		if (missing.length > 0) {
+			this.errorStr = "Missing required properties: ";
+			missing.forEach(p => {
+				this.errorStr += p + " ";
+			});
+			return;
+		}
+
 		let o = _.cloneDeep(this.obj);
 		this.apis.cleanUp(this.apis.schemas.response, o);
 		this.apis.cleanUpSwaggerSchema(o['schema']);

@@ -158,7 +158,7 @@ export class ApisService
 
 		if (schema['type'] == 'object') {
 			if (schema['properties']) {
-				Object.keys(schema['properties']).forEach(p => {
+				this.keys(schema['properties']).forEach(p => {
 					if (api[p] != null) {
 						this.cleanUp(schema['properties'][p], api[p]);
 						if (schema['properties'][p]['type'] == 'array') {
@@ -167,7 +167,7 @@ export class ApisService
 							}
 						}
 						if (schema['properties'][p]['type'] == 'object') {
-							if (Object.keys(api[p]).length == 0 && !this.propertyIsRequired(schema, p)) {
+							if (this.keys(api[p]).length == 0 && !this.propertyIsRequired(schema, p)) {
 								delete api[p];
 							}
 						}
@@ -181,7 +181,7 @@ export class ApisService
 					}
 				});
 				if (!schema['additionalProperties']) {
-					Object.keys(api).forEach(p => {
+					this.keys(api).forEach(p => {
 						if (!p.startsWith("x-") && !schema['properties'][p]) {
 							delete api[p];
 						}
@@ -189,7 +189,7 @@ export class ApisService
 				}
 			// TODO: properties AND additionalProperties
 			} else if (schema['additionalProperties']) {
-				Object.keys(api).forEach(p => {
+				this.keys(api).forEach(p => {
 					if (api[p] != null) {
 						this.cleanUp(schema['additionalProperties'], api[p]);
 						// we allow additional properties with empty values
@@ -359,5 +359,18 @@ export class ApisService
 	{
 		if (!obj) return [];
 		return Object.keys(obj);
+	}
+
+	missingRequiredProperties(schema: any, obj: any): Array<string>
+	{
+		let missingFields = [];
+		if (schema['required']) {
+			schema['required'].forEach(p => {
+				if (!obj[p]) {
+					missingFields.push(p);
+				}
+			});
+		}
+		return missingFields;
 	}
 }

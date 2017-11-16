@@ -6,6 +6,14 @@
 	"required": [
 		"description"
 	],
+	"x-swadit-editor-grid": [
+		[ "description" ],
+		[ "schema" ]
+	],
+	"x-swadit-editor-grid-cols": {
+		"description": 12,
+		"schema": 12
+	},
 	"properties": {
 		"description": {
 			"type": "string",
