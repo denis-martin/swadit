@@ -14,3 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+
+import { MarkdownModule } from 'ngx-markdown';
+
+import { PathRoutingModule } from './path-routing.module';
+import { PathComponent } from './path.component';
+
+@NgModule({
+	imports: [
+		CommonModule,
+		FormsModule,
+		NgbModule,
+		MarkdownModule.forRoot(),
+		PathRoutingModule
+	],
+	declarations: [
+		PathComponent
+	],
+	entryComponents: []
+})
+export class PathModule { }

@@ -10,6 +10,9 @@ const routes: Routes = [
             { path: 'definitions', loadChildren: './definitions/definitions.module#DefinitionsModule' },
             { path: 'parameters', loadChildren: './parameters/parameters.module#ParametersModule' },
             { path: 'responses', loadChildren: './responses/responses.module#ResponsesModule' },
+            { path: 'paths', loadChildren: './paths/paths.module#PathsModule' },
+            { path: 'path/:path', loadChildren: './path/path.module#PathModule' },
+            { path: 'path/:path/:method', loadChildren: './path/path.module#PathModule' },
         ]
     }
 ];

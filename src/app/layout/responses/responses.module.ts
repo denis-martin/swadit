@@ -21,8 +21,7 @@ import { FormsModule } from '@angular/forms';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { MarkdownModule } from 'angular2-markdown';
-import { HighlightModule } from 'ngx-highlightjs';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
 import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
@@ -37,7 +36,6 @@ import { ResponseEditComponent } from './response-edit/response-edit.component';
 		FormsModule,
 		NgbModule,
 		MarkdownModule.forRoot(),
-		HighlightModule.forRoot(),
 		SchemaViewModule,
 		SchemaEditorModule,
 		ResponsesRoutingModule

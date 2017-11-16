@@ -46,5 +46,5 @@
 	</tbody>
 </table>
 <ng-template #jsonView>
-	<pre><code highlight [innerHTML]="obj[key] | json"></code></pre>
+	<markdown [data]="obj[key] | language : 'json'"></markdown>
 </ng-template>

@@ -14,3 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import { Component, OnInit } from '@angular/core';
+import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+import { ApisService } from '../../shared/services';
+
+@Component({
+	selector: 'app-paths',
+	templateUrl: './paths.component.html',
+	styleUrls: ['./paths.component.scss']
+})
+export class PathsComponent implements OnInit 
+{
+	sortItems = true;
+	filterText: string;
+
+	readonly methods = [ 'get', 'post', 'put', 'delete' ];
+
+	constructor(public apis: ApisService, private modalService: NgbModal) 
+	{
+	}
+
+	ngOnInit() 
+	{
+	}
+}

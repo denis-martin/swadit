@@ -20,8 +20,7 @@ import { CommonModule } from '@angular/common';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { MarkdownModule } from 'angular2-markdown';
-import { HighlightModule } from 'ngx-highlightjs';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { SchemaViewComponent } from './schema-view.component';
 import { SwaggerSchemaViewComponent } from './custom/swagger-schema-view.component';
@@ -31,8 +30,7 @@ import { ExtensionsViewComponent } from './custom/extensions-view.component';
 	imports: [
 		CommonModule,
 		NgbModule,
-		MarkdownModule.forRoot(),
-		HighlightModule.forRoot()
+		MarkdownModule.forRoot()
 	],
 	declarations: [
 		SchemaViewComponent,

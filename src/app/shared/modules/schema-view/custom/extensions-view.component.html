@@ -21,6 +21,7 @@
 			<td class="label-text">{{k}}</td>
 			<td>
 				<span *ngIf="!isComplex(obj[k])">{{obj[k]}}</span>
+				<markdown *ngIf="isComplex(obj[k])" [data]="toYaml(obj[k]) | language: 'yaml'"></markdown>
 				<pre *ngIf="isComplex(obj[k])"><code highlight [innerHTML]="toYaml(obj[k])"></code></pre>
 			</td>
 		</tr>

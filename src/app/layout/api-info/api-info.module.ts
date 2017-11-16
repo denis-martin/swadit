@@ -20,8 +20,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { MarkdownModule } from 'angular2-markdown';
-import { HighlightModule } from 'ngx-highlightjs';
+import { MarkdownModule } from 'ngx-markdown';
 
 import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
 import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
@@ -36,7 +35,6 @@ import { ApiInfoEditComponent } from './api-info-edit/api-info-edit.component';
 		FormsModule,
 		NgbModule.forRoot(),
 		MarkdownModule.forRoot(),
-		HighlightModule.forRoot(),
 		SchemaViewModule,
 		SchemaEditorModule,
 		ApiInfoRoutingModule,

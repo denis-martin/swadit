@@ -1,0 +1,74 @@
+/*	
+ * Copyright 2017 Denis Martin.  This file is part of swadit.
+ * 
+ * swadit is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * swadit is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+.path {
+	padding: 4px;
+	border-radius: 5px;
+}
+
+.path-unselected:hover {
+	background-color: rgb(206, 219, 239);
+}
+
+.path-selected {
+	background-color: #FFDEA3;
+}
+
+.path-selected:hover {
+	background-color: darken(#FFDEA3, 20%);
+}
+
+.path-active {
+	background-color: #F5C773;
+}
+
+$colorGet: #3A4E98;
+$colorPost: #36B336;
+$colorPut: #DFB043;
+$colorDelete: #DF4343;
+
+.methodKey {
+	text-transform: uppercase;
+	color: white;
+	font-family: sans-serif;
+	font-weight: bold;
+	font-size: 85%;
+	padding: 0.2em 0.35em;
+	margin: 0.2em;
+	border-radius: 0.3em;
+	background-color: darkgrey;
+}
+
+.methodBgColor-get {
+	background-color: $colorGet;
+}
+
+.methodBgColor-post {
+	background-color: $colorPost;
+}
+
+.methodBgColor-put {
+	background-color: $colorPut;
+}
+
+.methodBgColor-delete {
+	background-color: $colorDelete;
+}
+
+.methodUnset {
+	opacity: 0.2;
+}

@@ -31,6 +31,9 @@
         <a [routerLink]="['/responses']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-reply"></i>&nbsp;Responses
         </a>
+        <a [routerLink]="['/paths']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+            <i class="fa fa-fw fa-road"></i>&nbsp;Paths
+        </a>
 
         <div class="list-group-item">
             <input type="text" class="form-control" placeholder="Filter paths" [(ngModel)]="filterText">
@@ -39,7 +42,9 @@
             </span>
         </div>
 
-        <a class="list-group-item" style="font-size: 80%" *ngFor="let p of apis.filterList(apis.keys(apis.current['paths']), filterText, true); let index = index">
+        <a *ngFor="let p of apis.filterList(apis.keys(apis.current['paths']), filterText, true); let index = index"
+            [routerLink]="['/path', p]" [routerLinkActive]="['router-link-active']" class="list-group-item" 
+            style="font-size: 80%">
             {{p}}
         </a>
 

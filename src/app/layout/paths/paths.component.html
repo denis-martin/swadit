@@ -1,0 +1,62 @@
+<!--
+	Copyright 2017 Denis Martin.  This file is part of swadit.
+
+	swadit is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	swadit is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<div class="edit-section" (click)="edit($event)" title="Add item">
+	<i class="fa fa-plus"></i>
+</div>
+<div class="filterBox">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="input-group">
+				<span class="input-group-addon">
+					<i class="fa fa-filter"></i>
+				</span>
+				<input type="text" [(ngModel)]="filterText" name="filterText" class="form-control"
+					placeholder="Filter by path name" title="Filter by path name">
+				<span class="input-group-addon clickable" *ngIf="filterText" (click)="filterText=''">
+					<i class="fa fa-times"></i>
+				</span>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="checkbox">
+				<input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
+				<label for="sortItems" class="mb-0" style="margin-top: 0.4rem">Display sorted</label>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div *ngFor="let path of apis.filterList(apis.keys(apis.current['paths']), filterText, sortItems); let index = index"
+	class="path clickable"
+	[ngClass]="{ 'path-unselected': !apis.selectedPaths.hasOwnProperty(path), 'path-selected': apis.selectedPaths.hasOwnProperty(path), 'path-active': path==apis.activePath }"
+	(click)="apis.activePath=path">
+	<div style="float: left">
+		<input type="checkbox" [ngModel]="apis.selectedPaths.hasOwnProperty(path)" 
+			(click)="apis.selectPath(path, $event)">
+		<span>{{path}}</span>
+	</div>
+	<div style="float: right">
+		<span *ngFor="let method of methods">
+			<span class="methodKey methodBgColor-{{method}}"
+				[ngClass]="{ 'methodUnset': !apis.current['paths'][path][method], 'deprecated': apis.current['paths'][path][method] && apis.current['paths'][path][method]['deprecated'] }">
+				{{method}}
+			</span>
+		</span>
+	</div>
+	<div style="clear: both"></div>
+</div>

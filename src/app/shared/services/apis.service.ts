@@ -79,6 +79,9 @@ export class ApisService
 	}
 	public currentFileName: string = "swagger.yaml";
 
+	selectedPaths = {};
+	activePath: string;
+
 	closeResult: string;
 	fileModal: NgbModalRef;
 	blob: Blob;
@@ -87,7 +90,7 @@ export class ApisService
 	constructor(private modalService: NgbModal) 
 	{
 		console.info("APIs service initialized");
-		this.openFile("assets/petstore.yaml", null);
+		this.openFile("/assets/petstore.yaml", null);
 	}
 
 	openFile(pathName: string, fobj)
@@ -372,5 +375,14 @@ export class ApisService
 			});
 		}
 		return missingFields;
+	}
+
+	selectPath(path: string, event: any)
+	{
+		if (this.selectedPaths.hasOwnProperty(path)) {
+			delete this.selectedPaths[path];
+		} else { 
+			this.selectedPaths[path] = true;
+		}
 	}
 }
