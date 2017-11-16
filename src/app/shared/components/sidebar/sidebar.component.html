@@ -34,6 +34,9 @@
 
         <div class="list-group-item">
             <input type="text" class="form-control" placeholder="Filter paths" [(ngModel)]="filterText">
+            <span class="input-clear-button" *ngIf="filterText" (click)="filterText=''">
+                <i class="fa fa-times"></i>
+            </span>
         </div>
 
         <a class="list-group-item" style="font-size: 80%" *ngFor="let p of apis.filterList(apis.keys(apis.current['paths']), filterText, true); let index = index">
