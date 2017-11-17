@@ -16,7 +16,7 @@
  */
 
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from '../../shared/services';
@@ -38,12 +38,30 @@ export class PathComponent implements OnInit
 
 	readonly methods = [ 'get', 'post', 'put', 'delete' ];
 
-	constructor(public apis: ApisService, private modalService: NgbModal, private route: ActivatedRoute) 
+	constructor(public apis: ApisService, private modalService: NgbModal, 
+		private route: ActivatedRoute, private router: Router) 
 	{
 		this.routeSubscription = this.route.params.subscribe(params => {
 			this.path = params['path'];
 			this.method = params['method'];
 			if (!this.method) {
+				let methods = this.getMethods();
+				console.log(this.apis.current['paths'], this.path, methods);
+				if (methods.length > 0) {
+					this.method = methods[0];
+				} else {
+					this.method = null;
+				}
+			}
+		});
+		this.apis.eventApiChanged.subscribe(param => {
+			if (!this.apis.current['paths'][this.path]) {
+				this.path = "";
+				this.method = "";
+				if (this.router.url.startsWith("/path")) {
+					this.router.navigate(['/api-info']);
+				}
+			} else if (this.method && !this.apis.current['paths'][this.path][this.method]) {
 				let methods = this.getMethods();
 				console.log(this.apis.current['paths'], this.path, methods);
 				if (methods.length > 0) {

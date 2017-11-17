@@ -19,7 +19,7 @@
 	<i class="fa fa-pencil"></i>
 </div>
 
-<div class="api-info">
+<div class="api-info" *ngIf="apis.current && apis.current['paths']">
 	<h1 style="margin-bottom: 0.7em">{{path}}</h1>
 
 	<ul class="nav nav-tabs">

@@ -17,6 +17,7 @@
 
 import { Injectable } from '@angular/core';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs/Subject';
 
 import { Spec as Swagger } from 'swagger-schema-official';
 import * as SwaggerParser from 'swagger-parser';
@@ -79,6 +80,9 @@ export class ApisService
 	}
 	public currentFileName: string = "swagger.yaml";
 
+	private _eventApiChanged = new Subject<string>();
+	eventApiChanged = this._eventApiChanged.asObservable();
+
 	selectedPaths = {};
 	activePath: string;
 
@@ -96,7 +100,6 @@ export class ApisService
 	openFile(pathName: string, fobj)
 	{
 		//Swadit.thinking = "Loading file...";
-		this.current = {};
 		if (pathName) {
 			SwaggerParser.parse(pathName)
 				.then(api => { this.swaggerLoaded(api); })
@@ -122,6 +125,7 @@ export class ApisService
 		console.log("swaggerLoaded");
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
+		this._eventApiChanged.next(this.currentFileName);
 	}
 
 	swaggerLoadingError(err)
@@ -250,6 +254,7 @@ export class ApisService
 			paths: {}
 		}
 		this.currentFileName = "swagger.yaml";
+		this._eventApiChanged.next(this.currentFileName);
 	}
 
 	openFileModal()
