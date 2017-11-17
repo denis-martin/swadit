@@ -39,6 +39,7 @@ import * as Swagger20SchemaParameterBody from '../schemas/2.0/swagger-parameterB
 import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-parameterNonBody.json';
 import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
 import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
+import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
 
 @Injectable()
 export class ApisService 
@@ -187,6 +188,7 @@ export class ApisService
 						delete api[p];
 					}
 				});
+				/* TODO we have incomplete schemas, thus we may not remove additional properties
 				if (!schema['additionalProperties']) {
 					this.keys(api).forEach(p => {
 						if (!p.startsWith("x-") && !schema['properties'][p]) {
@@ -194,6 +196,7 @@ export class ApisService
 						}
 					});
 				}
+				*/
 			// TODO: properties AND additionalProperties
 			} else if (schema['additionalProperties']) {
 				this.keys(api).forEach(p => {

@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="edit()">
+<div class="edit-section" (click)="editPath()">
 	<i class="fa fa-pencil"></i>
 </div>
 
@@ -27,7 +27,8 @@
 			class="nav-item">
 			<a class="nav-link" [ngClass]="{ 'active': m==method }" 
 				href="javascript:void(0)" (click)="method=m">
-				{{m}}
+				<span style="text-transform: uppercase">{{m}}</span>
+				<span *ngIf="apis.current['paths'][path][m]['deprecated']" class="badge badge-warning">deprecated</span>
 			</a>
 		</li>
 		<li class="nav-item">
@@ -39,12 +40,140 @@
 	</ul>
 
 	<div class="api-info-element" *ngIf="method">
+		<div class="api-info-element" *ngIf="apis.current['paths'][path][method]['summary']">
+			{{apis.current['paths'][path][method]['summary']}}
+		</div>
 		<markdown *ngIf="apis.current['paths'][path][method]['description']" class="api-info-element markdown" 
 			[data]="apis.current['paths'][path][method]['description']">
 		</markdown>
+
+		<div *ngIf="apis.current['paths'][path][method]['tags']" class="api-info-element">
+			Tags:
+			<span *ngFor="let tag of apis.current['paths'][path][method]['tags']" class="tag-badge">
+				{{tag}}
+			</span>
+		</div>
+
+		<div *ngIf="apis.current['paths'][path][method]['externalDocs']" class="api-info-element">
+			<a href="{{apis.current['paths'][path][method]['externalDocs']['url']}}" target="_blanc">
+				<span *ngIf="apis.current['paths'][path][method]['externalDocs']['description']; else 'More'">
+					{{apis.current['paths'][path][method]['externalDocs']['description']}}
+				</span>
+			</a>
+		</div>
+
+		<div *ngIf="apis.current['paths'][path][method]['schemes'] || apis.current['paths'][path][method]['operationId'] || apis.current['paths'][path][method]['consumes'] || apis.current['paths'][path][method]['produces']"
+			class="api-info-element">
+			<h2 class="clickable" (click)="collapsedInfo = !collapsedInfo">General Information</h2>
+			<table *ngIf="!collapsedInfo">
+				<tbody>
+					<tr *ngIf="apis.current['paths'][path][method]['schemes']">
+						<td class="label-text">schemes</td>
+						<td>
+							<span *ngFor="let item of apis.current['paths'][path][method]['schemes']">{{item}}&nbsp;</span>
+						</td>
+					</tr>
+					<tr *ngIf="apis.current['paths'][path][method]['operationId']">
+						<td class="label-text">operationId</td>
+						<td>{{apis.current['paths'][path][method]['operationId']}}</td>
+					</tr>
+					<tr *ngIf="apis.current['paths'][path][method]['consumes']">
+						<td class="label-text">consumes</td>
+						<td>
+							<ul class="list-unstyled">
+								<li *ngFor="let item of apis.current['paths'][path][method]['consumes']">{{item}}</li>
+							</ul>
+						</td>
+					</tr>
+					<tr *ngIf="apis.current['paths'][path][method]['produces']">
+						<td class="label-text">produces</td>
+						<td>
+							<ul class="list-unstyled">
+								<li *ngFor="let item of apis.current['paths'][path][method]['produces']">{{item}}</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div *ngIf="apis.current['paths'][path][method]['security']" class="api-info-element">
+			<h2 class="clickable" (click)="collapsedSecurity = !collapsedSecurity">Security</h2>
+			<div *ngIf="!collapsedSecurity">
+				<div *ngFor="let req of apis.current['paths'][path][method]['security']">
+					<p style="font-weight: bold">{{apis.keys(req)[0]}}</p>
+					<ul *ngIf="req[apis.keys(req)[0]].length>0">
+						<li *ngFor="let scope of req[apis.keys(req)[0]]">{{scope}}</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<div *ngIf="apis.current['paths'][path][method]['parameters'] && apis.current['paths'][path][method]['parameters'].length > 0" class="api-info-element">
+			<h2>Parameters</h2>
+			<div *ngFor="let param of apis.current['paths'][path][method]['parameters']" 
+				class="card mb-1">
+				<div class="card-header clickable" (click)="uncollapsedParameter[param['name']] = !uncollapsedParameter[param['name']]">
+					<div class="row">
+						<div class="col-md-11 preview">
+							{{param['name']}}
+							<span *ngIf="param['in']" class="headerType">in {{param['in']}}</span>
+							<span *ngIf="param['type']" class="headerType">({{param['type']}})</span>
+							<span *ngIf="param['description']">{{param['description']}}</span>
+						</div>
+						<div class="col-md-1">
+							<div class="edit-card" (click)="editParameter($event, param)">
+								<i class="fa fa-fw fa-pencil"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-block" *ngIf="uncollapsedParameter[param['name']]">
+					<swadit-schema-view *ngIf="param['in']=='body'; else nonBodyParameter"
+						[schema]="apis.schemas.parameterBody" [obj]="param">
+					</swadit-schema-view>
+					<ng-template #nonBodyParameter>
+						<swadit-schema-view
+							[schema]="apis.schemas.parameterNonBody" [obj]="param">
+						</swadit-schema-view>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+
+		<div *ngIf="apis.current['paths'][path][method]['responses'] && apis.keys(apis.current['paths'][path][method]['responses']).length>0">
+			<h2>Responses</h2>
+			<div *ngFor="let resp of apis.keys(apis.current['paths'][path][method]['responses']); let index = index" 
+				class="card mb-1">
+				<div class="card-header clickable" (click)="uncollapsedResponse[resp] = !uncollapsedResponse[resp]">
+					<div class="row">
+						<div class="col-md-11 preview">
+							{{resp}}
+							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['schema'] && apis.current['paths'][path][method]['responses'][resp]['schema']['type']" class="headerType">({{apis.current['paths'][path][method]['responses'][resp]['schema']['type']}})</span>
+							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['description']">{{apis.current['paths'][path][method]['responses'][resp]['description']}}</span>
+						</div>
+						<div class="col-md-1">
+							<div class="edit-card" (click)="editResponse($event, resp)">
+								<i class="fa fa-fw fa-pencil"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-block" *ngIf="uncollapsedResponse[resp]">
+					<swadit-schema-view
+						[schema]="apis.schemas.response" [obj]="apis.current['paths'][path][method]['responses'][resp]">
+					</swadit-schema-view>
+				</div>
+			</div>
+		</div>
+
+		<div *ngIf="apis.hasExtensions(apis.current['paths'][path][method])" class="api-info-element">
+			<h2>Extensions</h2>
+			<swadit-extensions-view [obj]="apis.current['paths'][path][method]"></swadit-extensions-view>
+		</div>
 	</div>
 
 	<div class="api-info-element" *ngIf="!method">
-		Add a method
+		Add a method (tbd)
 	</div>
 </div>

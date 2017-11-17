@@ -23,6 +23,9 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { MarkdownModule } from 'ngx-markdown';
 
+import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
+import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
+
 import { PathRoutingModule } from './path-routing.module';
 import { PathComponent } from './path.component';
 
@@ -32,6 +35,8 @@ import { PathComponent } from './path.component';
 		FormsModule,
 		NgbModule,
 		MarkdownModule.forRoot(),
+		SchemaViewModule,
+		SchemaEditorModule,
 		PathRoutingModule
 	],
 	declarations: [

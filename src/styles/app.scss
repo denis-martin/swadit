@@ -18,23 +18,23 @@ h1 {
 }
 
 h2 {
-	font-size: 200%;
-}
-
-h3 {
 	font-size: 180%;
 }
 
-h4 {
+h3 {
 	font-size: 160%;
 }
 
-h5 {
+h4 {
 	font-size: 140%;
 }
 
-h6 {
+h5 {
 	font-size: 120%;
+}
+
+h6 {
+	font-size: 100%;
 }
 
 .markdown table {
@@ -63,6 +63,12 @@ h6 {
 .tag-table td {
 	vertical-align: top;
 	padding: 0.2rem;
+}
+
+.param-cell {
+	vertical-align: top;
+	padding: 0.2rem;
+	font-weight: bold;
 }
 
 .label-text {
@@ -125,4 +131,22 @@ h6 {
 	position: absolute;
 	right: 1.1em;
 	cursor: pointer;
+}
+
+.tag-badge {
+	background-color: #31bfc6;
+	display: inline-block;
+    padding: 0.25em 0.4em;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+	border-radius: 0.25rem;
+	margin: 0 0.15em;
+}
+
+.deprecated {
+	text-decoration: line-through;
 }

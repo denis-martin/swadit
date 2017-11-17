@@ -26,7 +26,7 @@
 			<ngb-tab title="Info" >
 				<ng-template ngbTabContent>
 					<div class="tab-content">
-						<swadit-object-editor [schema]="apis.schemas.info" [(obj)]="api.info" [title]="false"></swadit-object-editor>
+						<swadit-object-editor [schema]="apis.schemas.info" [(obj)]="api['info']" [title]="false"></swadit-object-editor>
 					</div>
 				</ng-template>
 			</ngb-tab>
@@ -35,15 +35,15 @@
 					<div class="tab-content">
 						<div class="row">
 							<div class="col col-sm-12">
-								<swadit-object-editor [schema]="apis.schemas.contact" [(obj)]="api.info.contact" [card]="true"></swadit-object-editor>
+								<swadit-object-editor [schema]="apis.schemas.contact" [(obj)]="api['info']['contact']" [card]="true"></swadit-object-editor>
 							</div>
 						</div>
 						<div class="row" style="margin-top: 1rem!important">
 							<div class="col col-sm-6">
-								<swadit-object-editor [schema]="apis.schemas.license" [(obj)]="api.info.license" [card]="true"></swadit-object-editor>
+								<swadit-object-editor [schema]="apis.schemas.license" [(obj)]="api['info']['license']" [card]="true"></swadit-object-editor>
 							</div>
 							<div class="col col-sm-6">
-								<swadit-object-editor [schema]="apis.schemas.externalDocs" [(obj)]="api.externalDocs" [card]="true"></swadit-object-editor>
+								<swadit-object-editor [schema]="apis.schemas.externalDocs" [(obj)]="api['externalDocs']" [card]="true"></swadit-object-editor>
 							</div>
 						</div>
 					</div>
@@ -59,7 +59,7 @@
 			<ngb-tab title="Tags">
 				<ng-template ngbTabContent>
 					<div class="tab-content">
-						<swadit-array-editor [schema]="apis.schemas.tags" [(obj)]="api.tags"></swadit-array-editor>
+						<swadit-array-editor [schema]="apis.schemas.tags" [(obj)]="api['tags']"></swadit-array-editor>
 					</div>
 				</ng-template>
 			</ngb-tab>
@@ -67,10 +67,10 @@
 				<ng-template ngbTabContent>
 					<div class="tab-content">
 						<p>Security Definitions:</p>
-						<swadit-object-editor [schema]="apis.schemas.securityDefinitions" [(obj)]="api.securityDefinitions"></swadit-object-editor>
+						<swadit-object-editor [schema]="apis.schemas.securityDefinitions" [(obj)]="api['securityDefinitions']"></swadit-object-editor>
 						<p>Default Security Requirements:</p>
-						<swadit-security-editor [schema]="apis.schemas.security" [(obj)]="api.security"
-							[securityDefinitions]="api.securityDefinitions">
+						<swadit-security-editor [schema]="apis.schemas.security" [(obj)]="api['security']"
+							[securityDefinitions]="api['securityDefinitions']">
 						</swadit-security-editor>
 					</div>
 				</ng-template>

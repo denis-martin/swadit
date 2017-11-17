@@ -35,6 +35,8 @@ export class PathComponent implements OnInit
 
 	sortItems = true;
 	filterText: string;
+	uncollapsedResponse = {};
+	uncollapsedParameter = {};
 
 	readonly methods = [ 'get', 'post', 'put', 'delete' ];
 
@@ -46,7 +48,7 @@ export class PathComponent implements OnInit
 			this.method = params['method'];
 			if (!this.method) {
 				let methods = this.getMethods();
-				console.log(this.apis.current['paths'], this.path, methods);
+				//console.log(this.apis.current['paths'], this.path, methods);
 				if (methods.length > 0) {
 					this.method = methods[0];
 				} else {
@@ -92,5 +94,29 @@ export class PathComponent implements OnInit
 		if (!this.apis.current['paths']) return [];
 		let methods = this.apis.keys(this.apis.current['paths'][this.path]);
 		return methods;
+	}
+
+	editPath(event: any = null)
+	{
+		console.log("editPath()");
+		if (event) event.stopPropagation();
+
+		alert("Not yet implemented");
+	}
+
+	editResponse(event, resp)
+	{
+		console.log("editResponse()", resp);
+		if (event) event.stopPropagation();
+
+		alert("Not yet implemented");
+	}
+
+	editParameter(event, paramObj)
+	{
+		console.log("editParameter()", paramObj);
+		if (event) event.stopPropagation();
+
+		alert("Not yet implemented");
 	}
 }

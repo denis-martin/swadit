@@ -39,4 +39,12 @@ export class PathsComponent implements OnInit
 	ngOnInit() 
 	{
 	}
+
+	addPath(event)
+	{
+		console.log("addPath()");
+		if (event) event.stopPropagation();
+
+		alert("Not yet implemented");
+	}
 }

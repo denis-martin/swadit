@@ -10,6 +10,7 @@ import { ApisService } from '../../services';
 export class SidebarComponent {
     isActive = false;
     showMenu = '';
+    filterText: string;
 
     constructor(public apis: ApisService) {
         
