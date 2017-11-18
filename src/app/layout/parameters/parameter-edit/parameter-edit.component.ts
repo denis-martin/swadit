@@ -63,7 +63,10 @@ export class ParameterEditComponent implements OnInit
 		}
 		this.key = this.key.trim();
 
-		if (this.key != this.key_orig && this.apis.current['parameters'][this.key]) {
+		if (this.key != this.key_orig && 
+			this.apis.current['parameters'] && 
+			this.apis.current['parameters'][this.key]) 
+		{
 			this.errorStr = "Key name already exists.";
 			return;
 		}

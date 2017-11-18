@@ -62,7 +62,10 @@ export class DefinitionEditComponent implements OnInit
 		}
 		this.key = this.key.trim();
 
-		if (this.key != this.key_orig && this.apis.current['definitions'][this.key]) {
+		if (this.key != this.key_orig && 
+			this.apis.current['definitions'] && 
+			this.apis.current['definitions'][this.key]) 
+		{
 			this.errorStr = "Key name already exists.";
 			return;
 		}

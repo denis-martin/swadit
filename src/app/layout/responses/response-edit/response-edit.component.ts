@@ -63,6 +63,14 @@ export class ResponseEditComponent implements OnInit
 		}
 		this.key = this.key.trim();
 
+		if (this.key != this.key_orig && 
+			this.apis.current['responses'] && 
+			this.apis.current['responses'][this.key]) 
+		{
+			this.errorStr = "Key name already exists.";
+			return;
+		}
+
 		let missing = this.apis.missingRequiredProperties(this.apis.schemas.response, this.obj);
 		if (missing.length > 0) {
 			this.errorStr = "Missing required properties: ";
