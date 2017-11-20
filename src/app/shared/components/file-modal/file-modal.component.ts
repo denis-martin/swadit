@@ -51,6 +51,6 @@ export class FileModalComponent implements OnInit
 	
 	onFileChange(event)
 	{
-		this.files = event.srcElement.files;
+		this.files = event.target.files;
 	}
 }
