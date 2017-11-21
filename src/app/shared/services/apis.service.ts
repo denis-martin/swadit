@@ -338,13 +338,29 @@ export class ApisService
 	}
 
 	// TODO
-	resolveRef(ref: string)
+	resolveRef(ref: string): any
 	{
 		if (ref.startsWith("#/definitions/")) {
 			let refParts = ref.split('/');
 			return this.current['definitions'][refParts[2]];
 		}
+		if (ref.startsWith("#/parameters/")) {
+			let refParts = ref.split('/');
+			return this.current['parameters'][refParts[2]];
+		}
+		if (ref.startsWith("#/responses/")) {
+			let refParts = ref.split('/');
+			return this.current['responses'][refParts[2]];
+		}
 		return null;
+	}
+
+	resolveObj(obj: any): any
+	{
+		if (obj && obj['$ref']) {
+			return this.resolveRef(obj['$ref']);
+		}
+		return obj;
 	}
 
 	renameObjectKey(obj: any, key: string, newKey: string) 

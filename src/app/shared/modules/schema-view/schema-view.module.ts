@@ -22,7 +22,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { MarkdownModule } from 'ngx-markdown';
 
-import { SchemaViewComponent } from './schema-view.component';
+import { SchemaViewComponent, LetDirective } from './schema-view.component';
 import { SwaggerSchemaViewComponent } from './custom/swagger-schema-view.component';
 import { ExtensionsViewComponent } from './custom/extensions-view.component';
 
@@ -34,11 +34,13 @@ import { ExtensionsViewComponent } from './custom/extensions-view.component';
 	],
 	declarations: [
 		SchemaViewComponent,
+		LetDirective,
 		SwaggerSchemaViewComponent,
 		ExtensionsViewComponent
 	],
 	exports: [
 		SchemaViewComponent,
+		LetDirective,
 		SwaggerSchemaViewComponent,
 		ExtensionsViewComponent
 	]

@@ -15,9 +15,11 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Directive } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+
+import * as _ from "lodash";
 
 import { ApisService } from '../../shared/services';
 
@@ -26,8 +28,7 @@ import { ApisService } from '../../shared/services';
 	templateUrl: './path.component.html',
 	styleUrls: ['./path.component.scss']
 })
-export class PathComponent implements OnInit 
-{
+export class PathComponent implements OnInit {
 	private routeSubscription: any;
 
 	path: string;
@@ -38,11 +39,8 @@ export class PathComponent implements OnInit
 	uncollapsedResponse = {};
 	uncollapsedParameter = {};
 
-	readonly methods = [ 'get', 'post', 'put', 'delete' ];
-
-	constructor(public apis: ApisService, private modalService: NgbModal, 
-		private route: ActivatedRoute, private router: Router) 
-	{
+	constructor(public apis: ApisService, private modalService: NgbModal,
+		private route: ActivatedRoute, private router: Router) {
 		this.routeSubscription = this.route.params.subscribe(params => {
 			this.path = params['path'];
 			this.method = params['method'];
@@ -75,8 +73,7 @@ export class PathComponent implements OnInit
 		});
 	}
 
-	ngOnInit() 
-	{
+	ngOnInit() {
 		console.log("init", this.method);
 		if (!this.method) {
 			let methods = this.getMethods();
@@ -89,31 +86,46 @@ export class PathComponent implements OnInit
 		}
 	}
 
-	getMethods()
-	{
+	getMethods(): Array<string> {
 		if (!this.apis.current['paths']) return [];
 		let methods = this.apis.keys(this.apis.current['paths'][this.path]);
+		_.pull(methods, "parameters");
 		return methods;
 	}
 
-	editPath(event: any = null)
+	getParameters(path: string, method: string): Array<any> {
+		let params: Array<any> = [];
+		if (this.apis.current['paths'][path]['parameters']) {
+			params.push.apply(params, this.apis.current['paths'][path]['parameters']);
+		}
+		if (this.apis.current['paths'][path][method]['parameters']) {
+			params.push.apply(params, this.apis.current['paths'][path][method]['parameters']);
+		}
+		return params;
+	}
+
+	resolveObj(obj: any)
 	{
+		return new Promise((resolve, reject) => {
+			resolve(this.apis.resolveObj(obj));
+		});
+	}
+
+	editPath(event: any = null) {
 		console.log("editPath()");
 		if (event) event.stopPropagation();
 
 		alert("Not yet implemented");
 	}
 
-	editResponse(event, resp)
-	{
+	editResponse(event, resp) {
 		console.log("editResponse()", resp);
 		if (event) event.stopPropagation();
 
 		alert("Not yet implemented");
 	}
 
-	editParameter(event, paramObj)
-	{
+	editParameter(event, paramObj) {
 		console.log("editParameter()", paramObj);
 		if (event) event.stopPropagation();
 

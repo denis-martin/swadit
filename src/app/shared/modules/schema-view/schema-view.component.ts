@@ -15,11 +15,19 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Directive } from '@angular/core';
 
 import * as _ from "lodash";
 
 import { ApisService } from '../../services';
+
+@Directive({
+	selector: '[swLet]',
+	exportAs: 'swLet'
+})
+export class LetDirective {
+	@Input() values: any = {};
+}
 
 @Component({
 	selector: 'swadit-schema-view',

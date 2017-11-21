@@ -76,3 +76,9 @@ $colorDelete: #DF4343;
 .headerType {
 	color: #bbb;
 }
+
+.preview {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+}
