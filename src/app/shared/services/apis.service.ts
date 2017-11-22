@@ -38,8 +38,8 @@ import * as Swagger20SchemaSchema from '../schemas/2.0/swagger-schema.json';
 import * as Swagger20SchemaParameterBody from '../schemas/2.0/swagger-parameterBody.json';
 import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-parameterNonBody.json';
 import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
-import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
 import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
+import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
 
 @Injectable()
 export class ApisService 
@@ -59,6 +59,7 @@ export class ApisService
 			parameterBody: Swagger20SchemaParameterBody,
 			parameterNonBody: Swagger20SchemaParameterNonBody,
 			response: Swagger20SchemaResponse,
+			operation: Swagger20SchemaOperation,
 			header: Swagger20SchemaHeader
 		}
 	};
@@ -91,6 +92,8 @@ export class ApisService
 	fileModal: NgbModalRef;
 	blob: Blob;
 	blobUrl: string;
+
+	methodKeys = ["get", "post", "put", "delete", "options", "head", "patch" ];
 
 	constructor(private modalService: NgbModal) 
 	{

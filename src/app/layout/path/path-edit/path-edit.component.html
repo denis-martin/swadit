@@ -1,0 +1,89 @@
+<!--
+	Copyright 2017 Denis Martin.  This file is part of swadit.
+
+	swadit is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	swadit is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<form (ngSubmit)="ok()" #editForm="ngForm">
+	<!--
+	<div class="modal-header">
+		<h3 class="modal-title" id="modal-title">Path</h3>
+	</div>
+	-->
+	<div class="modal-body" id="modal-body">
+		<div class="row">
+			<div class="col-md-2">
+				<label for="methodKey">Path</label>
+				<select id="methodKey" name="methodKey" [(ngModel)]="methodKey" required
+					class="form-control" style="text-transform: uppercase">
+					<option *ngFor="let methodKey of apis.methodKeys" 
+						style="text-transform: uppercase">
+						{{methodKey}}
+					</option>
+				</select>
+			</div>
+			<div class="col-md-10">
+				<div class="form-group">
+					<label for="pathKey">Method</label>
+					<input type="text" id="pathKey" name="pathKey" [(ngModel)]="pathKey" required
+						class="form-control" placeholder="Enter path" title="Path">
+				</div>
+			</div>
+		</div>
+		<ngb-tabset>
+			<ngb-tab title="Info">
+				<ng-template ngbTabContent>
+					<div class="tab-content">
+						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'">
+						</swadit-schema-editor>
+					</div>
+				</ng-template>
+			</ngb-tab>
+			<ngb-tab title="Docs">
+				<ng-template ngbTabContent>
+					<div class="tab-content">
+						<swadit-object-editor [schema]="apis.schemas.externalDocs" [(obj)]="obj['externalDocs']">
+						</swadit-object-editor>
+					</div>
+				</ng-template>
+			</ngb-tab>
+			<ngb-tab title="Security" *ngIf="apis.current['securityDefinitions'] || obj['security']">
+				<ng-template ngbTabContent>
+					<div class="tab-content">
+						<label for="security">Security</label>
+						<swadit-security-editor [schema]="apis.schemas.security" [(obj)]="obj['security']" [id]="'security'"
+							[securityDefinitions]="apis.current['securityDefinitions']">
+						</swadit-security-editor>
+					</div>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+	</div>
+	<div class="modal-footer">
+		<button *ngIf="pathKey_orig" class="btn btn-danger" type="button" 
+			(click)="deletePath()" title="Delete path"
+			[ngClass]="{ 'mr-auto': !methodKey_orig }">
+			Delete Path</button>
+		<button *ngIf="methodKey_orig" class="btn btn-danger mr-auto" type="button" 
+			(click)="deleteMethod()" title="Delete method">
+			Delete Method</button>
+		<span *ngIf="errorStr" style="color: red">
+			{{errorStr}}
+		</span>
+		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
+			Apply</button>
+		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+			Cancel</button>
+	</div>
+</form>

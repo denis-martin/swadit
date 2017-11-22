@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="editPath()">
+<div class="edit-section" (click)="editPath($event, path, method)">
 	<i class="fa fa-pencil"></i>
 </div>
 
@@ -33,13 +33,13 @@
 		</li>
 		<li class="nav-item">
 			<a class="nav-link" [ngClass]="{ 'active': !method }" 
-				href="javascript:void(0)" (click)="method=null">
-				...
+				href="javascript:void(0)" (click)="editPath($event, path)">
+				<i class="fa fa-plus"></i>
 			</a>
 		</li>
 	</ul>
 
-	<div class="api-info-element" *ngIf="method">
+	<div class="api-info-element" *ngIf="method && apis.current['paths'][path][method]">
 		<div class="api-info-element" *ngIf="apis.current['paths'][path][method]['summary']">
 			{{apis.current['paths'][path][method]['summary']}}
 		</div>
@@ -54,12 +54,78 @@
 			</span>
 		</div>
 
-		<div *ngIf="apis.current['paths'][path][method]['externalDocs']" class="api-info-element">
-			<a href="{{apis.current['paths'][path][method]['externalDocs']['url']}}" target="_blanc">
-				<span *ngIf="apis.current['paths'][path][method]['externalDocs']['description']; else 'More'">
-					{{apis.current['paths'][path][method]['externalDocs']['description']}}
-				</span>
-			</a>
+		
+		<h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
+			Parameters
+			<span class="edit-subsection" (click)="editParameter($event, path, method)" title="Add parameter">
+				<i class="fa fa-plus"></i>
+			</span>
+		</h2>
+		<div *ngIf="!collapsedParameters">
+			<div *ngFor="let param of getParameters(path, method)"
+				swLet [values]="{paramObj: apis.resolveObj(param)}" #local="swLet"
+				class="card mb-1">
+				<div class="card-header clickable" 
+					(click)="uncollapsedParameter[local.values.paramObj['name']] = !uncollapsedParameter[local.values.paramObj['name']]">
+					<div class="row">
+						<div class="col-md-11 preview">
+							{{local.values.paramObj['name']}}
+							<span *ngIf="local.values.paramObj['in']" class="headerType">in {{local.values.paramObj['in']}}</span>
+							<span *ngIf="local.values.paramObj['type']" class="headerType">({{local.values.paramObj['type']}})</span>
+							<span *ngIf="local.values.paramObj['description']">{{local.values.paramObj['description']}}</span>
+						</div>
+						<div class="col-md-1">
+							<div class="edit-card" (click)="editParameter($event, param)">
+								<i class="fa fa-fw fa-pencil"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-block" *ngIf="uncollapsedParameter[local.values.paramObj['name']]">
+					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
+					<swadit-schema-view *ngIf="local.values.paramObj['in']=='body'; else nonBodyParameter"
+						[schema]="apis.schemas.parameterBody" [obj]="local.values.paramObj">
+					</swadit-schema-view>
+					<ng-template #nonBodyParameter>
+						<swadit-schema-view
+							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.paramObj">
+						</swadit-schema-view>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+
+		
+		<h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">
+			Responses
+			<span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response">
+				<i class="fa fa-plus"></i>
+			</span>
+		</h2>
+		<div *ngIf="!collapsedResponses && apis.current['paths'][path][method]['responses']">
+			<div *ngFor="let resp of apis.keys(apis.current['paths'][path][method]['responses']); let index = index" 
+				class="card mb-1">
+				<div class="card-header clickable" (click)="uncollapsedResponse[resp] = !uncollapsedResponse[resp]">
+					<div class="row">
+						<div class="col-md-11 preview">
+							{{resp}}
+							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['schema'] && apis.current['paths'][path][method]['responses'][resp]['schema']['type']" class="headerType">({{apis.current['paths'][path][method]['responses'][resp]['schema']['type']}})</span>
+							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['schema'] && apis.current['paths'][path][method]['responses'][resp]['$ref']" class="headerType">({{apis.current['paths'][path][method]['responses'][resp]['$ref']}})</span>
+							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['description']">{{apis.current['paths'][path][method]['responses'][resp]['description']}}</span>
+						</div>
+						<div class="col-md-1">
+							<div class="edit-card" (click)="editResponse($event, resp)">
+								<i class="fa fa-fw fa-pencil"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-block" *ngIf="uncollapsedResponse[resp]">
+					<swadit-schema-view
+						[schema]="apis.schemas.response" [obj]="apis.resolveObj(apis.current['paths'][path][method]['responses'][resp])">
+					</swadit-schema-view>
+				</div>
+			</div>
 		</div>
 
 		<div *ngIf="apis.current['paths'][path][method]['schemes'] || apis.current['paths'][path][method]['operationId'] || apis.current['paths'][path][method]['consumes'] || apis.current['paths'][path][method]['produces']"
@@ -109,71 +175,15 @@
 			</div>
 		</div>
 
-		<div *ngIf="(apis.current['paths'][path][method]['parameters'] && apis.current['paths'][path][method]['parameters'].length > 0) || (apis.current['paths'][path]['parameters'] && apis.current['paths'][path]['parameters'].length > 0)" 
-			class="api-info-element">
-			<h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">Parameters</h2>
-			<div *ngIf="!collapsedParameters">
-				<div *ngFor="let param of getParameters(path, method)"
-					swLet [values]="{paramObj: apis.resolveObj(param)}" #local="swLet"
-					class="card mb-1">
-					<div class="card-header clickable" 
-						(click)="uncollapsedParameter[local.values.paramObj['name']] = !uncollapsedParameter[local.values.paramObj['name']]">
-						<div class="row">
-							<div class="col-md-11 preview">
-								{{local.values.paramObj['name']}}
-								<span *ngIf="local.values.paramObj['in']" class="headerType">in {{local.values.paramObj['in']}}</span>
-								<span *ngIf="local.values.paramObj['type']" class="headerType">({{local.values.paramObj['type']}})</span>
-								<span *ngIf="local.values.paramObj['description']">{{local.values.paramObj['description']}}</span>
-							</div>
-							<div class="col-md-1">
-								<div class="edit-card" (click)="editParameter($event, param)">
-									<i class="fa fa-fw fa-pencil"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="card-block" *ngIf="uncollapsedParameter[local.values.paramObj['name']]">
-						<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
-						<swadit-schema-view *ngIf="local.values.paramObj['in']=='body'; else nonBodyParameter"
-							[schema]="apis.schemas.parameterBody" [obj]="local.values.paramObj">
-						</swadit-schema-view>
-						<ng-template #nonBodyParameter>
-							<swadit-schema-view
-								[schema]="apis.schemas.parameterNonBody" [obj]="local.values.paramObj">
-							</swadit-schema-view>
-						</ng-template>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div *ngIf="apis.current['paths'][path][method]['responses'] && apis.keys(apis.current['paths'][path][method]['responses']).length>0">
-			<h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">Responses</h2>
-			<div *ngIf="!collapsedResponses">
-				<div *ngFor="let resp of apis.keys(apis.current['paths'][path][method]['responses']); let index = index" 
-					class="card mb-1">
-					<div class="card-header clickable" (click)="uncollapsedResponse[resp] = !uncollapsedResponse[resp]">
-						<div class="row">
-							<div class="col-md-11 preview">
-								{{resp}}
-								<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['schema'] && apis.current['paths'][path][method]['responses'][resp]['schema']['type']" class="headerType">({{apis.current['paths'][path][method]['responses'][resp]['schema']['type']}})</span>
-								<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['schema'] && apis.current['paths'][path][method]['responses'][resp]['$ref']" class="headerType">({{apis.current['paths'][path][method]['responses'][resp]['$ref']}})</span>
-								<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['description']">{{apis.current['paths'][path][method]['responses'][resp]['description']}}</span>
-							</div>
-							<div class="col-md-1">
-								<div class="edit-card" (click)="editResponse($event, resp)">
-									<i class="fa fa-fw fa-pencil"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="card-block" *ngIf="uncollapsedResponse[resp]">
-						<swadit-schema-view
-							[schema]="apis.schemas.response" [obj]="apis.resolveObj(apis.current['paths'][path][method]['responses'][resp])">
-						</swadit-schema-view>
-					</div>
-				</div>
-			</div>
+		<div *ngIf="apis.current['paths'][path][method]['externalDocs']" class="api-info-element">
+			<h2 class="clickable" (click)="collapsedExternalDocs = !collapsedExternalDocs">Documentation</h2>
+			<p *ngIf="!collapsedExternalDocs">
+				<a href="{{apis.current['paths'][path][method]['externalDocs']['url']}}" target="_blanc">
+					<span *ngIf="apis.current['paths'][path][method]['externalDocs']['description']; else 'More'">
+						{{apis.current['paths'][path][method]['externalDocs']['description']}}
+					</span>
+				</a>
+			</p>
 		</div>
 
 		<div *ngIf="apis.hasExtensions(apis.current['paths'][path][method])" class="api-info-element">
@@ -185,6 +195,6 @@
 	</div>
 
 	<div class="api-info-element" *ngIf="!method">
-		Add a method (tbd)
+		<a href="javascript:void(0)" (click)="editPath($event, path)">Add a method...</a>
 	</div>
 </div>

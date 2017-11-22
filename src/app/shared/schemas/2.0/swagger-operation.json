@@ -4,68 +4,95 @@
 	"$schema": "http://json-schema.org/draft-04/schema#",
 	"type": "object",
 	"required": [
-	  "responses"
+		"responses"
 	],
 	"additionalProperties": false,
 	"patternProperties": {
-	  "^x-": {
-		"$ref": "#/definitions/vendorExtension"
-	  }
+		"^x-": {
+			"$ref": "#/definitions/vendorExtension"
+		}
+	},
+	"x-swadit-editor-grid": [
+		[ "summary", "deprecated" ],
+		[ "description" ],
+		[ "consumes", "produces" ],
+		[ "tags", "schemes", "operationId" ]
+	],
+	"x-swadit-editor-grid-cols": {
+		"summary": 10, "deprecated": 2,
+		"description": 12,
+		"consumes": 6, "produces": 6,
+		"tags": 4, "operationId": 4, "schemes": 4
 	},
 	"properties": {
-	  "tags": {
-		"type": "array",
-		"items": {
-		  "type": "string"
+		"summary": {
+			"type": "string",
+			"description": "A brief summary of the operation."
 		},
-		"uniqueItems": true
-	  },
-	  "summary": {
-		"type": "string",
-		"description": "A brief summary of the operation."
-	  },
-	  "description": {
-		"type": "string",
-		"description": "A longer description of the operation, GitHub Flavored Markdown is allowed."
-	  },
-	  "externalDocs": {
-		"$ref": "#/definitions/externalDocs"
-	  },
-	  "operationId": {
-		"type": "string",
-		"description": "A unique identifier of the operation."
-	  },
-	  "produces": {
-		"description": "A list of MIME types the API can produce.",
-		"allOf": [
-		  {
-			"$ref": "#/definitions/mediaTypeList"
-		  }
-		]
-	  },
-	  "consumes": {
-		"description": "A list of MIME types the API can consume.",
-		"allOf": [
-		  {
-			"$ref": "#/definitions/mediaTypeList"
-		  }
-		]
-	  },
-	  "parameters": {
-		"$ref": "#/definitions/parametersList"
-	  },
-	  "responses": {
-		"$ref": "#/definitions/responses"
-	  },
-	  "schemes": {
-		"$ref": "#/definitions/schemesList"
-	  },
-	  "deprecated": {
-		"type": "boolean",
-		"default": false
-	  },
-	  "security": {
-		"$ref": "#/definitions/security"
-	  }
+		"deprecated": {
+			"type": "boolean",
+			"default": false
+		},
+		"description": {
+			"type": "string",
+			"description": "A longer description of the operation, GitHub Flavored Markdown is allowed.",
+			"x-swadit-input-multiline": 6,
+			"x-swadit-input-class": "monospace"
+		},
+		"externalDocs": {
+			"$ref": "#/definitions/externalDocs"
+		},
+		"tags": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"uniqueItems": true
+		},
+		"operationId": {
+			"type": "string",
+			"description": "A unique identifier of the operation."
+		},
+		"produces": {
+			"description": "A list of MIME types the API can produce.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "The MIME type of the HTTP message."
+      },
+      "uniqueItems": true
+		},
+		"consumes": {
+			"description": "A list of MIME types accepted by the API.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "The MIME type of the HTTP message."
+      },
+      "uniqueItems": true
+		},
+		"parameters": {
+			"$ref": "#/definitions/parametersList"
+		},
+		"responses": {
+			"$ref": "#/definitions/responses"
+		},
+		"schemes": {
+			"type": "array",
+      "description": "The transfer protocol of the API.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "http",
+          "https",
+          "ws",
+          "wss"
+        ]
+      },
+      "uniqueItems": true
+		},
+		"security": {
+			"$ref": "#/definitions/security"
+		}
 	}
 }

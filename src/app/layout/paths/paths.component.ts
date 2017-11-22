@@ -19,6 +19,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from '../../shared/services';
+import { PathEditComponent } from '../../layout/path/path-edit/path-edit.component';
 
 @Component({
 	selector: 'app-paths',
@@ -31,6 +32,9 @@ export class PathsComponent implements OnInit
 	filterText: string;
 
 	readonly methods = [ 'get', 'post', 'put', 'delete' ];
+
+	closeResult: string;
+	editModal: NgbModalRef;
 
 	constructor(public apis: ApisService, private modalService: NgbModal) 
 	{
@@ -45,6 +49,30 @@ export class PathsComponent implements OnInit
 		console.log("addPath()");
 		if (event) event.stopPropagation();
 
-		alert("Not yet implemented");
+		this.editModal = this.modalService.open(PathEditComponent, PathEditComponent.modalOptions);
+		this.editModal.componentInstance.pathKey = null;
+		this.editModal.componentInstance.methodKey = null;
+		this.editModal.componentInstance.obj = {};
+		this.editModal.result.then((result) => {
+			this.closeResult = `Closed with: ${result}`;
+			//this.path = result.path;
+			//this.method = result.method;
+			console.info("addPath(): " + this.closeResult);
+			
+        }, (reason) => {
+			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+			console.warn("addPath(): " + this.closeResult);
+
+        });
+	}
+
+	private getDismissReason(reason: any): string {
+        if (reason === ModalDismissReasons.ESC) {
+            return 'by pressing ESC';
+        } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+            return 'by clicking on a backdrop';
+        } else {
+            return  `with: ${reason}`;
+        }
 	}
 }

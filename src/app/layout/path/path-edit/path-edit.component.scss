@@ -15,29 +15,9 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-
-//import { PathModule } from './../path/path.module';
-//import { PathEditComponent } from 'app/layout/path/path-edit/path-edit.component';
-
-import { PathsRoutingModule } from './paths-routing.module';
-import { PathsComponent } from './paths.component';
-
-@NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		NgbModule,
-//		PathModule,
-		PathsRoutingModule
-	],
-	declarations: [
-		PathsComponent
-	],
-	entryComponents: [ ]
-})
-export class PathsModule { }
+label {
+    font-size: 80%;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    cursor: pointer;
+}

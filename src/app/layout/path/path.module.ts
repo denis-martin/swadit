@@ -28,6 +28,7 @@ import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-ed
 
 import { PathRoutingModule } from './path-routing.module';
 import { PathComponent } from './path.component';
+import { PathEditComponent } from './path-edit/path-edit.component';
 
 @NgModule({
 	imports: [
@@ -40,8 +41,9 @@ import { PathComponent } from './path.component';
 		PathRoutingModule
 	],
 	declarations: [
-		PathComponent
+		PathComponent,
+		PathEditComponent
 	],
-	entryComponents: []
+	entryComponents: [ PathEditComponent ]
 })
 export class PathModule { }

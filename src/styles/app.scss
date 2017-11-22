@@ -83,18 +83,27 @@ h6 {
 	margin-bottom: 0;
 }
 
-.edit-section {
-	position: fixed;
-	top: 4rem;
-	right: 1rem;
+.edit-section, .edit-subsection {
 	font-size: 1.5rem;
 	color: #bbb;
 	cursor: pointer;
 	z-index: 100;
 }
 
-.edit-section:hover {
+.edit-section:hover, .edit-subsection:hover {
 	color: black;
+}
+
+.edit-section {
+	position: fixed;
+	top: 4rem;
+	right: 1rem;
+}
+
+.edit-subsection {
+	float: right;
+	margin-right: 0.5em;
+	font-size: 1em;
 }
 
 .clickable {

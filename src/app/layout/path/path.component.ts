@@ -22,6 +22,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 import * as _ from "lodash";
 
 import { ApisService } from '../../shared/services';
+import { PathEditComponent } from './path-edit/path-edit.component';
 
 @Component({
 	selector: 'app-path',
@@ -38,6 +39,9 @@ export class PathComponent implements OnInit {
 	filterText: string;
 	uncollapsedResponse = {};
 	uncollapsedParameter = {};
+
+	closeResult: string;
+	editModal: NgbModalRef;
 
 	constructor(public apis: ApisService, private modalService: NgbModal,
 		private route: ActivatedRoute, private router: Router) {
@@ -111,11 +115,25 @@ export class PathComponent implements OnInit {
 		});
 	}
 
-	editPath(event: any = null) {
+	editPath(event: any = null, path: string = null, method: string = null) {
 		console.log("editPath()");
 		if (event) event.stopPropagation();
 
-		alert("Not yet implemented");
+		this.editModal = this.modalService.open(PathEditComponent, PathEditComponent.modalOptions);
+		this.editModal.componentInstance.pathKey = path;
+		this.editModal.componentInstance.methodKey = method;
+		this.editModal.componentInstance.obj = path && method ? this.apis.current['paths'][path][method] : {};
+		this.editModal.result.then((result) => {
+			this.closeResult = `Closed with: ${result}`;
+			this.path = result.path;
+			this.method = result.method;
+			console.info("edit(): " + this.closeResult);
+			
+        }, (reason) => {
+			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+			console.warn("edit(): " + this.closeResult);
+
+        });
 	}
 
 	editResponse(event, resp) {
@@ -130,5 +148,15 @@ export class PathComponent implements OnInit {
 		if (event) event.stopPropagation();
 
 		alert("Not yet implemented");
+	}
+
+	private getDismissReason(reason: any): string {
+        if (reason === ModalDismissReasons.ESC) {
+            return 'by pressing ESC';
+        } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+            return 'by clicking on a backdrop';
+        } else {
+            return  `with: ${reason}`;
+        }
 	}
 }
