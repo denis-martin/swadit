@@ -25,7 +25,7 @@ import { ApisService } from '../../../services';
 @Component({
 	selector: 'app-path-edit',
 	templateUrl: './path-edit.component.html',
-	styleUrls: ['./path-edit.component.scss']
+	styleUrls: ['../editor-modals.scss']
 })
 export class PathEditComponent implements OnInit 
 {

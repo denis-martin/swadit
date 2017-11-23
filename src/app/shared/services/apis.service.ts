@@ -167,59 +167,69 @@ export class ApisService
 	{
 		if (!api) return;
 
-		if (schema['type'] == 'object') {
-			if (schema['properties']) {
-				this.keys(schema['properties']).forEach(p => {
-					if (api[p] != null) {
-						this.cleanUp(schema['properties'][p], api[p]);
-						if (schema['properties'][p]['type'] == 'array') {
-							if (api[p].length == 0 && !this.propertyIsRequired(schema, p)) {
+		if (api['$ref']) {
+			this.keys(api).forEach(k => {
+				if (k != '$ref') {
+					delete api[k];
+				}
+			});
+		} else {
+			if (schema['type'] == 'object') {
+				if (schema['properties']) {
+					this.keys(schema['properties']).forEach(p => {
+						if (api[p] != null) {
+							this.cleanUp(schema['properties'][p], api[p]);
+							if (schema['properties'][p]['type'] == 'array') {
+								if (api[p].length == 0 && !this.propertyIsRequired(schema, p)) {
+									delete api[p];
+								}
+							}
+							if (schema['properties'][p]['type'] == 'object') {
+								if (this.keys(api[p]).length == 0 && !this.propertyIsRequired(schema, p)) {
+									delete api[p];
+								}
+							}
+							if (schema['properties'][p]['type'] == 'string') {
+								if (api[p] == "" && !this.propertyIsRequired(schema, p)) {
+									delete api[p];
+								}
+							}
+						} else {
+							delete api[p];
+						}
+					});
+					/* TODO we have incomplete schemas, thus we may not remove additional properties
+					if (!schema['additionalProperties']) {
+						this.keys(api).forEach(p => {
+							if (!p.startsWith("x-") && !schema['properties'][p]) {
 								delete api[p];
 							}
-						}
-						if (schema['properties'][p]['type'] == 'object') {
-							if (this.keys(api[p]).length == 0 && !this.propertyIsRequired(schema, p)) {
-								delete api[p];
-							}
-						}
-						if (schema['properties'][p]['type'] == 'string') {
-							if (api[p] == "" && !this.propertyIsRequired(schema, p)) {
-								delete api[p];
-							}
-						}
-					} else {
-						delete api[p];
+						});
 					}
-				});
-				/* TODO we have incomplete schemas, thus we may not remove additional properties
-				if (!schema['additionalProperties']) {
+					*/
+				// TODO: properties AND additionalProperties
+				} else if (schema['additionalProperties']) {
 					this.keys(api).forEach(p => {
-						if (!p.startsWith("x-") && !schema['properties'][p]) {
+						if (api[p] != null) {
+							this.cleanUp(schema['additionalProperties'], api[p]);
+							// we allow additional properties with empty values
+						} else {
 							delete api[p];
 						}
 					});
 				}
-				*/
-			// TODO: properties AND additionalProperties
-			} else if (schema['additionalProperties']) {
-				this.keys(api).forEach(p => {
-					if (api[p] != null) {
-						this.cleanUp(schema['additionalProperties'], api[p]);
-						// we allow additional properties with empty values
-					} else {
-						delete api[p];
-					}
+			} else if (schema['type'] == 'array') {
+				api.forEach(item => {
+					this.cleanUp(schema['items'], item);
 				});
 			}
-		} else if (schema['type'] == 'array') {
-			api.forEach(item => {
-				this.cleanUp(schema['items'], item);
-			});
 		}
 	}
 
 	cleanUpSwaggerSchema(obj: any)
 	{
+		if (!obj) return;
+
 		this.cleanUp(this.schemas.schema, obj);
 
 		if (obj['type'] == "array") {

@@ -23,9 +23,19 @@
 				<div *ngFor="let p of row" class="form-group col-md-{{schema['x-swadit-editor-grid-cols'][p] ? schema['x-swadit-editor-grid-cols'][p] : 12}}">
 					<label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
 						{{deCamelize(p)}}<span *ngIf="propertyIsRequired(schema, p)" style="color: red">*</span><span *ngIf="collapsed[p]">...</span>
+						<span *ngIf="obj[p] != undefined && obj[p] != null && schema['properties'][p]['type'] == object && !propertyIsRequired(schema, p)"
+							(click)="deleteProperty($event, p)">
+							<i class="fa fa-trash"></i>
+						</span>
 					</label>
 					<div [ngbCollapse]="collapsed[p]">
-						<swadit-schema-editor [schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p"></swadit-schema-editor>
+						<swadit-schema-editor 
+							*ngIf="(obj[p] != undefined && obj[p] != null) || schema['properties'][p]['type'] != object; else addSchema"
+							[schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p">
+						</swadit-schema-editor>
+						<ng-template #addSchema>
+							<button class="btn" (click)="obj[p] = { type: 'object' }">add</button>
+						</ng-template>
 					</div>
 				</div>
 			</div>

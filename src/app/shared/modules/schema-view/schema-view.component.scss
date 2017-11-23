@@ -15,6 +15,10 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+.schemaView {
+	font-size: 10pt;
+}
+
 table {
 	font-size: 0.8rem;
 }
@@ -29,7 +33,7 @@ table {
 	font-style: italic;
 }
 
-.propertyType {
+.propertyType, .headerType {
 	color: #bbb;
 }
 

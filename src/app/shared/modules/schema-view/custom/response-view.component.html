@@ -1,0 +1,43 @@
+<!--
+	Copyright 2017 Denis Martin.  This file is part of swadit.
+
+	swadit is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	swadit is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<div class="schemaView">
+	<markdown *ngIf="obj['description']" class="markdown" 
+		[data]="obj['description']">
+	</markdown>
+
+	<div *ngIf="obj['schema']">
+		<p>
+			Response schema:
+			<span *ngIf="obj['schema']['$ref']" class="headerType">{{obj['schema']['$ref']}}</span>
+		</p>
+		<swadit-swagger-schema-view [obj]="apis.resolveObj(obj['schema'])">
+		</swadit-swagger-schema-view>
+	</div>
+
+	<!-- TODO: headers & examples -->
+
+	<div *ngIf="obj['headers']">
+		<p>Headers:</p>
+		<markdown *ngIf="obj['headers']" [data]="toYaml(obj['headers']) | language: 'yaml'"></markdown>
+	</div>
+
+	<div *ngIf="obj['examples']">
+		<p>Examples:</p>
+		<markdown *ngIf="obj['examples']" [data]="toYaml(obj['examples']) | language: 'yaml'"></markdown>
+	</div>
+</div>

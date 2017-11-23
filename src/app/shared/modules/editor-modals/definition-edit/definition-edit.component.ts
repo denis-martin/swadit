@@ -25,7 +25,7 @@ import { ApisService } from '../../../services';
 @Component({
 	selector: 'app-definition-edit',
 	templateUrl: './definition-edit.component.html',
-	styleUrls: ['./definition-edit.component.scss']
+	styleUrls: ['../editor-modals.scss']
 })
 export class DefinitionEditComponent implements OnInit 
 {

@@ -146,7 +146,7 @@ export class ObjectEditorComponent implements OnInit
 
 	deleteProperty(event: any, p: string)
 	{
-		event.preventDefault();
+		event.stopPropagation();
 		console.log("deleteProperty", p);
 		delete this.obj[p];
 	}

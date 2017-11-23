@@ -63,16 +63,16 @@
 		</h2>
 		<div *ngIf="!collapsedParameters">
 			<div *ngFor="let param of getParameters(path, method)"
-				swLet [values]="{paramObj: apis.resolveObj(param)}" #local="swLet"
+				swLet [values]="{obj: apis.resolveObj(param)}" #local="swLet"
 				class="card mb-1">
 				<div class="card-header clickable" 
-					(click)="uncollapsedParameter[local.values.paramObj['name']] = !uncollapsedParameter[local.values.paramObj['name']]">
+					(click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
 					<div class="row">
 						<div class="col-md-11 preview">
-							{{local.values.paramObj['name']}}
-							<span *ngIf="local.values.paramObj['in']" class="headerType">in {{local.values.paramObj['in']}}</span>
-							<span *ngIf="local.values.paramObj['type']" class="headerType">({{local.values.paramObj['type']}})</span>
-							<span *ngIf="local.values.paramObj['description']">{{local.values.paramObj['description']}}</span>
+							{{local.values.obj['name']}}
+							<span *ngIf="local.values.obj['in']" class="headerType">in {{local.values.obj['in']}}</span>
+							<span *ngIf="local.values.obj['type']" class="headerType">({{local.values.obj['type']}})</span>
+							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
 							<div class="edit-card" (click)="editParameter($event, param)">
@@ -81,14 +81,14 @@
 						</div>
 					</div>
 				</div>
-				<div class="card-block" *ngIf="uncollapsedParameter[local.values.paramObj['name']]">
+				<div class="card-block" *ngIf="uncollapsedParameter[local.values.obj['name']]">
 					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
-					<swadit-schema-view *ngIf="local.values.paramObj['in']=='body'; else nonBodyParameter"
-						[schema]="apis.schemas.parameterBody" [obj]="local.values.paramObj">
+					<swadit-schema-view *ngIf="local.values.obj['in']=='body'; else nonBodyParameter"
+						[schema]="apis.schemas.parameterBody" [obj]="local.values.obj">
 					</swadit-schema-view>
 					<ng-template #nonBodyParameter>
 						<swadit-schema-view
-							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.paramObj">
+							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.obj">
 						</swadit-schema-view>
 					</ng-template>
 				</div>
@@ -103,27 +103,30 @@
 			</span>
 		</h2>
 		<div *ngIf="!collapsedResponses && apis.current['paths'][path][method]['responses']">
-			<div *ngFor="let resp of apis.keys(apis.current['paths'][path][method]['responses']); let index = index" 
+			<div *ngFor="let resp of apis.keys(apis.current['paths'][path][method]['responses'])" 
+				swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['responses'][resp])}" #local="swLet"
 				class="card mb-1">
 				<div class="card-header clickable" (click)="uncollapsedResponse[resp] = !uncollapsedResponse[resp]">
 					<div class="row">
 						<div class="col-md-11 preview">
 							{{resp}}
-							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['schema'] && apis.current['paths'][path][method]['responses'][resp]['schema']['type']" class="headerType">({{apis.current['paths'][path][method]['responses'][resp]['schema']['type']}})</span>
-							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['schema'] && apis.current['paths'][path][method]['responses'][resp]['$ref']" class="headerType">({{apis.current['paths'][path][method]['responses'][resp]['$ref']}})</span>
-							<span *ngIf="apis.current['paths'][path][method]['responses'][resp]['description']">{{apis.current['paths'][path][method]['responses'][resp]['description']}}</span>
+							<span *ngIf="local.values.obj['schema'] && local.values.obj['schema']['type']" class="headerType">({{local.values.obj['schema']['type']}})</span>
+							<span *ngIf="local.values.obj['schema'] && local.values.obj['$ref']" class="headerType">({{local.values.obj['$ref']}})</span>
+							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
-							<div class="edit-card" (click)="editResponse($event, resp)">
+							<div class="edit-card" (click)="editResponse($event, path, method, resp)">
 								<i class="fa fa-fw fa-pencil"></i>
 							</div>
 						</div>
 					</div>
 				</div>
 				<div class="card-block" *ngIf="uncollapsedResponse[resp]">
-					<swadit-schema-view
-						[schema]="apis.schemas.response" [obj]="apis.resolveObj(apis.current['paths'][path][method]['responses'][resp])">
-					</swadit-schema-view>
+					<p *ngIf="apis.current['paths'][path][method]['responses'][resp]['$ref']" class="headerType">
+						Defined in {{apis.current['paths'][path][method]['responses'][resp]['$ref']}}:
+					</p>
+					<swadit-response-view [obj]="local.values.obj">
+					</swadit-response-view>
 				</div>
 			</div>
 		</div>

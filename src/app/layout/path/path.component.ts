@@ -23,6 +23,7 @@ import * as _ from "lodash";
 
 import { ApisService } from '../../shared/services';
 import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
+import { ResponseEditComponent } from '../../shared/modules/editor-modals/response-edit/response-edit.component';
 
 @Component({
 	selector: 'app-path',
@@ -136,11 +137,24 @@ export class PathComponent implements OnInit {
         });
 	}
 
-	editResponse(event, resp) {
-		console.log("editResponse()", resp);
+	editResponse(event, path, method, respKey) {
+		console.log("editResponse()", respKey);
 		if (event) event.stopPropagation();
 
-		alert("Not yet implemented");
+		this.editModal = this.modalService.open(ResponseEditComponent, ResponseEditComponent.modalOptions);
+		this.editModal.componentInstance.pathMode = true;
+		this.editModal.componentInstance.parent = this.apis.current['paths'][path][method];
+		this.editModal.componentInstance.key = respKey;
+		this.editModal.componentInstance.obj = respKey ? this.apis.current['paths'][path][method]['responses'][respKey] : {};
+		this.editModal.result.then((result) => {
+			this.closeResult = `Closed with: ${result}`;
+			console.info("edit(): " + this.closeResult);
+			
+        }, (reason) => {
+			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+			console.warn("edit(): " + this.closeResult);
+
+        });
 	}
 
 	editParameter(event, paramObj) {

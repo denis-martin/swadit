@@ -14,3 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import { Component, Input, OnInit } from '@angular/core';
+
+import * as YAML from 'js-yaml';
+
+import { ApisService } from '../../../services';
+
+@Component({
+	selector: 'swadit-response-view',
+	templateUrl: './response-view.component.html',
+	styleUrls: ['./../schema-view.component.scss']
+})
+export class ResponseViewComponent implements OnInit {
+	@Input() obj: any;
+
+	constructor(public apis: ApisService) { }
+
+	ngOnInit() {
+	}
+}

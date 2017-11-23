@@ -25,7 +25,7 @@ import { ApisService } from '../../../services';
 @Component({
 	selector: 'app-parameter-edit',
 	templateUrl: './parameter-edit.component.html',
-	styleUrls: ['./parameter-edit.component.scss']
+	styleUrls: ['../editor-modals.scss']
 })
 export class ParameterEditComponent implements OnInit 
 {

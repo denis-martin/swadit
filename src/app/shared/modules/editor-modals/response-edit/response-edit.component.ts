@@ -22,16 +22,23 @@ import * as _ from "lodash";
 
 import { ApisService } from '../../../services';
 
+import { httpStatusCodes } from './httpStatusCodes';
+
 @Component({
 	selector: 'app-response-edit',
 	templateUrl: './response-edit.component.html',
-	styleUrls: ['./response-edit.component.scss']
+	styleUrls: ['../editor-modals.scss']
 })
 export class ResponseEditComponent implements OnInit 
 {
 	static readonly modalOptions: NgbModalOptions = {
 		size: "lg"
 	}
+
+	httpStatusCodes = httpStatusCodes;
+
+	pathMode: boolean = false;
+	parent: {};
 
 	key: string = null;
 	key_orig: string = null;
@@ -50,7 +57,7 @@ export class ResponseEditComponent implements OnInit
 		this.obj_orig = this.obj;
 		if (!this.obj_orig) this.obj_orig = {};
 		this.obj = _.cloneDeep(this.obj_orig);
-		if (!this.obj['schema']) this.obj['schema'] = { type: 'object' };
+		//if (!this.obj['schema']) this.obj['schema'] = { type: 'object' };
 	}
 
 	ok() 
@@ -63,21 +70,25 @@ export class ResponseEditComponent implements OnInit
 		}
 		this.key = this.key.trim();
 
-		if (this.key != this.key_orig && 
-			this.apis.current['responses'] && 
-			this.apis.current['responses'][this.key]) 
+		if (this.key != this.key_orig && this.parent['responses'] && this.parent['responses'][this.key]) 
 		{
-			this.errorStr = "Key name already exists.";
+			if (this.pathMode) {
+				this.errorStr = "Response code already exists.";
+			} else {
+				this.errorStr = "Key name already exists.";
+			}
 			return;
 		}
 
-		let missing = this.apis.missingRequiredProperties(this.apis.schemas.response, this.obj);
-		if (missing.length > 0) {
-			this.errorStr = "Missing required properties: ";
-			missing.forEach(p => {
-				this.errorStr += p + " ";
-			});
-			return;
+		if (!this.obj['$ref']) {
+			let missing = this.apis.missingRequiredProperties(this.apis.schemas.response, this.obj);
+			if (missing.length > 0) {
+				this.errorStr = "Missing required properties: ";
+				missing.forEach(p => {
+					this.errorStr += p + " ";
+				});
+				return;
+			}
 		}
 
 		let o = _.cloneDeep(this.obj);
@@ -85,16 +96,20 @@ export class ResponseEditComponent implements OnInit
 		this.apis.cleanUpSwaggerSchema(o['schema']);
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);
-		Object.keys(o).forEach(k => this.obj_orig[k] = o[k]);
-		console.log("response-edit", o);
+		if (this.obj['$ref']) {
+			this.obj_orig['$ref'] = this.obj['$ref'];
+		} else {
+			Object.keys(o).forEach(k => this.obj_orig[k] = o[k]);
+		}
+		console.log("response-edit", this.obj_orig);
 
 		if (!this.key_orig) {
-			if (!this.apis.current['responses']) {
-				this.apis.current['responses'] = {};
+			if (!this.parent['responses']) {
+				this.parent['responses'] = {};
 			}
-			this.apis.current['responses'][this.key] = this.obj_orig;
+			this.parent['responses'][this.key] = this.obj_orig;
 		} else if (this.key != this.key_orig) {
-			this.apis.renameObjectKey(this.apis.current['responses'], this.key_orig, this.key);
+			this.apis.renameObjectKey(this.parent['responses'], this.key_orig, this.key);
 		}
 
 		this.errorStr = "";
@@ -104,7 +119,23 @@ export class ResponseEditComponent implements OnInit
 	deleteResponse()
 	{
 		if (!this.key_orig) return;
-		delete this.apis.current['responses'][this.key_orig];
+		delete this.parent['responses'][this.key_orig];
 		this.activeModal.close('ok');
+	}
+
+	keys(obj)
+	{
+		if (!obj) return [];
+		return Object.keys(obj);
+	}
+
+	statusCodeChanged(newCode)
+	{
+		if (this.httpStatusCodes[newCode] && 
+			(!this.obj['description'] || this.obj['description'] == this.httpStatusCodes[this.key]))
+		{
+			this.obj['description'] = this.httpStatusCodes[newCode];
+		}
+		this.key = newCode;
 	}
 }

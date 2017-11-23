@@ -22,15 +22,46 @@
 	</div>
 	-->
 	<div class="modal-body" id="modal-body">
-		<div class="form-group">
+		<div class="form-group" *ngIf="!pathMode">
 			<label for="responseKey">Name of response definition</label>
 			<input type="text" id="responseKey" name="responseKey" [(ngModel)]="key" required
 				class="form-control" placeholder="Enter name for response" title="Name of response">
 		</div>
-		<div class="form-group">
-			<label for="responseSchema">Response definition</label>
+		<div *ngIf="pathMode">
+			<div class="row">
+				<div class="form-group col-md-6">
+					<label for="responseKey">Response code</label>
+					<select id="responseKey" name="responseKey" [ngModel]="key" required
+						(ngModelChange)="statusCodeChanged($event)"
+						class="form-control" title="Response code">
+						<option *ngFor="let code of keys(httpStatusCodes)" value="{{code}}">
+							{{code}} &ndash; {{httpStatusCodes[code]}}
+						</option>
+						<option>default</option>
+					</select>
+				</div>
+				<!--
+				<div class="form-group col-md-9">
+					<label>&nbsp;</label>
+					<div *ngIf="httpStatusCodes[key]" class="form-control-static">
+						{{httpStatusCodes[key]}}
+					</div>
+				</div>
+				-->
+				<div class="form-group col-md-6">
+					<label for="refKey">Reference</label>
+					<select id="refKey" name="refKey"
+						[(ngModel)]="obj['$ref']" class="form-control" title="Reference to #/responses">
+						<option [ngValue]="null || undefined">(none)</option>
+						<option *ngFor="let def of keys(apis.current['responses'])" value="#/responses/{{def}}">
+							{{def}}
+						</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="form-group" *ngIf="!obj['$ref']">
 			<swadit-object-editor
-				[id]="'responseSchema'" 
 				[schema]="apis.schemas.response" [(obj)]="obj" [title]="false">
 			</swadit-object-editor>
 		</div>

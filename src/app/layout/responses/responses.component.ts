@@ -56,6 +56,7 @@ export class ResponsesComponent implements OnInit
 		if (event) event.stopPropagation();
 
 		this.editModal = this.modalService.open(ResponseEditComponent, ResponseEditComponent.modalOptions);
+		this.editModal.componentInstance.parent = this.apis.current;
 		this.editModal.componentInstance.key = def;
 		this.editModal.componentInstance.obj = def ? this.apis.current['responses'][def] : {};
 		this.editModal.result.then((result) => {
