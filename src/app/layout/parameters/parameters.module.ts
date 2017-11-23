@@ -24,11 +24,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
-import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
+import { EditorModalsModule } from '../../shared/modules/editor-modals/editor-modals.module';
 
 import { ParametersRoutingModule } from './parameters-routing.module';
 import { ParametersComponent } from './parameters.component';
-import { ParameterEditComponent } from './parameter-edit/parameter-edit.component';
 
 @NgModule({
 	imports: [
@@ -37,13 +36,12 @@ import { ParameterEditComponent } from './parameter-edit/parameter-edit.componen
 		NgbModule,
 		MarkdownModule.forRoot(),
 		SchemaViewModule,
-		SchemaEditorModule,
+		EditorModalsModule,
 		ParametersRoutingModule
 	],
 	declarations: [
-		ParametersComponent,
-		ParameterEditComponent
+		ParametersComponent
 	],
-	entryComponents: [ParameterEditComponent]
+	entryComponents: []
 })
 export class ParametersModule { }

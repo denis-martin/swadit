@@ -21,8 +21,7 @@ import { FormsModule } from '@angular/forms';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-//import { PathModule } from './../path/path.module';
-//import { PathEditComponent } from 'app/layout/path/path-edit/path-edit.component';
+import { EditorModalsModule } from '../../shared/modules/editor-modals/editor-modals.module';
 
 import { PathsRoutingModule } from './paths-routing.module';
 import { PathsComponent } from './paths.component';
@@ -32,7 +31,7 @@ import { PathsComponent } from './paths.component';
 		CommonModule,
 		FormsModule,
 		NgbModule,
-//		PathModule,
+		EditorModalsModule,
 		PathsRoutingModule
 	],
 	declarations: [

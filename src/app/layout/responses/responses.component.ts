@@ -20,7 +20,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 
 import { ApisService } from '../../shared/services';
 
-import { ResponseEditComponent } from './response-edit/response-edit.component';
+import { ResponseEditComponent } from '../../shared/modules/editor-modals/response-edit/response-edit.component';
 
 @Component({
 	selector: 'app-responses',

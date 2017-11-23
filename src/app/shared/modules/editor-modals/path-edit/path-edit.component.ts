@@ -20,7 +20,7 @@ import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import * as _ from "lodash";
 
-import { ApisService } from '../../../shared/services';
+import { ApisService } from '../../../services';
 
 @Component({
 	selector: 'app-path-edit',

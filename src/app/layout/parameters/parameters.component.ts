@@ -20,7 +20,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 
 import { ApisService } from '../../shared/services';
 
-import { ParameterEditComponent } from './parameter-edit/parameter-edit.component';
+import { ParameterEditComponent } from '../../shared/modules/editor-modals/parameter-edit/parameter-edit.component';
 
 @Component({
 	selector: 'app-parameters',

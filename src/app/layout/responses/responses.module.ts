@@ -24,11 +24,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
-import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
+import { EditorModalsModule } from '../../shared/modules/editor-modals/editor-modals.module';
 
 import { ResponsesRoutingModule } from './responses-routing.module';
 import { ResponsesComponent } from './responses.component';
-import { ResponseEditComponent } from './response-edit/response-edit.component';
 
 @NgModule({
 	imports: [
@@ -37,13 +36,12 @@ import { ResponseEditComponent } from './response-edit/response-edit.component';
 		NgbModule,
 		MarkdownModule.forRoot(),
 		SchemaViewModule,
-		SchemaEditorModule,
+		EditorModalsModule,
 		ResponsesRoutingModule
 	],
 	declarations: [
-		ResponsesComponent,
-		ResponseEditComponent
+		ResponsesComponent
 	],
-	entryComponents: [ResponseEditComponent]
+	entryComponents: []
 })
 export class ResponsesModule { }

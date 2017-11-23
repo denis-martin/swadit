@@ -20,14 +20,14 @@ import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import * as _ from "lodash";
 
-import { ApisService } from '../../../shared/services';
+import { ApisService } from '../../../services';
 
 @Component({
-	selector: 'app-definition-edit',
-	templateUrl: './definition-edit.component.html',
-	styleUrls: ['./definition-edit.component.scss']
+	selector: 'app-parameter-edit',
+	templateUrl: './parameter-edit.component.html',
+	styleUrls: ['./parameter-edit.component.scss']
 })
-export class DefinitionEditComponent implements OnInit 
+export class ParameterEditComponent implements OnInit 
 {
 	static readonly modalOptions: NgbModalOptions = {
 		size: "lg"
@@ -50,11 +50,12 @@ export class DefinitionEditComponent implements OnInit
 		this.obj_orig = this.obj;
 		if (!this.obj_orig) this.obj_orig = {};
 		this.obj = _.cloneDeep(this.obj_orig);
+		if (!this.obj['schema']) this.obj['schema'] = { type: 'object' };
 	}
 
 	ok() 
 	{
-		console.log("DefinitionEditComponent.ok()");
+		console.log("ParameterEditComponent.ok()");
 
 		if (!this.key || !this.key.trim()) {
 			this.errorStr = "Please enter a key name.";
@@ -63,43 +64,70 @@ export class DefinitionEditComponent implements OnInit
 		this.key = this.key.trim();
 
 		if (this.key != this.key_orig && 
-			this.apis.current['definitions'] && 
-			this.apis.current['definitions'][this.key]) 
+			this.apis.current['parameters'] && 
+			this.apis.current['parameters'][this.key]) 
 		{
 			this.errorStr = "Key name already exists.";
 			return;
 		}
 
-		if (!this.obj['type'] && !this.obj['$ref']) {
-			this.errorStr = "Please enter a type or $ref.";
+		if (this.obj['in'] == 'body') {
+			let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterBody, this.obj);
+			if (missing.length > 0) {
+				this.errorStr = "Missing required properties: ";
+				missing.forEach(p => {
+					this.errorStr += p + " ";
+				});
+				return;
+			}
+
+		} else {
+			let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterNonBody, this.obj);
+			if (missing.length > 0) {
+				this.errorStr = "Missing required properties: ";
+				missing.forEach(p => {
+					this.errorStr += p + " ";
+				});
+				return;
+			}
+		}
+
+		if (this.obj['in'] == 'path' && !this.obj['required']) {
+			this.errorStr = "Path parameter must be 'required'.";
 			return;
 		}
 
 		let o = _.cloneDeep(this.obj);
-		this.apis.cleanUpSwaggerSchema(o);
+		if (o['in'] == "body") {
+			this.apis.cleanUp(this.apis.schemas.parameterBody, o);
+			this.apis.cleanUpSwaggerSchema(o['schema']);
+		} else {
+			this.apis.cleanUp(this.apis.schemas.parameterNonBody, o);
+		}
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);
 		Object.keys(o).forEach(k => this.obj_orig[k] = o[k]);
-		console.log("definition-edit", o);
+		console.log("parameter-edit", o);
 
 		if (!this.key_orig) {
-			if (!this.apis.current['definitions']) {
-				this.apis.current['definitions'] = {};
+			if (!this.apis.current['parameters']) {
+				this.apis.current['parameters'] = {};
 			}
-			this.apis.current['definitions'][this.key] = this.obj_orig;
+			this.apis.current['parameters'][this.key] = this.obj_orig;
 		} else if (this.key != this.key_orig) {
-			this.apis.renameObjectKey(this.apis.current['definitions'], this.key_orig, this.key);
+			this.apis.renameObjectKey(this.apis.current['parameters'], this.key_orig, this.key);
 		}
 
 		this.errorStr = "";
 		this.activeModal.close('ok');
 	}
 	
-	deleteDefinition()
+	deleteParameter()
 	{
-		console.log("DefinitionEditComponent.deleteDefinition()");
+		console.log("ParameterEditComponent.deleteParameter()");
+
 		if (!this.key_orig) return;
-		delete this.apis.current['definitions'][this.key_orig];
+		delete this.apis.current['parameters'][this.key_orig];
 		this.activeModal.close('ok');
 	}
 }

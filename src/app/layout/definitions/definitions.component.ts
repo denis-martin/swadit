@@ -20,7 +20,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 
 import { ApisService } from '../../shared/services';
 
-import { DefinitionEditComponent } from './definition-edit/definition-edit.component';
+import { DefinitionEditComponent } from '../../shared/modules/editor-modals/definition-edit/definition-edit.component';
 
 @Component({
 	selector: 'app-definitions',

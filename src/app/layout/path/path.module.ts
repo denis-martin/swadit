@@ -24,11 +24,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
-import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
+import { EditorModalsModule } from '../../shared/modules/editor-modals/editor-modals.module';
 
 import { PathRoutingModule } from './path-routing.module';
 import { PathComponent } from './path.component';
-import { PathEditComponent } from './path-edit/path-edit.component';
 
 @NgModule({
 	imports: [
@@ -37,13 +36,12 @@ import { PathEditComponent } from './path-edit/path-edit.component';
 		NgbModule,
 		MarkdownModule.forRoot(),
 		SchemaViewModule,
-		SchemaEditorModule,
+		EditorModalsModule,
 		PathRoutingModule
 	],
 	declarations: [
-		PathComponent,
-		PathEditComponent
+		PathComponent
 	],
-	entryComponents: [ PathEditComponent ]
+	entryComponents: []
 })
 export class PathModule { }

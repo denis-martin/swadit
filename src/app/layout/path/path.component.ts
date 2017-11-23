@@ -22,7 +22,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 import * as _ from "lodash";
 
 import { ApisService } from '../../shared/services';
-import { PathEditComponent } from './path-edit/path-edit.component';
+import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
 
 @Component({
 	selector: 'app-path',

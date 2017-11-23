@@ -19,7 +19,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from '../../shared/services';
-import { PathEditComponent } from '../../layout/path/path-edit/path-edit.component';
+import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
 
 @Component({
 	selector: 'app-paths',

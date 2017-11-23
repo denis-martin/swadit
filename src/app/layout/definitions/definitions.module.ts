@@ -24,11 +24,10 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { MarkdownModule } from 'ngx-markdown';
 
 import { SchemaViewModule } from '../../shared/modules/schema-view/schema-view.module';
-import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-editor.module';
+import { EditorModalsModule } from '../../shared/modules/editor-modals/editor-modals.module';
 
 import { DefinitionsRoutingModule } from './definitions-routing.module';
 import { DefinitionsComponent } from './definitions.component';
-import { DefinitionEditComponent } from './definition-edit/definition-edit.component';
 
 @NgModule({
 	imports: [
@@ -37,13 +36,11 @@ import { DefinitionEditComponent } from './definition-edit/definition-edit.compo
 		NgbModule,
 		MarkdownModule.forRoot(),
 		SchemaViewModule,
-		SchemaEditorModule,
+		EditorModalsModule,
 		DefinitionsRoutingModule
 	],
 	declarations: [
-		DefinitionsComponent,
-		DefinitionEditComponent
-	],
-	entryComponents: [DefinitionEditComponent]
+		DefinitionsComponent
+	]
 })
 export class DefinitionsModule { }
