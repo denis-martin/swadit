@@ -33,6 +33,7 @@ export class ObjectEditorComponent implements OnInit
 	@Input() card: boolean = false;
 	@Input() title: boolean = true;
 	@Input() header: string;
+	@Input() group: number = null;
 
 	private _obj: any;
 	@Input() 
@@ -170,5 +171,33 @@ export class ObjectEditorComponent implements OnInit
 
 	trackByIndex(index: any, item: any) {
 		return index;
+	}
+
+	getGrid(group: number = null): any
+	{
+		if (group == null) group = this.group;
+		if (group == null || !this.schema['x-swadit-editor-groups']) {
+			return this.schema['x-swadit-editor-grid'];
+		} else {
+			if (this.schema['x-swadit-editor-groups']) {
+				return this.schema['x-swadit-editor-groups'][group]['x-swadit-editor-grid'];
+			} else {
+				return null;
+			}
+		}
+	}
+
+	getGridCols(group: number = null): any
+	{
+		if (group == null) group = this.group;
+		if (group == null || !this.schema['x-swadit-editor-groups']) {
+			return this.schema['x-swadit-editor-grid-cols'];
+		} else {
+			if (this.schema['x-swadit-editor-groups']) {
+				return this.schema['x-swadit-editor-groups'][group]['x-swadit-editor-grid-cols'];
+			} else {
+				return null;
+			}
+		}
 	}
 }

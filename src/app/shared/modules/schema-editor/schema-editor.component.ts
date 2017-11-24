@@ -30,6 +30,7 @@ export class SchemaEditorComponent implements OnInit
 {
 	@Input() schema: any;
 	@Input() id: string;
+	@Input() group: number = null;
 
 	private _obj: any;
 	@Input() 

@@ -24,7 +24,7 @@
 	<div class="modal-body" id="modal-body">
 		<div class="row">
 			<div class="col-md-2">
-				<label for="methodKey">Path</label>
+				<label for="methodKey">Method</label>
 				<select id="methodKey" name="methodKey" [(ngModel)]="methodKey" required
 					class="form-control" style="text-transform: uppercase">
 					<option *ngFor="let methodKey of apis.methodKeys" 
@@ -35,7 +35,7 @@
 			</div>
 			<div class="col-md-10">
 				<div class="form-group">
-					<label for="pathKey">Method</label>
+					<label for="pathKey">Path</label>
 					<input type="text" id="pathKey" name="pathKey" [(ngModel)]="pathKey" required
 						class="form-control" placeholder="Enter path" title="Path">
 				</div>
@@ -45,7 +45,15 @@
 			<ngb-tab title="Info">
 				<ng-template ngbTabContent>
 					<div class="tab-content">
-						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'">
+						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="0">
+						</swadit-schema-editor>
+					</div>
+				</ng-template>
+			</ngb-tab>
+			<ngb-tab title="General">
+				<ng-template ngbTabContent>
+					<div class="tab-content">
+						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="1">
 						</swadit-schema-editor>
 					</div>
 				</ng-template>
@@ -53,8 +61,8 @@
 			<ngb-tab title="Docs">
 				<ng-template ngbTabContent>
 					<div class="tab-content">
-						<swadit-object-editor [schema]="apis.schemas.externalDocs" [(obj)]="obj['externalDocs']">
-						</swadit-object-editor>
+						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="2">
+						</swadit-schema-editor>
 					</div>
 				</ng-template>
 			</ngb-tab>

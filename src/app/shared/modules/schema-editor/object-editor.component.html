@@ -18,9 +18,9 @@
 <div [ngClass]="{'card': card}">
 	<div *ngIf="title && (header || schema['description'])" [ngClass]="{'card-header': card, 'header': !card}">{{header || schema['description']}}</div>
 	<div [ngClass]="{'card-block': card}">
-		<div *ngIf="schema['x-swadit-editor-grid']">
-			<div *ngFor="let row of schema['x-swadit-editor-grid']" class="row">
-				<div *ngFor="let p of row" class="form-group col-md-{{schema['x-swadit-editor-grid-cols'][p] ? schema['x-swadit-editor-grid-cols'][p] : 12}}">
+		<div *ngIf="getGrid()">
+			<div *ngFor="let row of getGrid()" class="row">
+				<div *ngFor="let p of row" class="form-group col-md-{{getGridCols()[p] ? getGridCols()[p] : 12}}">
 					<label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
 						{{deCamelize(p)}}<span *ngIf="propertyIsRequired(schema, p)" style="color: red">*</span><span *ngIf="collapsed[p]">...</span>
 						<span *ngIf="obj[p] != undefined && obj[p] != null && schema['properties'][p]['type'] == object && !propertyIsRequired(schema, p)"
@@ -40,7 +40,7 @@
 				</div>
 			</div>
 		</div>
-		<div *ngIf="!schema['x-swadit-editor-grid']">
+		<div *ngIf="!getGrid()">
 			<div *ngFor="let p of schemaProperties()" class="form-group">
 				<label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
 					{{deCamelize(p)}}<span *ngIf="propertyIsRequired(schema, p)" style="color: red">*</span><span *ngIf="collapsed[p]">...</span>

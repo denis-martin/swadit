@@ -12,18 +12,38 @@
 			"$ref": "#/definitions/vendorExtension"
 		}
 	},
-	"x-swadit-editor-grid": [
-		[ "summary", "deprecated" ],
-		[ "description" ],
-		[ "consumes", "produces" ],
-		[ "tags", "schemes", "operationId" ]
+	"x-swadit-editor-groups": [
+		{
+			"x-swadit-editor-grid": [
+				[ "summary", "deprecated" ],
+				[ "description" ]
+			],
+			"x-swadit-editor-grid-cols": {
+				"summary": 10, "deprecated": 2,
+				"description": 12
+			}
+		},
+		{
+			"x-swadit-editor-grid": [
+				[ "operationId", "schemes" ],
+				[ "consumes", "produces" ],
+				[ "tags" ]
+			],
+			"x-swadit-editor-grid-cols": {
+				"operationId": 8, "schemes": 4,
+				"consumes": 6, "produces": 6,
+				"tags": 12
+			}
+		},
+		{
+			"x-swadit-editor-grid": [
+				[ "externalDocs" ]
+			],
+			"x-swadit-editor-grid-cols": {
+				"externalDocs": 12
+			}
+		}
 	],
-	"x-swadit-editor-grid-cols": {
-		"summary": 10, "deprecated": 2,
-		"description": 12,
-		"consumes": 6, "produces": 6,
-		"tags": 4, "operationId": 4, "schemes": 4
-	},
 	"properties": {
 		"summary": {
 			"type": "string",
@@ -36,11 +56,26 @@
 		"description": {
 			"type": "string",
 			"description": "A longer description of the operation, GitHub Flavored Markdown is allowed.",
-			"x-swadit-input-multiline": 6,
+			"x-swadit-input-multiline": 10,
 			"x-swadit-input-class": "monospace"
 		},
 		"externalDocs": {
-			"$ref": "#/definitions/externalDocs"
+			"x-swadit-editor-card": true,
+			"type": "object",
+			"additionalProperties": false,
+			"description": "Information about external documentation",
+			"required": [
+				"url"
+			],
+			"properties": {
+				"url": {
+					"type": "string",
+					"format": "uri"
+				},
+				"description": {
+					"type": "string"
+				}
+			}
 		},
 		"tags": {
 			"type": "array",
