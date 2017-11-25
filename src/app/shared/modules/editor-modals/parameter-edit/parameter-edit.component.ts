@@ -33,6 +33,9 @@ export class ParameterEditComponent implements OnInit
 		size: "lg"
 	}
 
+	pathMode: boolean = false;
+	allMethods: boolean = false;
+
 	key: string = null;
 	key_orig: string = null;
 	obj: any = null;
@@ -57,77 +60,91 @@ export class ParameterEditComponent implements OnInit
 	{
 		console.log("ParameterEditComponent.ok()");
 
-		if (!this.key || !this.key.trim()) {
-			this.errorStr = "Please enter a key name.";
-			return;
-		}
-		this.key = this.key.trim();
-
-		if (this.key != this.key_orig && 
-			this.apis.current['parameters'] && 
-			this.apis.current['parameters'][this.key]) 
-		{
-			this.errorStr = "Key name already exists.";
-			return;
-		}
-
-		if (this.obj['in'] == 'body') {
-			let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterBody, this.obj);
-			if (missing.length > 0) {
-				this.errorStr = "Missing required properties: ";
-				missing.forEach(p => {
-					this.errorStr += p + " ";
-				});
+		if (!this.pathMode) {
+			if (!this.key || !this.key.trim()) {
+				this.errorStr = "Please enter a key name.";
 				return;
 			}
+			this.key = this.key.trim();
 
-		} else {
-			let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterNonBody, this.obj);
-			if (missing.length > 0) {
-				this.errorStr = "Missing required properties: ";
-				missing.forEach(p => {
-					this.errorStr += p + " ";
-				});
+			if (this.key != this.key_orig && 
+				this.apis.current['parameters'] && 
+				this.apis.current['parameters'][this.key]) 
+			{
+				this.errorStr = "Key name already exists.";
 				return;
 			}
 		}
 
-		if (this.obj['in'] == 'path' && !this.obj['required']) {
-			this.errorStr = "Path parameter must be 'required'.";
-			return;
+		if (!this.obj['$ref']) {
+			if (this.obj['in'] == 'body') {
+				let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterBody, this.obj);
+				if (missing.length > 0) {
+					this.errorStr = "Missing required properties: ";
+					missing.forEach(p => {
+						this.errorStr += p + " ";
+					});
+					return;
+				}
+
+			} else {
+				let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterNonBody, this.obj);
+				if (missing.length > 0) {
+					this.errorStr = "Missing required properties: ";
+					missing.forEach(p => {
+						this.errorStr += p + " ";
+					});
+					return;
+				}
+			}
+
+			if (this.obj['in'] == 'path' && !this.obj['required']) {
+				this.errorStr = "Path parameter must be 'required'.";
+				return;
+			}
 		}
 
-		let o = _.cloneDeep(this.obj);
-		if (o['in'] == "body") {
-			this.apis.cleanUp(this.apis.schemas.parameterBody, o);
-			this.apis.cleanUpSwaggerSchema(o['schema']);
+		let o;
+		if (!this.obj['$ref']) {
+			o = _.cloneDeep(this.obj);
+			if (o['in'] == "body") {
+				this.apis.cleanUp(this.apis.schemas.parameterBody, o);
+				this.apis.cleanUpSwaggerSchema(o['schema']);
+			} else {
+				this.apis.cleanUp(this.apis.schemas.parameterNonBody, o);
+			}
 		} else {
-			this.apis.cleanUp(this.apis.schemas.parameterNonBody, o);
+			o = {};
+			o['$ref'] = this.obj['$ref'];
 		}
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);
 		Object.keys(o).forEach(k => this.obj_orig[k] = o[k]);
 		console.log("parameter-edit", o);
 
-		if (!this.key_orig) {
-			if (!this.apis.current['parameters']) {
-				this.apis.current['parameters'] = {};
+		if (!this.pathMode) {
+			if (!this.key_orig) {
+				if (!this.apis.current['parameters']) {
+					this.apis.current['parameters'] = {};
+				}
+				this.apis.current['parameters'][this.key] = this.obj_orig;
+			} else if (this.key != this.key_orig) {
+				this.apis.renameObjectKey(this.apis.current['parameters'], this.key_orig, this.key);
 			}
-			this.apis.current['parameters'][this.key] = this.obj_orig;
-		} else if (this.key != this.key_orig) {
-			this.apis.renameObjectKey(this.apis.current['parameters'], this.key_orig, this.key);
 		}
 
 		this.errorStr = "";
-		this.activeModal.close('ok');
+		this.activeModal.close({ obj: this.obj_orig, allMethods: this.allMethods });
 	}
 	
 	deleteParameter()
 	{
 		console.log("ParameterEditComponent.deleteParameter()");
 
-		if (!this.key_orig) return;
-		delete this.apis.current['parameters'][this.key_orig];
-		this.activeModal.close('ok');
+		if (!this.pathMode) {
+			if (!this.key_orig) return;
+			delete this.apis.current['parameters'][this.key_orig];
+		}
+		this.activeModal.close({ obj: this.obj_orig, delete: true });
 	}
 }

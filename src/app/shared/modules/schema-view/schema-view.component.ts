@@ -38,6 +38,7 @@ export class SchemaViewComponent implements OnInit
 {
 	@Input() schema: Object;
 	@Input() obj: Object;
+	@Input() skip: Array<string> = [];
 
 	uncollapsed = {};
 
@@ -55,6 +56,7 @@ export class SchemaViewComponent implements OnInit
 			let schemaKeys = Object.keys(this.schema['properties']);
 			let objKeys = Object.keys(this.obj);
 			_.remove(schemaKeys, k => { return objKeys.indexOf(k) < 0; });
+			_.remove(schemaKeys, k => { return this.doSkip(k); });
 			return schemaKeys;
 		}
 	}
@@ -72,5 +74,10 @@ export class SchemaViewComponent implements OnInit
 	propertyIsRequired(propKey)
 	{
 		return this.obj['required'] && this.obj['required'].indexOf(propKey) >= 0;
+	}
+
+	doSkip(property: string): boolean
+	{
+		return this.skip.indexOf(property) >= 0;
 	}
 }

@@ -57,12 +57,47 @@
 		
 		<h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
 			Parameters
-			<span class="edit-subsection" (click)="editParameter($event, path, method)" title="Add parameter">
+			<span class="edit-subsection" (click)="editParameter($event)" title="Add parameter">
 				<i class="fa fa-plus"></i>
 			</span>
 		</h2>
 		<div *ngIf="!collapsedParameters">
-			<div *ngFor="let param of getParameters(path, method)"
+			<!-- parameters for all methods -->
+			<div *ngFor="let param of this.apis.current['paths'][path]['parameters']"
+				swLet [values]="{obj: apis.resolveObj(param)}" #local="swLet"
+				class="card mb-1">
+				<div class="card-header clickable" 
+					(click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
+					<div class="row">
+						<div class="col-md-11 preview">
+							{{local.values.obj['name']}}
+							<span *ngIf="local.values.obj['in']" class="headerType">in {{local.values.obj['in']}}</span>
+							<span *ngIf="local.values.obj['type']" class="headerType">({{local.values.obj['type']}})</span>
+							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
+						</div>
+						<div class="col-md-1">
+							<div class="edit-card" (click)="editParameter($event, param, true)">
+								<i class="fa fa-fw fa-pencil"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card-block" *ngIf="uncollapsedParameter[local.values.obj['name']]">
+					<p class="headerType">This parameter applies to all methods.</p>
+					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
+					<markdown *ngIf="param['description']" [data]="param['description']"></markdown>
+					<swadit-schema-view *ngIf="local.values.obj['in']=='body'; else nonBodyParameter"
+						[schema]="apis.schemas.parameterBody" [obj]="local.values.obj" [skip]="['description']">
+					</swadit-schema-view>
+					<ng-template #nonBodyParameter>
+						<swadit-schema-view
+							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.obj" [skip]="['description']">
+						</swadit-schema-view>
+					</ng-template>
+				</div>
+			</div>
+			<!-- parameters for this method -->
+			<div *ngFor="let param of this.apis.current['paths'][path][method]['parameters']"
 				swLet [values]="{obj: apis.resolveObj(param)}" #local="swLet"
 				class="card mb-1">
 				<div class="card-header clickable" 
@@ -83,12 +118,13 @@
 				</div>
 				<div class="card-block" *ngIf="uncollapsedParameter[local.values.obj['name']]">
 					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
+					<markdown *ngIf="param['description']" [data]="param['description']"></markdown>
 					<swadit-schema-view *ngIf="local.values.obj['in']=='body'; else nonBodyParameter"
-						[schema]="apis.schemas.parameterBody" [obj]="local.values.obj">
+						[schema]="apis.schemas.parameterBody" [obj]="local.values.obj" [skip]="['description']">
 					</swadit-schema-view>
 					<ng-template #nonBodyParameter>
 						<swadit-schema-view
-							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.obj">
+							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.obj" [skip]="['description']">
 						</swadit-schema-view>
 					</ng-template>
 				</div>

@@ -43,7 +43,7 @@
 			"type": "string",
 			"description": "A brief description of the parameter. This could contain examples of use.  GitHub Flavored Markdown is allowed.",
 			"x-swadit-markdown": true,
-			"x-swadit-input-multiline": 5,
+			"x-swadit-input-multiline": 4,
 			"x-swadit-input-class": "monospace"
 		},
 		"required": {

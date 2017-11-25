@@ -24,6 +24,7 @@ import * as _ from "lodash";
 import { ApisService } from '../../shared/services';
 import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
 import { ResponseEditComponent } from '../../shared/modules/editor-modals/response-edit/response-edit.component';
+import { ParameterEditComponent } from '../../shared/modules/editor-modals/parameter-edit/parameter-edit.component';
 
 @Component({
 	selector: 'app-path',
@@ -157,11 +158,63 @@ export class PathComponent implements OnInit {
         });
 	}
 
-	editParameter(event, paramObj) {
+	editParameter(event, paramObj = null, allMethods = false) {
 		console.log("editParameter()", paramObj);
 		if (event) event.stopPropagation();
 
-		alert("Not yet implemented");
+		this.editModal = this.modalService.open(ParameterEditComponent, ParameterEditComponent.modalOptions);
+		this.editModal.componentInstance.pathMode = true;
+		this.editModal.componentInstance.allMethods = allMethods;
+		this.editModal.componentInstance.key = null;
+		this.editModal.componentInstance.obj = paramObj;
+		this.editModal.result.then((result) => {
+			this.closeResult = `Closed with: ${result}`;
+			console.info("editParameter(): " + this.closeResult);
+			if (!paramObj) {
+				if (result.allMethods) {
+					this.apis.current['paths'][this.path]['parameters'].push(result.obj);
+				} else {
+					this.apis.current['paths'][this.path][this.method]['parameters'].push(result.obj);
+				}
+			}
+			let i = 0
+			let mi, pi = -1;
+			this.apis.current['paths'][this.path][this.method]['parameters'].forEach(p => {
+				if (p == result.obj) {
+					if (result.delete) {
+						this.apis.current['paths'][this.path][this.method]['parameters'].splice(i, 1);
+					} else {
+						mi = i;
+					}
+				}
+				i = i + 1;
+			});
+			i = 0;
+			this.apis.current['paths'][this.path]['parameters'].forEach(p => {
+				if (p == result.obj) {
+					if (result.delete) {
+						this.apis.current['paths'][this.path]['parameters'].splice(i, 1);
+					} else {
+						pi = i;
+					}
+				}
+				i = i + 1;
+			});
+			if (!result.delete) {
+				if (result.allMethods && mi >= 0 && pi < 0) {
+					this.apis.current['paths'][this.path][this.method]['parameters'].splice(mi, 1);
+					this.apis.current['paths'][this.path]['parameters'].push(result.obj);
+				} else if (!result.allMethods && mi < 0 && pi >= 0) {
+					this.apis.current['paths'][this.path]['parameters'].splice(pi, 1);
+					this.apis.current['paths'][this.path][this.method]['parameters'].push(result.obj);
+				}
+			}
+			
+        }, (reason) => {
+			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+			console.warn("editParameter(): " + this.closeResult);
+
+        });
 	}
 
 	private getDismissReason(reason: any): string {
