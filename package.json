@@ -26,7 +26,7 @@
     "@ngx-translate/core": "^7.2.2",
     "@ngx-translate/http-loader": "^0.1.0",
     "@types/file-saver": "0.0.1",
-    "@types/js-yaml": "^3.10.0",
+    "@types/js-yaml": "^3.10.1",
     "@types/lodash": "^4.14.85",
     "@types/swagger-parser": "^4.0.2",
     "angular2-elastic": "^0.13.0",
@@ -35,7 +35,7 @@
     "file-saver": "^1.3.3",
     "font-awesome": "^4.7.0",
     "js-yaml": "^3.10.0",
-    "ng-trim-value-accessor": "^2.0.0",
+    "ng-trim-value-accessor": "^2.0.2",
     "ng2-charts": "^1.6.0",
     "ngx-markdown": "^1.4.0",
     "rxjs": "^5.5.2",
@@ -44,7 +44,7 @@
     "zone.js": "^0.8.18"
   },
   "devDependencies": {
-    "@angular/cli": "^1.5.3",
+    "@angular/cli": "^1.5.4",
     "@angular/compiler-cli": "^4.4.6",
     "@angular/language-service": "^4.4.6",
     "@types/jasmine": "2.5.45",
