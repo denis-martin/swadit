@@ -35,6 +35,8 @@ export class ParametersComponent implements OnInit
 
 	closeResult: string;
 	editModal: NgbModalRef;
+
+	hideGeneratedExample = {};
 	
 	constructor(public apis: ApisService, private modalService: NgbModal) 
 	{

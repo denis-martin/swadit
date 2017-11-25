@@ -25,6 +25,7 @@ import { MarkdownModule } from 'ngx-markdown';
 import { SchemaViewComponent, LetDirective } from './schema-view.component';
 import { SwaggerSchemaViewComponent } from './custom/swagger-schema-view.component';
 import { ResponseViewComponent } from './custom/response-view.component';
+import { ParameterViewComponent } from './custom/parameter-view.component';
 import { ExtensionsViewComponent } from './custom/extensions-view.component';
 
 @NgModule({
@@ -38,6 +39,7 @@ import { ExtensionsViewComponent } from './custom/extensions-view.component';
 		LetDirective,
 		SwaggerSchemaViewComponent,
 		ResponseViewComponent,
+		ParameterViewComponent,
 		ExtensionsViewComponent
 	],
 	exports: [
@@ -45,6 +47,7 @@ import { ExtensionsViewComponent } from './custom/extensions-view.component';
 		LetDirective,
 		SwaggerSchemaViewComponent,
 		ResponseViewComponent,
+		ParameterViewComponent,
 		ExtensionsViewComponent
 	]
 })

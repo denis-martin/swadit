@@ -70,7 +70,7 @@
 					(click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
 					<div class="row">
 						<div class="col-md-11 preview">
-							{{local.values.obj['name']}}
+							{{local.values.obj['name']}}<span *ngIf="local.values.obj['required']" style="color: red">*</span>
 							<span *ngIf="local.values.obj['in']" class="headerType">in {{local.values.obj['in']}}</span>
 							<span *ngIf="local.values.obj['type']" class="headerType">({{local.values.obj['type']}})</span>
 							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
@@ -83,17 +83,10 @@
 					</div>
 				</div>
 				<div class="card-block" *ngIf="uncollapsedParameter[local.values.obj['name']]">
-					<p class="headerType">This parameter applies to all methods.</p>
+					<p class="headerType">This parameter applies to all operations on this path.</p>
 					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
-					<markdown *ngIf="param['description']" [data]="param['description']"></markdown>
-					<swadit-schema-view *ngIf="local.values.obj['in']=='body'; else nonBodyParameter"
-						[schema]="apis.schemas.parameterBody" [obj]="local.values.obj" [skip]="['description']">
-					</swadit-schema-view>
-					<ng-template #nonBodyParameter>
-						<swadit-schema-view
-							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.obj" [skip]="['description']">
-						</swadit-schema-view>
-					</ng-template>
+					<swadit-parameter-view [obj]="local.values.obj">
+					</swadit-parameter-view>
 				</div>
 			</div>
 			<!-- parameters for this method -->
@@ -104,7 +97,7 @@
 					(click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
 					<div class="row">
 						<div class="col-md-11 preview">
-							{{local.values.obj['name']}}
+							{{local.values.obj['name']}}<span *ngIf="local.values.obj['required']" style="color: red">*</span>
 							<span *ngIf="local.values.obj['in']" class="headerType">in {{local.values.obj['in']}}</span>
 							<span *ngIf="local.values.obj['type']" class="headerType">({{local.values.obj['type']}})</span>
 							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
@@ -118,15 +111,8 @@
 				</div>
 				<div class="card-block" *ngIf="uncollapsedParameter[local.values.obj['name']]">
 					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
-					<markdown *ngIf="param['description']" [data]="param['description']"></markdown>
-					<swadit-schema-view *ngIf="local.values.obj['in']=='body'; else nonBodyParameter"
-						[schema]="apis.schemas.parameterBody" [obj]="local.values.obj" [skip]="['description']">
-					</swadit-schema-view>
-					<ng-template #nonBodyParameter>
-						<swadit-schema-view
-							[schema]="apis.schemas.parameterNonBody" [obj]="local.values.obj" [skip]="['description']">
-						</swadit-schema-view>
-					</ng-template>
+					<swadit-parameter-view [obj]="local.values.obj">
+					</swadit-parameter-view>
 				</div>
 			</div>
 		</div>

@@ -68,7 +68,8 @@
 			"description": "Format of type (optional). Examples: \ninteger: int32, int64 \nnumber: float, double \nstring: byte, binary, date, date-time, password"
 		},
 		"items": {
-			"$ref": "#/definitions/primitivesItems"
+			"$ref": "#/definitions/primitivesItems",
+			"x-swadit-swagger-schema": true
 		},
 		"collectionFormat": {
 			"$ref": "#/definitions/collectionFormat"

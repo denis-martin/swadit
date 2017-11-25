@@ -33,11 +33,23 @@
 
 	<div *ngIf="obj['headers']">
 		<p>Headers:</p>
-		<markdown *ngIf="obj['headers']" [data]="toYaml(obj['headers']) | language: 'yaml'"></markdown>
+		<markdown [data]="apis.toYaml(obj['headers']) | language: 'yaml'"></markdown>
 	</div>
 
 	<div *ngIf="obj['examples']">
 		<p>Examples:</p>
-		<markdown *ngIf="obj['examples']" [data]="toYaml(obj['examples']) | language: 'yaml'"></markdown>
+		<div *ngFor="let k of apis.keys(obj['examples'])">
+			<p><label>{{k}}:</label><br>
+				<markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown>
+			</p>
+		</div>
+	</div>
+	<div *ngIf="obj['schema']">
+		<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+			Example (generated)<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
+		</p>
+		<markdown *ngIf="showGeneratedExample"
+			[data]="apis.toJson(apis.generateExample(obj['schema'])) | language: 'json'">
+		</markdown>
 	</div>
 </div>

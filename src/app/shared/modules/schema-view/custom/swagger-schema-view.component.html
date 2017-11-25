@@ -25,6 +25,10 @@
 			<td class="label-text">format</td>
 			<td>{{obj['format']}}</td>
 		</tr>
+		<tr *ngIf="obj['enum']">
+			<td class="label-text">enum</td>
+			<td><span *ngFor="let ev of obj['enum']; let index = index"><span *ngIf="index>0"> | </span>{{ev}}</span></td>
+		</tr>
 		<tr *ngIf="obj['description']">
 			<td class="label-text">description</td>
 			<td class="description"><markdown [data]="obj['description']"></markdown></td>
@@ -42,6 +46,9 @@
 							</span>
 							<span *ngIf="obj['properties'][p]['format']">
 								({{obj['properties'][p]['format']}})
+							</span>
+							<span *ngIf="obj['properties'][p]['readOnly']">
+								read only
 							</span>
 						</span>
 						<span class="propertyDescription" *ngIf="obj['properties'][p]['description']">

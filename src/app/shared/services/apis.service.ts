@@ -143,6 +143,11 @@ export class ApisService
 		return YAML.dump(obj);
 	}
 
+	toJson(obj: any): string
+	{
+		return JSON.stringify(obj, null, 2);
+	}
+
 	hasExtensions(obj: Object): boolean
 	{
 		if (obj == null) return false;
@@ -421,5 +426,64 @@ export class ApisService
 		} else { 
 			this.selectedPaths[path] = true;
 		}
+	}
+
+	generateExample(schema: any, noReadOnly: boolean = false): any
+	{
+		let res: any = undefined;
+		schema = this.resolveObj(schema);
+		if (!noReadOnly || !schema.readOnly) {
+			if (schema.type == "string") {
+				if (schema.example) {
+					res = schema.example;
+				} else if (schema.default) {
+					res = schema.default;
+				} else {
+					res = "string";
+				}
+			} else if (schema.type == "boolean") {
+				if (schema.example) {
+					res = schema.example;
+				} else if (schema.default) {
+					res = schema.default;
+				} else {
+					res = false;
+				}
+			} else if (schema.type == "number" || schema.type == "integer") {
+				if (schema.example) {
+					res = schema.example;
+				} else if (schema.default) {
+					res = schema.default;
+				} else {
+					res = 0;
+				}
+			} else if (schema.type == "array") {
+				if (schema.example) {
+					res = schema.example;
+				} else if (schema.default) {
+					res = schema.default;
+				} else {
+					let r = this.generateExample(schema.items, noReadOnly);
+					if (r !== undefined) {
+						res = [ r ];
+					}
+				}
+			} else if (schema.type == "object") {
+				if (schema.example) {
+					res = schema.example;
+				} else if (schema.default) {
+					res = schema.default;
+				} else {
+					res = {};
+					this.keys(schema.properties).forEach(k => {
+						let r = this.generateExample(schema.properties[k], noReadOnly);
+						if (r !== undefined) {
+							res[k] = r;
+						}
+					});
+				}
+			}
+		}
+		return res;
 	}
 }

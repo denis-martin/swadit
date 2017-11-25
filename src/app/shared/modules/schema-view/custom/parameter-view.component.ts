@@ -22,11 +22,11 @@ import * as YAML from 'js-yaml';
 import { ApisService } from '../../../services';
 
 @Component({
-	selector: 'swadit-response-view',
-	templateUrl: './response-view.component.html',
+	selector: 'swadit-parameter-view',
+	templateUrl: './parameter-view.component.html',
 	styleUrls: ['./../schema-view.component.scss']
 })
-export class ResponseViewComponent implements OnInit {
+export class ParameterViewComponent implements OnInit {
 	@Input() obj: any;
 
 	showGeneratedExample = true;
@@ -34,6 +34,6 @@ export class ResponseViewComponent implements OnInit {
 	constructor(public apis: ApisService) { }
 
 	ngOnInit() {
-		this.showGeneratedExample = !this.obj['examples'];
+		this.showGeneratedExample = !this.obj['example'];
 	}
 }

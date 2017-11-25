@@ -1,0 +1,43 @@
+<!--
+	Copyright 2017 Denis Martin.  This file is part of swadit.
+
+	swadit is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	swadit is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<div class="schemaView">
+	<markdown *ngIf="obj['description']" 
+		[data]="obj['description']"></markdown>
+	<div *ngIf="obj['in']=='body'; else nonBodyParameter">
+		<swadit-schema-view
+			[schema]="apis.schemas.parameterBody" [obj]="obj" [skip]="['description']">
+		</swadit-schema-view>
+		<div *ngIf="obj['schema'] && obj['schema']['example']">
+			<p>Example:</p>
+			<markdown [data]="apis.toJson(obj['schema']['example']) | language: 'json'"></markdown>
+		</div>
+		<div *ngIf="obj['schema']">
+			<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+				Example (generated)<span *ngIf="!showGeneratedExample">:</span><span *ngIf="showGeneratedExample">...</span>
+			</p>
+			<markdown *ngIf="!showGeneratedExample"
+				[data]="apis.toJson(apis.generateExample(obj['schema'], true)) | language: 'json'">
+			</markdown>
+		</div>
+	</div>
+	<ng-template #nonBodyParameter>
+		<swadit-schema-view
+			[schema]="apis.schemas.parameterNonBody" [obj]="obj" [skip]="['description']">
+		</swadit-schema-view>
+	</ng-template>
+</div>

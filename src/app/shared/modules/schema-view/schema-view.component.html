@@ -20,14 +20,15 @@
 		<tr *ngFor="let key of getKeys()">
 			<td class="label-text">{{key}}</td>
 			<td *ngIf="schema['properties'] && schema['properties'][key]"
-				[ngClass]="{ 'no-padding': isComplex(obj[key]) }">
+				[ngClass]="{ 'no-padding': (isComplex(obj[key]) && !obj[key]['$ref']) }">
 				<markdown *ngIf="schema['properties'][key]['x-swadit-markdown']; else nonMarkdown"
 					[data]="obj[key]"></markdown>
 				<ng-template #nonMarkdown>
-					<swadit-swagger-schema-view 
-						*ngIf="schema['properties'][key]['x-swadit-swagger-schema']; else schemaView"
-						[obj]="obj[key]">
-					</swadit-swagger-schema-view>
+					<div *ngIf="schema['properties'][key]['x-swadit-swagger-schema']; else schemaView">
+						<span *ngIf="obj[key]['$ref']" class="headerType">{{obj[key]['$ref']}}</span>
+						<swadit-swagger-schema-view [obj]="apis.resolveObj(obj[key])">
+						</swadit-swagger-schema-view>
+					</div>
 					<ng-template #schemaView>
 						<span *ngIf="!isComplex(obj[key]); else recursiveView">{{obj[key]}}</span>
 						<ng-template #recursiveView>
@@ -46,5 +47,5 @@
 	</tbody>
 </table>
 <ng-template #jsonView>
-	<markdown [data]="obj[key] | language : 'json'"></markdown>
+	<markdown [data]="apis.toYaml(obj) | language : 'yaml'"></markdown>
 </ng-template>
