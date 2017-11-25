@@ -167,8 +167,14 @@ export class PathComponent implements OnInit {
 			// add new parameter
 			if (!paramObj) {
 				if (result.allMethods) {
+					if (!this.apis.current['paths'][this.path]['parameters']) {
+						this.apis.current['paths'][this.path]['parameters'] = [];
+					}
 					this.apis.current['paths'][this.path]['parameters'].push(result.obj);
 				} else {
+					if (!this.apis.current['paths'][this.path][this.method]['parameters']) {
+						this.apis.current['paths'][this.path][this.method]['parameters'] = [];
+					}
 					this.apis.current['paths'][this.path][this.method]['parameters'].push(result.obj);
 				}
 			}
