@@ -42,7 +42,6 @@ export class PathComponent implements OnInit {
 	uncollapsedResponse = {};
 	uncollapsedParameter = {};
 
-	closeResult: string;
 	editModal: NgbModalRef;
 
 	constructor(public apis: ApisService, private modalService: NgbModal,
@@ -126,14 +125,12 @@ export class PathComponent implements OnInit {
 		this.editModal.componentInstance.methodKey = method;
 		this.editModal.componentInstance.obj = path && method ? this.apis.current['paths'][path][method] : {};
 		this.editModal.result.then((result) => {
-			this.closeResult = `Closed with: ${result}`;
 			this.path = result.path;
 			this.method = result.method;
-			console.info("edit(): " + this.closeResult);
+			console.info("editPath(): " + result);
 			
         }, (reason) => {
-			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-			console.warn("edit(): " + this.closeResult);
+			console.warn("editPath(): " + reason);
 
         });
 	}
@@ -148,12 +145,10 @@ export class PathComponent implements OnInit {
 		this.editModal.componentInstance.key = respKey;
 		this.editModal.componentInstance.obj = respKey ? this.apis.current['paths'][path][method]['responses'][respKey] : {};
 		this.editModal.result.then((result) => {
-			this.closeResult = `Closed with: ${result}`;
-			console.info("edit(): " + this.closeResult);
+			console.info("editResponse(): " + result);
 			
         }, (reason) => {
-			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-			console.warn("edit(): " + this.closeResult);
+			console.warn("editResponse(): " + reason);
 
         });
 	}
@@ -168,8 +163,8 @@ export class PathComponent implements OnInit {
 		this.editModal.componentInstance.key = null;
 		this.editModal.componentInstance.obj = paramObj;
 		this.editModal.result.then((result) => {
-			this.closeResult = `Closed with: ${result}`;
-			console.info("editParameter(): " + this.closeResult);
+			console.info("editParameter(): " + result);
+			// add new parameter
 			if (!paramObj) {
 				if (result.allMethods) {
 					this.apis.current['paths'][this.path]['parameters'].push(result.obj);
@@ -177,42 +172,57 @@ export class PathComponent implements OnInit {
 					this.apis.current['paths'][this.path][this.method]['parameters'].push(result.obj);
 				}
 			}
-			let i = 0
-			let mi, pi = -1;
-			this.apis.current['paths'][this.path][this.method]['parameters'].forEach(p => {
-				if (p == result.obj) {
-					if (result.delete) {
-						this.apis.current['paths'][this.path][this.method]['parameters'].splice(i, 1);
-					} else {
-						mi = i;
+			// search previous location of existing parameter & delete parameter if desired
+			let mi = -1;
+			let pi = -1;
+			if (this.apis.current['paths'][this.path][this.method]['parameters']) {
+				this.apis.current['paths'][this.path][this.method]['parameters'].forEach((p, i) => {
+					if (p == result.obj) {
+						if (result.delete) {
+							this.apis.current['paths'][this.path][this.method]['parameters'].splice(i, 1);
+						} else {
+							mi = i;
+						}
 					}
-				}
-				i = i + 1;
-			});
-			i = 0;
-			this.apis.current['paths'][this.path]['parameters'].forEach(p => {
-				if (p == result.obj) {
-					if (result.delete) {
-						this.apis.current['paths'][this.path]['parameters'].splice(i, 1);
-					} else {
-						pi = i;
+				});
+			}
+			if (this.apis.current['paths'][this.path]['parameters']) {
+				this.apis.current['paths'][this.path]['parameters'].forEach((p, i) => {
+					if (p == result.obj) {
+						if (result.delete) {
+							this.apis.current['paths'][this.path]['parameters'].splice(i, 1);
+						} else {
+							pi = i;
+						}
 					}
-				}
-				i = i + 1;
-			});
+				});
+			}
 			if (!result.delete) {
+				// change location of existing parameter if necessary
 				if (result.allMethods && mi >= 0 && pi < 0) {
 					this.apis.current['paths'][this.path][this.method]['parameters'].splice(mi, 1);
+					if (!this.apis.current['paths'][this.path]['parameters']) {
+						this.apis.current['paths'][this.path]['parameters'] = [];
+					}
 					this.apis.current['paths'][this.path]['parameters'].push(result.obj);
 				} else if (!result.allMethods && mi < 0 && pi >= 0) {
 					this.apis.current['paths'][this.path]['parameters'].splice(pi, 1);
+					if (!this.apis.current['paths'][this.path][this.method]['parameters']) {
+						this.apis.current['paths'][this.path][this.method]['parameters'] = [];
+					}
 					this.apis.current['paths'][this.path][this.method]['parameters'].push(result.obj);
 				}
 			}
+			// clean up 'parameters' if necessary
+			if (this.apis.current['paths'][this.path]['parameters'] && this.apis.current['paths'][this.path]['parameters'].length == 0) {
+				delete this.apis.current['paths'][this.path]['parameters'];
+			}
+			if (this.apis.current['paths'][this.path][this.method]['parameters'] && this.apis.current['paths'][this.path][this.method]['parameters'].length == 0) {
+				delete this.apis.current['paths'][this.path][this.method]['parameters'];
+			}
 			
         }, (reason) => {
-			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-			console.warn("editParameter(): " + this.closeResult);
+			console.warn("editParameter(): " + reason);
 
         });
 	}
