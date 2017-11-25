@@ -14,6 +14,8 @@
                         <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>
                     <li><a href="javascript:void(0)" (click)="apis.downloadFileModal()">
                         <i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a></li>
+                    <li><a [routerLink]="['/source']">
+                        <i class="fa fa-fw fa-align-left"></i> {{ 'Edit Source' | translate }}</a></li>
                     <li><a href="javascript:void(0)" (click)="apis.settingsModal()">
                         <i class="fa fa-fw fa-cog"></i> {{ 'Settings' | translate }}</a></li>
                 </ul>
