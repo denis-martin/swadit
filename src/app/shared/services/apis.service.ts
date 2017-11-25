@@ -16,6 +16,7 @@
  */
 
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs/Subject';
 
@@ -40,6 +41,7 @@ import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-paramet
 import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
 import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
 import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
+import { YAMLException } from 'js-yaml';
 
 @Injectable()
 export class ApisService 
@@ -81,6 +83,8 @@ export class ApisService
 		paths: {}
 	}
 	public currentFileName: string = "swagger.yaml";
+	public lastLoaded: string;
+	public hasLoadingErrors: boolean = false;
 
 	private _eventApiChanged = new Subject<string>();
 	eventApiChanged = this._eventApiChanged.asObservable();
@@ -95,7 +99,7 @@ export class ApisService
 
 	methodKeys = ["get", "post", "put", "delete", "options", "head", "patch" ];
 
-	constructor(private modalService: NgbModal) 
+	constructor(private modalService: NgbModal, private router: Router) 
 	{
 		console.info("APIs service initialized");
 		this.openFile("/assets/petstore.yaml", null);
@@ -112,12 +116,13 @@ export class ApisService
 			let apis = this;
 			let reader = new FileReader();
 			reader.onloadend = function(e) {
+				apis.lastLoaded = reader.result;
 				try {
-					SwaggerParser.parse(YAML.load(reader.result))
+					SwaggerParser.parse(YAML.safeLoad(reader.result))
 						.then(api => { apis.swaggerLoaded(api, fobj.name); })
-						.catch(err => { apis.swaggerLoadingError(err); });
+						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {
-					apis.swaggerLoadingError(ex);
+					apis.swaggerLoadingError(ex, fobj.name);
 				}
 			}
 			reader.readAsText(fobj);
@@ -129,13 +134,38 @@ export class ApisService
 		console.log("swaggerLoaded");
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
-		this._eventApiChanged.next(this.currentFileName);
+
+		let self = this;
+		let apiClone: any = _.cloneDeep(this.current);
+		SwaggerParser.validate(apiClone)
+			.then(function(api) {
+				console.log("This API is a valid Swagger file.");
+				self.hasLoadingErrors = false;
+				self._eventApiChanged.next(self.currentFileName);
+			})
+			.catch(function(err) {
+				console.log("Swagger validation error: ", err.message);
+				self.hasLoadingErrors = true;
+				self._eventApiChanged.next(self.currentFileName);
+				self.router.navigate(['/source']);
+			});
 	}
 
-	swaggerLoadingError(err)
+	swaggerLoadingError(err, fileName: string = null)
 	{
-		console.log("error loading yaml: ", err)
-		alert("Error loading YAML: " + err);
+		console.log("error loading yaml: ", err);
+		this.hasLoadingErrors = true;
+		this.current = { 
+			swagger: "2.0",
+			info: { 
+				title: "Loading Error",
+				version: "1.0"
+			},
+			paths: {}
+		}
+		this.currentFileName = fileName ? fileName : "swagger.yaml";
+		this._eventApiChanged.next(this.currentFileName);
+		this.router.navigate(['/source']);
 	}
 
 	toYaml(obj: Object): string
@@ -315,6 +345,16 @@ export class ApisService
 		this.fileModal.componentInstance.dialogType = "fileDownload";
 		this.fileModal.componentInstance.blob = this.blob;
 		this.fileModal.componentInstance.fileName = this.currentFileName;
+		
+		if (this.hasLoadingErrors) {
+			this.fileModal.componentInstance.validationErrors = true;
+		} else {
+			let fileModal = this.fileModal;
+			this.validate(this.current)
+				.then(api => { fileModal.componentInstance.validationErrors = false })
+				.catch(err => { fileModal.componentInstance.validationErrors = true });
+		}
+
 		this.fileModal.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 			console.info("downloadFileModal(): " + this.closeResult);
@@ -485,5 +525,49 @@ export class ApisService
 			}
 		}
 		return res;
+	}
+
+	validateStr(input: string): any
+	{
+		let apis = this;
+		return new Promise((resolve, reject) => {
+			let api;
+			let apiClone;
+			try {
+				api = YAML.safeLoad(input);
+				apiClone = _.cloneDeep(api);
+			} catch (ye) {
+				reject("YAML Error: " + ye.message);
+				return;
+			}
+			SwaggerParser.validate(api)
+				.then(function(api) {
+					console.log("This API is a valid Swagger file.");
+					// 'api' is modified by SwaggerParser.validate (references are dereferenced)
+					resolve(apiClone);
+				})
+				.catch(function(err) {
+					console.log("Swagger validation error: ", err.message);
+					reject(err.message);
+				});
+		});
+	}
+	
+	validate(obj: any): any
+	{
+		let apis = this;
+		return new Promise((resolve, reject) => {
+			let apiClone = _.cloneDeep(obj);
+			SwaggerParser.validate(apiClone)
+				.then(function(api) {
+					console.log("This API is a valid Swagger file.");
+					// 'apiClone' is modified by SwaggerParser.validate (references are dereferenced)
+					resolve(apiClone);
+				})
+				.catch(function(err) {
+					console.log("Swagger validation error: ", err.message);
+					reject(err.message);
+				});
+		});
 	}
 }

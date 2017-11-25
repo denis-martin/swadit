@@ -15,4 +15,35 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<p>Source</p>
+<div class="editor-header">
+	<button class="btn btn-primary" (click)="apply()">Apply</button>
+	<button class="btn btn-success" (click)="validate()">Validate</button>
+	<button class="btn btn-warning" (click)="revert()">Revert</button>
+	<div class="mt-1" style="float: right">
+		<span *ngIf="applied===true" style="color: #5cb85c">
+			<i class="fa fa-check-square"></i> changes applied
+		</span>
+		<span *ngIf="validationPassed===true && !applied" style="color: #5cb85c">
+			<i class="fa fa-check-square"></i> validation passed
+		</span>
+		<span *ngIf="validationPassed===false" style="color: #d9534f">
+			<i class="fa fa-times-rectangle"></i> validation failed
+		</span>
+	</div>
+</div>
+
+<div ace-editor
+	[(text)]="text"
+	[mode]="'yaml'"
+	[theme]="'eclipse'"
+	[options]="options"
+	[readOnly]="false"
+	[autoUpdateContent]="true"
+	[durationBeforeCallback]="500"
+	(textChanged)="onChange($event)"
+	class="editor" [ngClass]="{ 'editor-with-footer': message }">
+</div>
+
+<div class="editor-footer" *ngIf="message">
+	<div class="alert alert-danger">{{message}}</div>
+</div>

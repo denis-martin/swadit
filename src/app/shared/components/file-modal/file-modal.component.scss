@@ -7,3 +7,15 @@ label {
 .modal-title {
     margin: 0;
 }
+
+.alert a {
+    color: rgb(241, 194, 194);
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.alert a:hover {
+    color: white;
+    text-decoration: underline;
+    font-weight: bold;
+}

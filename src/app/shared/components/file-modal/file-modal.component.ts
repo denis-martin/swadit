@@ -20,6 +20,7 @@ export class FileModalComponent implements OnInit
 	fileName: string;
 	modalHint: string = "";
 	files: any;
+	validationErrors: boolean = null;
 
 	get modalTitle(): string
 	{

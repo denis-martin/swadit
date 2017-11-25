@@ -17,15 +17,87 @@
 
 import { Component, OnInit } from '@angular/core';
 
-@Component({
-    selector: 'app-source',
-    templateUrl: './source.component.html',
-    styleUrls: ['./source.component.scss']
-})
-export class SourceComponent implements OnInit {
-    constructor() {
-    }
+import { ApisService } from '../../shared/services';
 
-    ngOnInit() {
-    }
+@Component({
+	selector: 'app-source',
+	templateUrl: './source.component.html',
+	styleUrls: ['./source.component.scss']
+})
+export class SourceComponent implements OnInit 
+{
+	text: string = "";
+	options: any = { printMargin: true };
+	message: string = null;
+	validationPassed: boolean = null;
+	applied: boolean = null;
+	skipReset: boolean = false;
+
+	constructor(public apis: ApisService)
+	{
+		this.apis.eventApiChanged.subscribe(param => {
+			this.revert();
+		});
+	}
+
+	ngOnInit() 
+	{
+		this.revert();
+	}
+
+	onChange(text)
+	{
+		//console.log(text);
+		if (!this.skipReset) {
+			this.validationPassed = null;
+			this.applied = null;
+		} else {
+			this.skipReset = false;
+		}
+	}
+
+	revert()
+	{
+		if (this.apis.current) {
+			this.text = this.apis.hasLoadingErrors ? this.apis.lastLoaded : this.apis.toYaml(this.apis.current);
+			this.skipReset = true;
+			this.validate();
+		}
+	}
+
+	apply()
+	{
+		let self = this;
+		self.validationPassed = null;
+		self.applied = null;
+		this.apis.validateStr(this.text)
+			.then(api => {
+				self.message = null;
+				self.validationPassed = true;
+				self.applied = true;
+				self.apis.hasLoadingErrors = false;
+				self.apis.current = api;
+			})
+			.catch(msg => {
+				self.message = msg;
+				self.validationPassed = false;
+				self.applied = null;
+			});
+	}
+
+	validate()
+	{
+		let self = this;
+		self.validationPassed = null;
+		self.applied = null;
+		this.apis.validateStr(this.text)
+			.then(api => {
+				self.message = null;
+				self.validationPassed = true;
+			})
+			.catch(msg => {
+				self.message = msg;
+				self.validationPassed = false;
+			});
+	}
 }

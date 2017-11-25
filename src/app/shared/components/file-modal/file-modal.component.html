@@ -11,10 +11,14 @@
 			<input type="text" [(ngModel)]="fileName" class="form-control" name="fileName">
 		</p>
 		<p *ngIf="modalHint!=''">{{modalHint}}</p>
+		<div class="alert alert-danger" *ngIf="validationErrors===true">
+			There are validation errors. 
+			<a [routerLink]="['/source']" (click)="activeModal.dismiss('cancel')">Please review them</a> before saving the file.
+		</div>
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-primary" type="submit" 
-			[disabled]="(dialogType=='fileDownload' && !fileName) || ((dialogType=='fileOpen' || dialogType=='fileAdd') && (!files || files.length==0))">
+			[disabled]="validationErrors || (dialogType=='fileDownload' && !fileName) || ((dialogType=='fileOpen' || dialogType=='fileAdd') && (!files || files.length==0))">
 			<span *ngIf="dialogType=='fileOpen'">Open</span>
 			<span *ngIf="dialogType=='fileAdd'">Add</span>
 			<span *ngIf="dialogType=='fileDownload'">Download</span>
