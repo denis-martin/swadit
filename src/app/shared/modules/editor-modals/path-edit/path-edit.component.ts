@@ -81,6 +81,11 @@ export class PathEditComponent implements OnInit
 		}
 		this.pathKey = this.pathKey.trim();
 
+		if (!this.pathKey.startsWith('/')) {
+			this.errorStr = "Path must start with '/'.";
+			return;
+		}
+
 		if (this.pathKey != this.pathKey_orig && 
 			this.apis.current['paths'] && 
 			this.apis.current['paths'][this.pathKey]) 
@@ -115,7 +120,7 @@ export class PathEditComponent implements OnInit
 			if (!this.apis.current['paths']) {
 				this.apis.current['paths'] = {};
 			}
-			this.apis.current['paths'][this.pathKey] = this.obj_orig;
+			this.apis.current['paths'][this.pathKey] = {};
 		} else if (this.pathKey != this.pathKey_orig) {
 			this.apis.renameObjectKey(this.apis.current['paths'], this.pathKey_orig, this.pathKey);
 		}
@@ -124,6 +129,14 @@ export class PathEditComponent implements OnInit
 			this.apis.current['paths'][this.pathKey][this.methodKey] = this.obj_orig;
 		} else if (this.methodKey != this.methodKey_orig) {
 			this.apis.renameObjectKey(this.apis.current['paths'][this.pathKey], this.methodKey_orig, this.methodKey);
+		}
+
+		if (!this.apis.current['paths'][this.pathKey][this.methodKey]['responses']) {
+			this.apis.current['paths'][this.pathKey][this.methodKey]['responses'] = {
+				'default': {
+					'description': "Default"
+				}
+			};
 		}
 
 		this.errorStr = "";
