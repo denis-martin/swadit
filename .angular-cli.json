@@ -21,11 +21,13 @@
       "prefix": "app",
       "styles": [
         "../node_modules/font-awesome/css/font-awesome.css",
-        "../node_modules/prismjs/themes/prism.css",
+        "../node_modules/prismjs/themes/prism-coy.css",
         "styles/app.scss"
       ],
       "scripts": [
-        "../node_modules/chart.js/dist/Chart.js",
+        "../node_modules/marked/lib/marked.js",
+        "../node_modules/prismjs/prism.js",
+        "../node_modules/prismjs/components/prism-json.min.js",
         "../node_modules/ace-builds/src-min/ace.js",
         "../node_modules/ace-builds/src-min/theme-eclipse.js",
         "../node_modules/ace-builds/src-min/mode-yaml.js",

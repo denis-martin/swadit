@@ -159,3 +159,8 @@ h6 {
 .deprecated {
 	text-decoration: line-through;
 }
+
+pre[class*="language-"]>code {
+	border: none;
+	box-shadow: 0px 0px 0px 1px #dfdfdf;
+}
