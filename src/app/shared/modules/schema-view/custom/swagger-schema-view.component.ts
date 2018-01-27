@@ -27,6 +27,7 @@ import { ApisService } from '../../../services';
 export class SwaggerSchemaViewComponent implements OnInit 
 {
 	@Input() obj: Object;
+	@Input() generateExample: boolean = false;
 
 	uncollapsed = {};
 

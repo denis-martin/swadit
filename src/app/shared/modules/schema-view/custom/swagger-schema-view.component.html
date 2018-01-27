@@ -17,24 +17,13 @@
 
 <table>
 	<tbody>
-		<tr>
+		<tr *ngIf="(obj['type'] != 'object' && obj['type'] != 'array') || (obj['type'] == 'object' && !obj['properties']) || (obj['type'] == 'array' && !obj['items'])">
 			<td class="label-text">type</td>
 			<td>{{obj['type']}}</td>
 		</tr>
-		<tr *ngIf="obj['format']">
-			<td class="label-text">format</td>
-			<td>{{obj['format']}}</td>
-		</tr>
-		<tr *ngIf="obj['enum']">
-			<td class="label-text">enum</td>
-			<td><span *ngFor="let ev of obj['enum']; let index = index"><span *ngIf="index>0"> | </span>{{ev}}</span></td>
-		</tr>
-		<tr *ngIf="obj['description']">
-			<td class="label-text">description</td>
-			<td class="description"><markdown [data]="obj['description']"></markdown></td>
-		</tr>
 		<tr *ngIf="obj['properties']">
-			<td class="label-text">properties</td>
+			<td class="label-text" *ngIf="obj['type'] != 'object'">properties</td>
+			<td class="label-text" *ngIf="obj['type'] == 'object'">object</td>
 			<td>
 				<div *ngFor="let p of keys(obj['properties'])">
 					<div class="clickable" (click)="uncollapsed[p] = !uncollapsed[p]">
@@ -68,7 +57,8 @@
 			</td>
 		</tr>
 		<tr *ngIf="obj['items']">
-			<td class="label-text">items</td>
+			<td class="label-text" *ngIf="obj['type'] != 'array'">items</td>
+			<td class="label-text" *ngIf="obj['type'] == 'array'">array of</td>
 			<td style="padding: 0">
 				<div *ngIf="obj['items']['$ref']; else nonRef">
 					<swadit-swagger-schema-view [obj]="apis.resolveRef(obj['items']['$ref'])">
@@ -79,6 +69,18 @@
 					</swadit-swagger-schema-view>
 				</ng-template>
 			</td>
+		</tr>
+		<tr *ngIf="obj['format']">
+			<td class="label-text">format</td>
+			<td>{{obj['format']}}</td>
+		</tr>
+		<tr *ngIf="obj['enum']">
+			<td class="label-text">enum</td>
+			<td><span *ngFor="let ev of obj['enum']; let index = index"><span *ngIf="index>0"> | </span>{{ev}}</span></td>
+		</tr>
+		<tr *ngIf="obj['description']">
+			<td class="label-text">description</td>
+			<td class="description"><markdown [data]="obj['description']"></markdown></td>
 		</tr>
 		<tr *ngIf="obj['default']">
 			<td class="label-text">default</td>
@@ -91,7 +93,20 @@
 			<td class="label-text">example</td>
 			<td>
 				<span *ngIf="!isComplex(obj['example'])">{{obj['example']}}</span>
-				<pre *ngIf="isComplex(obj['example'])"><code highlight [innerHTML]="toJson(obj['example'])"></code></pre>
+				<markdown *ngIf="isComplex(obj['example'])"
+					[data]="apis.toJson(obj['example']) | language: 'json'">
+				</markdown>
+			</td>
+		</tr>
+		<tr *ngIf="generateExample && (obj['type'] == 'object' || obj['type'] == 'array')">
+			<td class="label-text">example</td>
+			<td>
+				<span class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+					Generated example<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
+				</span>
+				<markdown *ngIf="showGeneratedExample"
+					[data]="apis.toJson(apis.generateExample(obj, false, true)) | language: 'json'">
+				</markdown>
 			</td>
 		</tr>
 	</tbody>

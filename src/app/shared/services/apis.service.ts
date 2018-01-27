@@ -468,7 +468,7 @@ export class ApisService
 		}
 	}
 
-	generateExample(schema: any, noReadOnly: boolean = false): any
+	generateExample(schema: any, noReadOnly: boolean = false, forceGeneration: boolean = false): any
 	{
 		let res: any = undefined;
 		schema = this.resolveObj(schema);
@@ -498,9 +498,9 @@ export class ApisService
 					res = 0;
 				}
 			} else if (schema.type == "array") {
-				if (schema.example) {
+				if (schema.example && !forceGeneration) {
 					res = schema.example;
-				} else if (schema.default) {
+				} else if (schema.default && !forceGeneration) {
 					res = schema.default;
 				} else {
 					let r = this.generateExample(schema.items, noReadOnly);
@@ -509,9 +509,9 @@ export class ApisService
 					}
 				}
 			} else if (schema.type == "object") {
-				if (schema.example) {
+				if (schema.example && !forceGeneration) {
 					res = schema.example;
-				} else if (schema.default) {
+				} else if (schema.default && !forceGeneration) {
 					res = schema.default;
 				} else {
 					res = {};

@@ -58,7 +58,7 @@
 		</div>
 	</div>
 	<div class="card-block" *ngIf="uncollapsedDef[def]">
-		<swadit-swagger-schema-view [obj]="apis.current['definitions'][def]">
+		<swadit-swagger-schema-view [obj]="apis.current['definitions'][def]" [generateExample]="true">
 		</swadit-swagger-schema-view>
 	</div>
 </div>
