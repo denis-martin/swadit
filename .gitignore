@@ -6,6 +6,8 @@ yarn-error.log
 
 # dependencies
 /node_modules
+/src/assets/swadoc/node_modules
+/src/assets/swadoc/bower_components
 
 # IDEs and editors
 /.idea
@@ -28,7 +30,7 @@ yarn-error.log
 /connect.lock
 /coverage
 /libpeerconnection.log
-npm-debug.log
+npm-debug.log*
 testem.log
 /typings
 

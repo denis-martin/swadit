@@ -7,7 +7,8 @@ const routes: Routes = [
 		path: '', component: LayoutComponent,
 		children: [
 			{ path: 'source', loadChildren: './source/source.module#SourceModule' },
-			{ path: 'print', loadChildren: './print/print.module#PrintModule' },
+			//{ path: 'print', loadChildren: './print/print.module#PrintModule' },
+			{ path: 'swadoc', loadChildren: './swadoc/swadoc.module#SwadocModule' },
 			{ path: 'api-info', loadChildren: './api-info/api-info.module#ApiInfoModule' },
 			{ path: 'definitions', loadChildren: './definitions/definitions.module#DefinitionsModule' },
 			{ path: 'parameters', loadChildren: './parameters/parameters.module#ParametersModule' },
