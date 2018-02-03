@@ -25,6 +25,7 @@ import { SchemaEditorModule } from '../../shared/modules/schema-editor/schema-ed
 
 import { PrintRoutingModule } from './print-routing.module';
 import { PrintComponent } from './print.component';
+import { SchemaPrintViewComponent } from './schema-print-view/schema-print-view.component';
 
 @NgModule({
   imports: [
@@ -34,6 +35,6 @@ import { PrintComponent } from './print.component';
 		SchemaEditorModule,
     PrintRoutingModule
   ],
-  declarations: [PrintComponent]
+  declarations: [PrintComponent, SchemaPrintViewComponent]
 })
 export class PrintModule { }

@@ -1,0 +1,56 @@
+<!--
+	Copyright 2018 Denis Martin.  This file is part of swadit.
+
+	swadit is free software: you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, either version 3 of the License, or
+	(at your option) any later version.
+
+	swadit is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<div *ngIf="schema && schema['type']=='object' || (schema['type']=='array' && schema['items']['type']=='object')">
+	<table>
+		<colgroup>
+			<col style="width:38%">
+			<col style="width:12%">
+			<col style="width:50%">
+		</colgroup>  
+		<thead>
+			<th>Property</th>
+			<th>Type</th>
+			<th>Description</th>
+		</thead>
+		<tbody>
+			<tr *ngFor="let p of flatProperties; let index = index">
+				<td class="propertycell">
+					<span *ngIf="p.level>1">
+						<span ngFor="let i of getCountArray(p.level-1)" class="indent">&nbsp;</span>
+					</span>
+					<span *ngIf="p.level>0">&#9493;</span> 
+					{{p.prop}}
+					<span *ngIf="p.required"><br>
+						<span class="paramproperties">
+							<span ngFor="let i of getCountArray(p.level)" class="indent">&nbsp;</span>
+							required
+						</span>
+					</span>
+				</td>
+				<td class="type">{{p.def['type']}} <span *ngIf="p.def['type']=='array'">({{p.def['items'].type}})</span></td>
+				<td style="padding-bottom: 0">
+					<div marked="p.def['description']"></div>
+					<p *ngIf="p.def['default']">Default: <span *ngIf="p.def['type']=='string'">"</span>{{p.def['default']}}<span ng-if="p.def['type']=='string'">"</span></p>
+					<p *ngIf="p.def['example']">Example: <span *ngIf="p.def['type']=='string'">"</span>{{p.def['example']}}<span ng-if="p.def['type']=='string'">"</span></p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<p>{{type}} Body Example:</p>
+	<markdown>{{example}}</markdown>
+</div>

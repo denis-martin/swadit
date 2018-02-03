@@ -26,14 +26,20 @@ import { ApisService } from '../../shared/services';
 })
 export class PrintComponent implements OnInit
 {
+	api: any = null; // dereferenced API object
+	err: any = null;
+
 	constructor(public apis: ApisService)
 	{
 		this.apis.eventApiChanged.subscribe(param => {
-			
+			console.warn("PrintComponent: API changed event (nyi)");
 		});
 	}
 
 	ngOnInit() {
+		this.apis.validate(this.apis.current)
+			.then(api => this.api = api)
+			.catch(err => this.err = err);
 	}
 
 	print()

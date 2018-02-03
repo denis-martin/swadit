@@ -571,31 +571,34 @@ export class ApisService
 		});
 	}
 
-	getMethods(path: string): Array<object>
+	getMethods(path: string, api: any = null): Array<object>
 	{
-		if (!this.current['paths']) return [];
-		let methodKeys = this.keys(this.current['paths'][path]);
+		if (!api) {
+			api = this.current;
+		}
+		if (!api['paths']) return [];
+		let methodKeys = this.keys(api['paths'][path]);
 		_.pull(methodKeys, "parameters");
 		let methods: Array<object> = [];
 		methodKeys.forEach(m => methods.push({ 
 			key: m,
-			obj: this.current['paths'][path][m] 
+			obj: api['paths'][path][m] 
 		}));
 		return methods;
 	}
 
-	getParameters(path: string, method: string, includeBody: boolean = true): Array<object>
+	getParameters(api: any, path: string, method: string, includeBody: boolean = true): Array<object>
 	{
-		if (!this.current['paths']) return [];
-		if (!this.current['paths'][path]) return [];
-		if (!this.current['paths'][path][method]) return [];
+		if (!api || !api['paths']) return [];
+		if (!api['paths'][path]) return [];
+		if (!api['paths'][path][method]) return [];
 
 		let parameters: Array<object> = [];
-		if (this.current['paths'][path]['parameters']) {
-			parameters = parameters.concat(this.current['paths'][path]['parameters']);
+		if (api['paths'][path]['parameters']) {
+			parameters = parameters.concat(api['paths'][path]['parameters']);
 		}
-		if (this.current['paths'][path][method]['parameters']) {
-			parameters = parameters.concat(this.current['paths'][path][method]['parameters']);
+		if (api['paths'][path][method]['parameters']) {
+			parameters = parameters.concat(api['paths'][path][method]['parameters']);
 		}
 		if (!includeBody) {
 			_.remove(parameters, p => { return p['in'] == 'body'; });
@@ -603,22 +606,22 @@ export class ApisService
 		return parameters;
 	}
 
-	getBodyParameter(path: string, method: string): object
+	getBodyParameter(api: any, path: string, method: string): object
 	{
-		if (!this.current['paths']) return null;
-		if (!this.current['paths'][path]) return null;
-		if (!this.current['paths'][path][method]) return null;
+		if (!api['paths']) return null;
+		if (!api['paths'][path]) return null;
+		if (!api['paths'][path][method]) return null;
 
 		let body: object = null;
-		if (this.current['paths'][path]['parameters']) {
-			this.current['paths'][path]['parameters'].forEach(p => {
+		if (api['paths'][path]['parameters']) {
+			api['paths'][path]['parameters'].forEach(p => {
 				if (p['in'] == 'body') {
 					body = p;
 				}
 			});
 		}
-		if (this.current['paths'][path][method]['parameters']) {
-			this.current['paths'][path][method]['parameters'].forEach(p => {
+		if (api['paths'][path][method]['parameters']) {
+			api['paths'][path][method]['parameters'].forEach(p => {
 				if (p['in'] == 'body') {
 					body = p;
 				}
@@ -627,30 +630,30 @@ export class ApisService
 		return body;
 	}
 
-	getConsumes(path: string, method: string): any
+	getConsumes(api: any, path: string, method: string): any
 	{
-		if (!this.current['paths']) return null;
-		if (!this.current['paths'][path]) return null;
-		if (!this.current['paths'][path][method]) return null;
+		if (!api['paths']) return null;
+		if (!api['paths'][path]) return null;
+		if (!api['paths'][path][method]) return null;
 
-		if (this.current['paths'][path][method]['consumes']) {
-			return this.current['paths'][path][method]['consumes'];
-		} else if (this.current['consumes']) {
-			return this.current['consumes'];
+		if (api['paths'][path][method]['consumes']) {
+			return api['paths'][path][method]['consumes'];
+		} else if (api['consumes']) {
+			return api['consumes'];
 		}
 		return null;
 	}
 
-	getProduces(path: string, method: string): any
+	getProduces(api: any, path: string, method: string): any
 	{
-		if (!this.current['paths']) return null;
-		if (!this.current['paths'][path]) return null;
-		if (!this.current['paths'][path][method]) return null;
+		if (!api['paths']) return null;
+		if (!api['paths'][path]) return null;
+		if (!api['paths'][path][method]) return null;
 
-		if (this.current['paths'][path][method]['produces']) {
-			return this.current['paths'][path][method]['produces'];
-		} else if (this.current['produces']) {
-			return this.current['produces'];
+		if (api['paths'][path][method]['produces']) {
+			return api['paths'][path][method]['produces'];
+		} else if (api['produces']) {
+			return api['produces'];
 		}
 		return null;
 	}

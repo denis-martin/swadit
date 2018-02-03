@@ -19,49 +19,57 @@
 	<i class="fa fa-print"></i> 
 </a>
 
-<div id="contentToPrint">
+<div *ngIf="!api">
+	Validating API against Swagger specification...
+</div>
+
+<div *ngIf="err">
+	Swagger validation error. See File / Source for details.
+</div>
+
+<div id="contentToPrint" *ngIf="!err && api">
 
 <!-- from api-info begin -->
-<div *ngIf="apis.current['info']" class="api-info">
-	<h1>{{apis.current['info']['title']}}
-		<span *ngIf="apis.current['info']['version']" style="font-size: 70%"> v{{apis.current['info']['version']}}</span>
+<div *ngIf="api['info']" class="api-info">
+	<h1>{{api['info']['title']}}
+		<span *ngIf="api['info']['version']" style="font-size: 70%"> v{{api['info']['version']}}</span>
 	</h1>
-	<div *ngIf="apis.current['info']['contact']" class="api-info-element">
-		{{apis.current['info']['contact']['name']}} 
-		<span *ngIf="apis.current['info']['contact']['email']">
-			(<a href="mailto:{{apis.current['info']['contact']['email']}}">{{apis.current['info']['contact']['email']}}</a>)
+	<div *ngIf="api['info']['contact']" class="api-info-element">
+		{{api['info']['contact']['name']}} 
+		<span *ngIf="api['info']['contact']['email']">
+			(<a href="mailto:{{api['info']['contact']['email']}}">{{api['info']['contact']['email']}}</a>)
 		</span>
-		<span *ngIf="apis.current['info']['contact']['url']">{{apis.current['info']['contact']['url']}}</span>
+		<span *ngIf="api['info']['contact']['url']">{{api['info']['contact']['url']}}</span>
 	</div>
-	<markdown *ngIf="apis.current['info'].description" class="api-info-element markdown" 
-		[data]="apis.current['info'].description">
+	<markdown *ngIf="api['info'].description" class="api-info-element markdown">
+		{{api['info']['description']}}
 	</markdown>
-	<div *ngIf="apis.current.externalDocs" class="api-info-element">
-		<a href="{{apis.current.externalDocs['url']}}" target="_blanc">
-			<span *ngIf="apis.current.externalDocs.description; else 'More'">{{apis.current.externalDocs.description}}</span>
+	<div *ngIf="api.externalDocs" class="api-info-element">
+		<a href="{{api.externalDocs['url']}}" target="_blanc">
+			<span *ngIf="api.externalDocs.description; else 'More'">{{api.externalDocs.description}}</span>
 		</a>
 	</div>
-	<div *ngIf="apis.current['info']['termsOfService'] || apis.current['info']['license']" class="api-info-element">
-		<p *ngIf="apis.current['info']['termsOfService']">
-			Terms of service: {{apis.current['info']['termsOfService']}}
+	<div *ngIf="api['info']['termsOfService'] || api['info']['license']" class="api-info-element">
+		<p *ngIf="api['info']['termsOfService']">
+			Terms of service: {{api['info']['termsOfService']}}
 		</p>
-		<p *ngIf="apis.current['info']['license']">
-			License: {{apis.current['info']['license']['name']}}
-			<span *ngIf="apis.current['info']['license']['url']">
-				(<a href="{{apis.current['info']['license']['url']}}">{{apis.current['info']['license']['url']}}</a>)
+		<p *ngIf="api['info']['license']">
+			License: {{api['info']['license']['name']}}
+			<span *ngIf="api['info']['license']['url']">
+				(<a href="{{api['info']['license']['url']}}">{{api['info']['license']['url']}}</a>)
 			</span>
 		</p>
 	</div>
 </div>
 
-<div *ngIf="apis.current['tags']" class="api-info api-info-element">
+<div *ngIf="api['tags']" class="api-info api-info-element">
 	<h2>Tags</h2>
 	<table class="tag-table">
 		<tbody>
-			<tr *ngFor="let tag of apis.current['tags']">
+			<tr *ngFor="let tag of api['tags']">
 				<td style="font-weight: bold">{{tag['name']}}</td>
 				<td>
-					<div Markdown>{{tag.description}}</div>
+					<div markdown>{{tag.description}}</div>
 					<div *ngIf="tag.externalDocs">
 						<a href="{{tag.externalDocs['url']}}" target="_blanc">
 							<span *ngIf="tag.externalDocs.description; else more">{{tag.externalDocs.description}}</span>
@@ -74,38 +82,38 @@
 	</table>
 </div>
 
-<div *ngIf="apis.current['schemes'] || apis.current['host'] || apis.current['basePath'] || apis.current['consumes'] || apis.current['produces']"
+<div *ngIf="api['schemes'] || api['host'] || api['basePath'] || api['consumes'] || api['produces']"
 	class="api-info api-info-element">
 	<h2>General Information</h2>
 	<table>
 		<tbody>
-			<tr *ngIf="apis.current['schemes']">
+			<tr *ngIf="api['schemes']">
 				<td class="label-text">schemes</td>
 				<td>
-					<span *ngFor="let item of apis.current['schemes']">{{item}}&nbsp;</span>
+					<span *ngFor="let item of api['schemes']">{{item}}&nbsp;</span>
 				</td>
 			</tr>
-			<tr *ngIf="apis.current['host']">
+			<tr *ngIf="api['host']">
 				<td class="label-text">host</td>
-				<td>{{apis.current['host']}}</td>
+				<td>{{api['host']}}</td>
 			</tr>
-			<tr *ngIf="apis.current['basePath']" >
+			<tr *ngIf="api['basePath']" >
 				<td class="label-text">basePath</td>
-				<td>{{apis.current['basePath']}}</td>
+				<td>{{api['basePath']}}</td>
 			</tr>
-			<tr *ngIf="apis.current['consumes']">
+			<tr *ngIf="api['consumes']">
 				<td class="label-text">consumes</td>
 				<td>
 					<ul class="list-unstyled">
-						<li *ngFor="let item of apis.current['consumes']">{{item}}</li>
+						<li *ngFor="let item of api['consumes']">{{item}}</li>
 					</ul>
 				</td>
 			</tr>
-			<tr *ngIf="apis.current['produces']">
+			<tr *ngIf="api['produces']">
 				<td class="label-text">produces</td>
 				<td>
 					<ul class="list-unstyled">
-						<li *ngFor="let item of apis.current['produces']">{{item}}</li>
+						<li *ngFor="let item of api['produces']">{{item}}</li>
 					</ul>
 				</td>
 			</tr>
@@ -113,48 +121,48 @@
 	</table>
 </div>
 
-<div *ngIf="apis.current['securityDefinitions'] || apis.current['security']" class="api-info api-info-element">
+<div *ngIf="api['securityDefinitions'] || api['security']" class="api-info api-info-element">
 	<h2>Security</h2>
-	<div *ngFor="let def of keys(apis.current['securityDefinitions'])">
+	<div *ngFor="let def of keys(api['securityDefinitions'])">
 		<p>Security definition: <b>{{def}}</b></p>
 		<table>
 			<tbody>
 				<tr>
 					<td class="label-text">type</td>
-					<td>{{apis.current['securityDefinitions'][def]['type']}}</td>
+					<td>{{api['securityDefinitions'][def]['type']}}</td>
 				</tr>
-				<tr *ngIf="apis.current['securityDefinitions'][def]['description']">
+				<tr *ngIf="api['securityDefinitions'][def]['description']">
 					<td class="label-text">description</td>
-					<td><markdown [data]="apis.current['securityDefinitions'][def]['description']"></markdown></td>
+					<td><markdown>{{api['securityDefinitions'][def]['description']}}</markdown></td>
 				</tr>
-				<tr *ngIf="apis.current['securityDefinitions'][def]['name']">
+				<tr *ngIf="api['securityDefinitions'][def]['name']">
 					<td class="label-text">name</td>
-					<td>{{apis.current['securityDefinitions'][def]['name']}}</td>
+					<td>{{api['securityDefinitions'][def]['name']}}</td>
 				</tr>
-				<tr *ngIf="apis.current['securityDefinitions'][def]['in']">
+				<tr *ngIf="api['securityDefinitions'][def]['in']">
 					<td class="label-text">in</td>
-					<td>{{apis.current['securityDefinitions'][def]['in']}}</td>
+					<td>{{api['securityDefinitions'][def]['in']}}</td>
 				</tr>
-				<tr *ngIf="apis.current['securityDefinitions'][def]['flow']">
+				<tr *ngIf="api['securityDefinitions'][def]['flow']">
 					<td class="label-text">flow</td>
-					<td>{{apis.current['securityDefinitions'][def]['flow']}}</td>
+					<td>{{api['securityDefinitions'][def]['flow']}}</td>
 				</tr>
-				<tr *ngIf="apis.current['securityDefinitions'][def]['authorizationUrl']">
+				<tr *ngIf="api['securityDefinitions'][def]['authorizationUrl']">
 					<td class="label-text">auth URL</td>
-					<td>{{apis.current['securityDefinitions'][def]['authorizationUrl']}}</td>
+					<td>{{api['securityDefinitions'][def]['authorizationUrl']}}</td>
 				</tr>
-				<tr *ngIf="apis.current['securityDefinitions'][def]['tokenUrl']">
+				<tr *ngIf="api['securityDefinitions'][def]['tokenUrl']">
 					<td class="label-text">token URL</td>
-					<td>{{apis.current['securityDefinitions'][def]['tokenUrl']}}</td>
+					<td>{{api['securityDefinitions'][def]['tokenUrl']}}</td>
 				</tr>
-				<tr *ngIf="apis.current['securityDefinitions'][def]['scopes']">
+				<tr *ngIf="api['securityDefinitions'][def]['scopes']">
 					<td class="label-text">scopes</td>
 					<td>
 						<table>
 							<tbody>
-								<tr *ngFor="let scope of keys(apis.current['securityDefinitions'][def]['scopes'])">
+								<tr *ngFor="let scope of keys(api['securityDefinitions'][def]['scopes'])">
 									<td style="font-weight: bold">{{scope}}</td>
-									<td>{{apis.current['securityDefinitions'][def]['scopes'][scope]}}</td>
+									<td>{{api['securityDefinitions'][def]['scopes'][scope]}}</td>
 								</tr>
 							</tbody>
 						</table>
@@ -163,9 +171,9 @@
 			</tbody>
 		</table>
 	</div>
-	<div *ngIf="apis.current['security']">
+	<div *ngIf="api['security']">
 		<h3>Default Security Requirements</h3>
-		<div *ngFor="let req of apis.current['security']">
+		<div *ngFor="let req of api['security']">
 			<p style="font-weight: bold">{{keys(req)[0]}}</p>
 			<ul *ngIf="req[keys(req)[0]].length>0">
 				<li *ngFor="let scope of req[keys(req)[0]]">{{scope}}</li>
@@ -174,55 +182,56 @@
 	</div>
 </div>
 
-<div *ngIf="apis.hasExtensions(apis.current) || apis.hasExtensions(apis.current['info'])" class="api-info api-info-element">
+<div *ngIf="apis.hasExtensions(api) || apis.hasExtensions(api['info'])" class="api-info api-info-element">
 	<h2>Extensions</h2>
-	<div *ngIf="apis.hasExtensions(apis.current)" class="api-info-element">
+	<div *ngIf="apis.hasExtensions(api)" class="api-info-element">
 		At document root:
-		<swadit-extensions-view [obj]="apis.current"></swadit-extensions-view>
+		<swadit-extensions-view [obj]="api"></swadit-extensions-view>
 	</div>
-	<div *ngIf="apis.hasExtensions(apis.current['info'])" class="api-info-element">
+	<div *ngIf="apis.hasExtensions(api['info'])" class="api-info-element">
 		At document info:
-		<swadit-extensions-view [obj]="apis.current['info']"></swadit-extensions-view>
+		<swadit-extensions-view [obj]="api['info']"></swadit-extensions-view>
 	</div>
 </div>
 <!-- from api-info end -->
 
 <!-- path list -->
 <h2 class="pathlistheading"><a name="pathlist">Paths</a></h2>
-<p>This API supports {{apis.keys(apis.current['paths']).length}} paths:</p>
+<p>This API supports {{apis.keys(api['paths']).length}} paths:</p>
 <table class="pathlist">
 	<tbody>
-		<tr *ngFor="let path of apis.filterList(apis.keys(apis.current['paths']), null, true); let index = index">
+		<tr *ngFor="let path of apis.filterList(apis.keys(api['paths']), null, true); let index = index">
 			<td><a href="#{{getPathAnchor(path)}}">{{path}}</a></td>
         </tr>
 	</tbody>
 </table>
 
 <!-- paths -->
-<div *ngFor="let path of apis.filterList(apis.keys(apis.current['paths']), null, true); let index = index">
+<div *ngFor="let path of apis.filterList(apis.keys(api['paths']), null, true); let index = index">
 	<h3 class="pathheading">
 		<a name="{{getPathAnchor(path)}}">{{path}}</a>
 		<a href="#pathlist" style="float: right; font-size: 80%; text-decoration: none; color: inherit">&#9776;&nbsp;</a>
 	</h3>
 	<p>
 		This path supports the following methods:
-		<span *ngFor="let method of apis.getMethods(path)">
+		<span *ngFor="let method of apis.getMethods(path, api)">
 			<span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">{{method.key}}</span>
 		</span>
 	</p>
-	<div *ngFor="let method of apis.getMethods(path)">
+	<div *ngFor="let method of apis.getMethods(path, api)">
 		<h4 class="methodheading" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
 			<span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
 				{{method.key}}
 			</span>
 			{{path}}
 		</h4>
-		<markdown [data]="method.obj.summary"></markdown>
+		
+		<markdown>{{method.obj.summary}}</markdown>
+		
+		<h5 *ngIf="method.obj.description">Description</h5>
+		<!-- <markdown>{{method.obj.description}}</markdown> -->
 
-		<h5 *ngIf="method.obj.description" >Description</h5>
-		<markdown [data]="method.obj.description"></markdown>
-
-		<div *ngIf="apis.getParameters(path, method.key, false).length > 0">
+		<div *ngIf="apis.getParameters(api, path, method.key, false).length > 0">
 			<h5>Parameters</h5>
 			<table>
 				<thead>
@@ -238,7 +247,7 @@
 						</td>
 						<td class="type">{{param['type']}}</td>
 						<td>
-							<markdown [data]="param['description']"></markdown>
+							<markdown>{{param['description']}}</markdown>
 							<p *ngIf="param['default']">Default: <span *ngIf="param['type']=='string'">"</span>{{param['default']}}<span *ngIf="param['type']=='string'">"</span></p>
 							<p *ngIf="param['example']">Example: <span *ngIf="param['type']=='string'">"</span>{{param['example']}}<span *ngIf="param['type']=='string'">"</span></p>
 						</td>
@@ -247,55 +256,31 @@
 			</table>
 		</div>
 
-		<div *ngIf="apis.getBodyParameter(path, method.key) as body">
-			<h5>Request Body <span *ngFor="let consume of apis.getConsumes(path, method.key)">({{consume}}) </span></h5>
-			<markdown [data]="body['description']"></markdown>
-			<div *ngIf="apis.resolveObj(body['schema']) as bodySchema">
-				<p>Schema: {{bodySchema['type']}} <span *ngIf="bodySchema['type']=='array'">({{apis.resolveObj(bodySchema['items'])['type']}})</span></p>
-				<markdown [data]="bodySchema['description']"></markdown>
-				<!--
-				<div ng-if="body.schema && (body.schema.type=='object' || (body.schema.type=='array' && body.schema.items.type=='object'))"
-						ng-controller="SwadocSchemaController" 
-						ng-init="schema = body.schema.type=='object' ? body.schema : body.schema.items; flattenObject(schema, 0)">
-					<table>
-						<colgroup>
-							<col style="width:38%">
-							<col style="width:12%">
-							<col style="width:50%">
-						</colgroup>  
-						<thead>
-							<th>Property</th>
-							<th>Type</th>
-							<th>Description</th>
-						</thead>
-						<tbody>
-							<tr ng-repeat="p in flatProperties track by $index">
-								<td class="propertycell">
-									<span ng-if="p.level>1">
-										<span ng-repeat="i in getCountArray(p.level-1) track by $index" class="indent">&nbsp;</span>
-									</span>
-									<span ng-if="p.level>0">&#9493;</span> 
-									{{p.prop}}
-									<span ng-if="p.required"><br>
-										<span class="paramproperties">
-											<span ng-repeat="i in getCountArray(p.level) track by $index" class="indent">&nbsp;</span>
-											required
-										</span>
-									</span>
-								</td>
-								<td class="type">{{p.def.type}} <span ng-if="p.def.type=='array'">({{p.def.items.type}})</span></td>
-								<td style="padding-bottom: 0">
-									<div marked="p.def.description"></div>
-									<p ng-if="p.def.default">Default: <span ng-if="p.def.type=='string'">"</span>{{p.def.default}}<span ng-if="p.def.type=='string'">"</span></p>
-									<p ng-if="p.def.example">Example: <span ng-if="p.def.type=='string'">"</span>{{p.def.example}}<span ng-if="p.def.type=='string'">"</span></p>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-					<p>Request Body Example:</p>
-					<div marked="getExampleMarked(body.schema)"></div>
-				</div>
-				-->
+		<div *ngIf="apis.getBodyParameter(api, path, method.key) as body">
+			<h5>Request Body <span *ngFor="let consume of apis.getConsumes(api, path, method.key)">({{consume}}) </span></h5>
+			<markdown>{{body['description']}}</markdown>
+			<div *ngIf="body['schema'] as bodySchema">
+				<p>Schema: {{bodySchema['type']}} 
+					<span *ngIf="bodySchema['type']=='array'">
+						of {{bodySchema['items']['type']}}
+					</span>
+				</p>
+				<markdown>{{bodySchema['description']}}</markdown>
+				<schema-print-view [schema]="bodySchema" [type]="'Request'"></schema-print-view>
+			</div>
+		</div>
+
+		<h5>Responses</h5>
+		<div class="responsebox" *ngFor="let resp of apis.keys(method.obj['responses'])">
+			<h6 class="responseheading">{{resp}}: {{method.obj['responses'][resp]['description']}}</h6>
+			<div *ngIf="method.obj['responses'][resp]['schema'] as respSchema">
+				<p>Schema: {{respSchema['type']}} 
+					<span *ngIf="respSchema['type']=='array' && respSchema['items']">
+						of {{respSchema['items']['type']}}
+					</span>
+				</p>
+				<markdown>{{respSchema['description']}}</markdown>
+				<schema-print-view [schema]="respSchema" [type]="'Response'"></schema-print-view>
 			</div>
 		</div>
 	</div>
