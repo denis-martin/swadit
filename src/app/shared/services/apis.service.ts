@@ -570,4 +570,88 @@ export class ApisService
 				});
 		});
 	}
+
+	getMethods(path: string): Array<object>
+	{
+		if (!this.current['paths']) return [];
+		let methodKeys = this.keys(this.current['paths'][path]);
+		_.pull(methodKeys, "parameters");
+		let methods: Array<object> = [];
+		methodKeys.forEach(m => methods.push({ 
+			key: m,
+			obj: this.current['paths'][path][m] 
+		}));
+		return methods;
+	}
+
+	getParameters(path: string, method: string, includeBody: boolean = true): Array<object>
+	{
+		if (!this.current['paths']) return [];
+		if (!this.current['paths'][path]) return [];
+		if (!this.current['paths'][path][method]) return [];
+
+		let parameters: Array<object> = [];
+		if (this.current['paths'][path]['parameters']) {
+			parameters = parameters.concat(this.current['paths'][path]['parameters']);
+		}
+		if (this.current['paths'][path][method]['parameters']) {
+			parameters = parameters.concat(this.current['paths'][path][method]['parameters']);
+		}
+		if (!includeBody) {
+			_.remove(parameters, p => { return p['in'] == 'body'; });
+		}
+		return parameters;
+	}
+
+	getBodyParameter(path: string, method: string): object
+	{
+		if (!this.current['paths']) return null;
+		if (!this.current['paths'][path]) return null;
+		if (!this.current['paths'][path][method]) return null;
+
+		let body: object = null;
+		if (this.current['paths'][path]['parameters']) {
+			this.current['paths'][path]['parameters'].forEach(p => {
+				if (p['in'] == 'body') {
+					body = p;
+				}
+			});
+		}
+		if (this.current['paths'][path][method]['parameters']) {
+			this.current['paths'][path][method]['parameters'].forEach(p => {
+				if (p['in'] == 'body') {
+					body = p;
+				}
+			});
+		}
+		return body;
+	}
+
+	getConsumes(path: string, method: string): any
+	{
+		if (!this.current['paths']) return null;
+		if (!this.current['paths'][path]) return null;
+		if (!this.current['paths'][path][method]) return null;
+
+		if (this.current['paths'][path][method]['consumes']) {
+			return this.current['paths'][path][method]['consumes'];
+		} else if (this.current['consumes']) {
+			return this.current['consumes'];
+		}
+		return null;
+	}
+
+	getProduces(path: string, method: string): any
+	{
+		if (!this.current['paths']) return null;
+		if (!this.current['paths'][path]) return null;
+		if (!this.current['paths'][path][method]) return null;
+
+		if (this.current['paths'][path][method]['produces']) {
+			return this.current['paths'][path][method]['produces'];
+		} else if (this.current['produces']) {
+			return this.current['produces'];
+		}
+		return null;
+	}
 }
