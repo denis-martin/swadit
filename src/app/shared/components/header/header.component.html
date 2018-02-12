@@ -36,10 +36,18 @@
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" [routerLink]="['/source']">
 							<i class="fa fa-fw fa-align-left"></i> {{ 'Edit Source' | translate }}</a>
+						<a class="dropdown-item" [routerLink]="['/swaggerui']" title="Preview in Swagger UI">
+							<i class="fa fa-fw fa-eye"></i> {{ 'Swagger UI' | translate }}</a>
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.settingsModal()">
 							<i class="fa fa-fw fa-cog"></i> {{ 'Settings' | translate }}</a>
 					</div>
+				</li>
+				<li class="nav-item">
+					<a href="javascript:void(0)" class="nav-link" [routerLink]="['/swaggerui']">
+						<img src="/assets/images/swagger-ui-32x32.png" class="swagger-ui-logo" 
+							title="Preview in Swagger UI"> 
+					</a>
 				</li>
 				<!--
 				<li class="nav-item dropdown" ngbDropdown>

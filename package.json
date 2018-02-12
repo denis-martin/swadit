@@ -43,6 +43,7 @@
     "prismjs": "^1.10.0",
     "rxjs": "^5.5.2",
     "swagger-parser": "^4.0.1",
+    "swagger-ui-dist": "^3.10.0",
     "webpack": "^3.8.1",
     "zone.js": "^0.8.18"
   },

@@ -164,3 +164,7 @@ pre[class*="language-"]>code {
 	border: none;
 	box-shadow: 0px 0px 0px 1px #dfdfdf;
 }
+
+#swaggerui td.col, #swaggerui th.col {
+	width: auto;
+}
