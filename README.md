@@ -1,7 +1,13 @@
 # Swadit
-A visual editor for Swagger files ([Demo](https://swadit.misc-net.de)).
+A visual editor for Swagger files supporting the 'API first' approach ([Demo](https://swadit.misc-net.de)).
 
 This is a complete rewrite of the [first version](https://github.com/denis-martin/swadit/tree/javascript) ([Demo](https://swaditjs.misc-net.de) of the first version). Instead of AngularJS and JavaScript, this new version is based on TypeScript and Angular4, which are much more suitable for the given tasks. However, it will take some time until feature parity is reached (at least to a certain extend).
+
+Currently supported features include:
+*  Visual editing of the most common Swagger elements (no need to understand Swagger/OpenAPI 2.0).
+*  Preview in Swagger UI.
+*  Generation of a print preview (to generate PDF files).
+*  Editing the Swagger source in YAML format including a validation of the Swagger file.
 
 
 ## Prepare
@@ -11,13 +17,6 @@ npm install
 npm run build
 ```
 The deployable files can then be found in the 'dist' folder.
-
-If you want Swagger UI to be integrated into Swadit, simply clone my fork of the Swagger UI repository into the Swadit folder as "swagger-ui":
-```
-cd swadit
-git clone https://github.com/denis-martin/swagger-ui.git swagger-ui
-```
-This fork includes minor adaptations to fetch the currently loaded Swagger file from Swadit into Swagger UI as blob-URLs. This means that the Swagger file is handed over to Swagger UI locally within the browser without any server support.
 
 
 ## Run
