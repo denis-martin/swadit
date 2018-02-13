@@ -45,7 +45,10 @@ export class PathComponent implements OnInit {
 	editModal: NgbModalRef;
 
 	constructor(public apis: ApisService, private modalService: NgbModal,
-		private route: ActivatedRoute, private router: Router) {
+		private route: ActivatedRoute, private router: Router) 
+	{
+		this.apis.activePath = this.path;
+		
 		this.routeSubscription = this.route.params.subscribe(params => {
 			this.path = params['path'];
 			this.method = params['method'];
@@ -58,6 +61,8 @@ export class PathComponent implements OnInit {
 					this.method = null;
 				}
 			}
+
+			this.apis.activePath = this.path;
 		});
 		this.apis.eventApiChanged.subscribe(param => {
 			if (!this.apis.current['paths'][this.path]) {

@@ -10,6 +10,7 @@ import { DefinitionEditComponent } from './definition-edit/definition-edit.compo
 import { ParameterEditComponent } from './parameter-edit/parameter-edit.component';
 import { ResponseEditComponent } from './response-edit/response-edit.component';
 import { PathEditComponent } from './path-edit/path-edit.component';
+import { ConfirmComponent } from './confirm/confirm.component';
 
 @NgModule({
 	imports: [
@@ -22,19 +23,22 @@ import { PathEditComponent } from './path-edit/path-edit.component';
 		DefinitionEditComponent,
 		ParameterEditComponent,
 		ResponseEditComponent,
-		PathEditComponent
+		PathEditComponent,
+		ConfirmComponent
 	],
 	exports: [
 		DefinitionEditComponent,
 		ParameterEditComponent,
 		ResponseEditComponent,
-		PathEditComponent
+		PathEditComponent,
+		ConfirmComponent
 	],
 	entryComponents: [
 		DefinitionEditComponent,
 		ParameterEditComponent,
 		ResponseEditComponent,
-		PathEditComponent
+		PathEditComponent,
+		ConfirmComponent
 	]
 })
 export class EditorModalsModule { }

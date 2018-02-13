@@ -13,6 +13,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from './shared';
 import { FileModalComponent } from './shared/components/file-modal/file-modal.component';
+import { EditorModalsModule } from './shared/modules/editor-modals/editor-modals.module';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: Http) {
@@ -39,6 +40,7 @@ export function HttpLoaderFactory(http: Http) {
             }
         }),
         NgbModule.forRoot(),
+        EditorModalsModule
     ],
     providers: [AuthGuard, ApisService],
     bootstrap: [AppComponent],

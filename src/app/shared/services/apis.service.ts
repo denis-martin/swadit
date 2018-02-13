@@ -26,6 +26,7 @@ import * as YAML from 'js-yaml';
 import * as _ from "lodash";
 
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
+import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
 
 import * as Swagger20SchemaRoot from '../schemas/2.0/swagger-root.json';
 import * as Swagger20SchemaInfo from '../schemas/2.0/swagger-info.json';
@@ -446,6 +447,14 @@ export class ApisService
 		return Object.keys(obj);
 	}
 
+	getLength(obj: any): number
+	{
+		if (!obj) return 0;
+		if (Array.isArray(obj)) return obj.length;
+		if (typeof obj == "object") return Object.keys(obj).length;
+		return null;
+	}
+
 	missingRequiredProperties(schema: any, obj: any): Array<string>
 	{
 		let missingFields = [];
@@ -465,6 +474,50 @@ export class ApisService
 			delete this.selectedPaths[path];
 		} else { 
 			this.selectedPaths[path] = true;
+		}
+	}
+
+	selectAllPaths()
+	{
+		Object.keys(this.current['paths']).forEach(p => this.selectedPaths[p] = true);
+	}
+
+	deselectAllPaths()
+	{
+		this.selectedPaths = {};
+	}
+
+	deleteSelectedPaths()
+	{
+		var paths = Object.keys(this.selectedPaths);
+		if (paths.length == 0) {
+			ConfirmComponent.open(this.modalService, "Please select a path.", "Ok", null);
+		} else {
+			ConfirmComponent.open(this.modalService, "Delete " + paths.length + " paths?")
+				.then((result) => {
+					console.info("deleteSelectedPaths()", result);
+					paths.forEach(p => delete this.current['paths'][p]);
+					this.selectedPaths = {};
+				})
+				.catch((reason) => {});
+		}
+	}
+
+	inverseSelectedPaths()
+	{
+		var paths = Object.keys(this.selectedPaths);
+		if (paths.length == 0) {
+			this.selectAllPaths();
+		} else if (paths.length == Object.keys(this.current['paths']).length) {
+			this.deselectAllPaths();
+		} else {
+			Object.keys(this.current['paths']).forEach(p => {
+				if (this.selectedPaths[p]) {
+					delete this.selectedPaths[p];
+				} else {
+					this.selectedPaths[p] = true;
+				}
+			});
 		}
 	}
 
