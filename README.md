@@ -1,21 +1,36 @@
 # Swadit
-A visual editor for Swagger files supporting the 'API first' approach ([Demo](https://swadit.misc-net.de)).
-
-This is a complete rewrite of the [first version](https://github.com/denis-martin/swadit/tree/javascript) ([Demo](https://swaditjs.misc-net.de) of the first version). Instead of AngularJS and JavaScript, this new version is based on TypeScript and Angular4, which are much more suitable for the given tasks. However, it will take some time until feature parity is reached (at least to a certain extend).
+A visual editor for Swagger/OpenAPI files supporting the 'API first' approach ([Demo](https://swadit.misc-net.de)): Design your API first, then start coding with generated code stubs!
 
 Currently supported features include:
-*  Visual editing of the most common Swagger elements (no need to understand Swagger/OpenAPI 2.0).
-*  Preview in Swagger UI.
-*  Generation of a print preview (to generate PDF files).
-*  Editing the Swagger source in YAML format including a validation of the Swagger file.
+*  Design your REST API visually (no need to understand the Swagger/OpenAPI specification).
+*  Preview your API with a single click in Swagger UI.
+*  Generate a preview for printing a PDF file.
+*  Open/save your API as Swagger/OpenAPI file.
+*  For the expert: Edit the Swagger/OpenAPI source of your API in YAML format (with validation).
+
+Swadit is completely run within your browser:
+*  No need to install server-side software (except for a web server, of course).
+*  Your API definition remains within your browser and is not sent to any server. You may even use, e.g., [NW.js](https://nwjs.io/) to run it as a local tool, so not even a web server is necessary (see below).
 
 
 ## Prepare
-Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies and compile the typescript sources to javascript:
+Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies
 ```
 npm install
+```
+
+Since the print preview (swadoc) is a standalone Node package, you'll need to install its dependencies separately:
+```
+cd src/assets/swadoc
+npm install
+cd ../../..
+```
+
+Finally, compile the typescript sources to javascript:
+```
 npm run build
 ```
+
 The deployable files can then be found in the 'dist' folder.
 
 
@@ -27,6 +42,10 @@ During development, you may run a live server with @angular/cli:
 ng serve
 ```
 
+## History
+
+This is a complete rewrite of the [first version](https://github.com/denis-martin/swadit/tree/javascript) ([Demo](https://swaditjs.misc-net.de) of the first version). Instead of AngularJS and JavaScript, this new version is based on TypeScript and Angular4, which are much more suitable for the given tasks. However, it will take some time until feature parity is reached (at least to a certain extend).
+
 
 ## Acknowledgements
 
@@ -35,7 +54,7 @@ The template is based on [SB-Admin-BS4-Angular-4](https://github.com/start-angul
 
 ## Copyright & License
 
-Copyright 2017 Denis Martin.
+Copyright 2016-2018 Denis Martin.
 
 swadit is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
