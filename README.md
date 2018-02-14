@@ -14,7 +14,7 @@ Swadit is completely run within your browser:
 
 
 ## Prepare
-Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies
+Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies:
 ```
 npm install
 ```
