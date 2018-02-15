@@ -1,13 +1,12 @@
 {
   "name": "swadit",
-  "version": "1.0.1",
+  "version": "1.0.1alpha",
   "license": "GPLv3",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --ec true --port 4201",
     "build": "ng build --prod",
-    "gitbuild": "ng build --prod --base /start-angular/SB-Admin-BS4-Angular-4/master/dist/",
-    "test": "ng test",
+    "test": "ng build",
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
