@@ -8,9 +8,9 @@
       "root": "src",
       "outDir": "dist",
       "assets": [
-        "assets",
-        "favicon.ico",
-        ".htaccess"
+        "./assets",
+        "./favicon.ico",
+        "./.htaccess"
       ],
       "index": "index.html",
       "main": "main.ts",
@@ -23,7 +23,7 @@
         "../node_modules/font-awesome/css/font-awesome.css",
         "../node_modules/prismjs/themes/prism-coy.css",
         "../node_modules/swagger-ui-dist/swagger-ui.css",
-        "styles/app.scss"
+        "./styles/app.scss"
       ],
       "scripts": [
         "../node_modules/marked/lib/marked.js",
@@ -36,10 +36,10 @@
         "../node_modules/swagger-ui-dist/swagger-ui-bundle.js",
         "../node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js"
       ],
-      "environmentSource": "environments/environment.ts",
+      "environmentSource": "./environments/environment.ts",
       "environments": {
-        "dev": "environments/environment.ts",
-        "prod": "environments/environment.prod.ts"
+        "dev": "./environments/environment.ts",
+        "prod": "./environments/environment.prod.ts"
       }
     }
   ],
