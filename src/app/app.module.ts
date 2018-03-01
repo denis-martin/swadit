@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Http, HttpModule } from '@angular/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -16,10 +16,10 @@ import { FileModalComponent } from './shared/components/file-modal/file-modal.co
 import { EditorModalsModule } from './shared/modules/editor-modals/editor-modals.module';
 
 // AoT requires an exported function for factories
-export function HttpLoaderFactory(http: Http) {
+export function createTranslateLoader(http: HttpClient) {
     // for development
     // return new TranslateHttpLoader(http, '/start-angular/SB-Admin-BS4-Angular-4/master/dist/assets/i18n/', '.json');
-    return new TranslateHttpLoader(http, '/assets/i18n/', '.json');
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json');
 }
 @NgModule({
     declarations: [
@@ -30,13 +30,13 @@ export function HttpLoaderFactory(http: Http) {
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
-        HttpModule,
+        HttpClientModule,
         AppRoutingModule,
         TranslateModule.forRoot({
             loader: {
                 provide: TranslateLoader,
-                useFactory: HttpLoaderFactory,
-                deps: [Http]
+                useFactory: createTranslateLoader,
+                deps: [HttpClient]
             }
         }),
         NgbModule.forRoot(),
