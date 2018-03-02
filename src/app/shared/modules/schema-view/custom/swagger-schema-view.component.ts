@@ -57,4 +57,24 @@ export class SwaggerSchemaViewComponent implements OnInit
 	{
 		return this.obj['required'] && this.obj['required'].indexOf(propKey) >= 0;
 	}
+
+	getTypePreview(obj: any): string
+	{
+		let tp: string = "";
+		if (Array.isArray(obj["allOf"]) && obj["allOf"].length > 0) {
+			obj = obj["allOf"][0];
+		}
+		
+		tp = obj['type'] || obj['$ref'];
+		if (obj['type'] == 'array' && obj['items']) {
+			tp = tp + " (" + obj['items']['type'] || obj['items']['$ref'] + ")";
+		}
+		if (obj['format']) {
+			tp = tp + " (" + obj['format'] + ")";
+		}
+		if (obj['readOnly']) {
+			tp = tp + " read only";
+		}
+		return tp;
+	}
 }

@@ -15,7 +15,28 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<table class="swagger-schema-editor border-left">
+<div *ngIf="obj['allOf']">
+	<div *ngFor="let allOfObj of obj['allOf']; let i = index">
+		<label>Composite schema item {{i+1}}:</label>
+		<span class="clickable" (click)="deleteAllOfItem($event, i)">
+			<i class="fa fa-fw fa-trash"></i>
+		</span>
+		<swadit-swagger-schema-editor [(obj)]="obj['allOf'][i]" [allowComposite]="false">
+		</swadit-swagger-schema-editor>
+	</div>
+	<button
+		type="button" class="btn" (click)="addToAllOf(obj)"
+		title='adds a new schema to the composite ("allOf")'>
+		add schema
+	</button>
+	<button *ngIf="obj['allOf'].length <= 1"
+		type="button" class="btn" (click)="convertToSingleSchema(obj)"
+		title='remove the composite ("allOf")'>
+		remove composite
+	</button>
+</div>
+
+<table *ngIf="!obj['allOf']" class="swagger-schema-editor border-left">
 	<tr *ngIf="obj['$ref']">
 		<td class="label-text">$ref</td>
 		<td>
@@ -116,8 +137,8 @@
 						<span>
 							<i *ngIf="!uncollapsed[propKey]" class="fa fa-fw-sm fa-caret-right"></i>
 							<i *ngIf="uncollapsed[propKey]" class="fa fa-fw-sm fa-caret-down"></i>
-							<span *ngIf="!obj['properties'][propKey]['$ref'] && obj['properties'][propKey]['type']">
-								{{obj['properties'][propKey]['type']}}</span>
+							<span *ngIf="!obj['properties'][propKey]['$ref'] && (obj['properties'][propKey]['type'] || obj['properties'][propKey]['allOf'])">
+								{{getType(obj['properties'][propKey])}}</span>
 							<span *ngIf="obj['properties'][propKey]['$ref']">
 								$ref</span>
 						</span>
@@ -154,6 +175,17 @@
 					<i class="fa fa-fw fa-plus"></i>
 				</div>
 			</div>
+		</td>
+	</tr>
+
+	<tr *ngIf="allowComposite && (obj['$ref'] || obj['type']=='object')">
+		<td class="label-text">&nbsp;</td>
+		<td>
+			<button 
+				class="btn" (click)="convertToAllOf(obj)"
+				title='create a composite schema ("allOf")'>
+				create composite
+			</button>
 		</td>
 	</tr>
 </table>

@@ -416,8 +416,35 @@ export class ApisService
 
 	resolveObj(obj: any): any
 	{
-		if (obj && obj['$ref']) {
-			return this.resolveRef(obj['$ref']);
+		if (obj) {
+			if (obj['$ref']) {
+				obj = this.resolveRef(obj['$ref']);
+			}
+			if (Array.isArray(obj['allOf'])) {
+				let mergedObj = {};
+				obj['allOf'].forEach(o => {
+					o = this.resolveObj(o);
+					for (let key of Object.keys(o)) {
+						if (!mergedObj[key]) {
+							mergedObj[key] = _.cloneDeep(o[key]);
+						}
+					}	
+					if (o["properties"]) {
+						if (!mergedObj["properties"]) {
+							mergedObj["properties"] = {};
+						}
+						for (let p of Object.keys(o["properties"])) {
+							// no recursive resolving
+							mergedObj["properties"][p] = o["properties"][p];
+						}
+					}
+					// TODO: additionalProperties? patternedProperties?
+					if (mergedObj["type"] != o["type"]) {
+						console.warn("allOf objects have different types");
+					}
+				});
+				obj = mergedObj;
+			}
 		}
 		return obj;
 	}

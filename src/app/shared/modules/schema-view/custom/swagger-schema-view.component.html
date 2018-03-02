@@ -17,28 +17,28 @@
 
 <table>
 	<tbody>
-		<tr *ngIf="(obj['type'] != 'object' && obj['type'] != 'array') || (obj['type'] == 'object' && !obj['properties']) || (obj['type'] == 'array' && !obj['items'])">
+		<tr *ngIf="obj['allOf']">
+			<td class="label-text">all of</td>
+			<td style="padding: 0">
+				<div *ngFor="let allOfObj of obj['allOf']">
+					<swadit-swagger-schema-view [obj]="apis.resolveObj(allOfObj)">
+					</swadit-swagger-schema-view>
+				</div>
+			</td>
+		</tr>
+		<tr *ngIf="obj['type'] && ((obj['type'] != 'object' && obj['type'] != 'array') || (obj['type'] == 'object' && !obj['properties']) || (obj['type'] == 'array' && !obj['items']))">
 			<td class="label-text">type</td>
 			<td>{{obj['type']}}</td>
 		</tr>
 		<tr *ngIf="obj['properties']">
-			<td class="label-text" *ngIf="obj['type'] != 'object'">properties</td>
-			<td class="label-text" *ngIf="obj['type'] == 'object'">object</td>
+			<td class="label-text" *ngIf="obj['type'] && obj['type'] != 'object'">properties</td>
+			<td class="label-text" *ngIf="obj['type'] == 'object' || !obj['type']">object</td>
 			<td>
 				<div *ngFor="let p of keys(obj['properties'])">
 					<div class="clickable" (click)="uncollapsed[p] = !uncollapsed[p]">
 						<span class="property">{{p}}<span *ngIf="propertyIsRequired(p)" style="color: red">*</span></span>
 						<span class="propertyType">: 
-							{{obj['properties'][p]['type'] || obj['properties'][p]['$ref']}}
-							<span *ngIf="obj['properties'][p]['type'] == 'array'">
-								({{obj['properties'][p]['items']['type'] || obj['properties'][p]['items']['$ref']}})
-							</span>
-							<span *ngIf="obj['properties'][p]['format']">
-								({{obj['properties'][p]['format']}})
-							</span>
-							<span *ngIf="obj['properties'][p]['readOnly']">
-								read only
-							</span>
+							{{getTypePreview(obj['properties'][p])}}
 						</span>
 						<span class="propertyDescription" *ngIf="obj['properties'][p]['description']">
 							{{obj['properties'][p]['description'].length > 40 ? obj['properties'][p]['description'].substr(0,39) + '...' : obj['properties'][p]['description']}}
@@ -98,7 +98,7 @@
 				</markdown>
 			</td>
 		</tr>
-		<tr *ngIf="generateExample && (obj['type'] == 'object' || obj['type'] == 'array')">
+		<tr *ngIf="generateExample && (obj['type'] == 'object' || obj['type'] == 'array' || obj['allOf'])">
 			<td class="label-text">example</td>
 			<td>
 				<span class="clickable" (click)="showGeneratedExample = !showGeneratedExample">

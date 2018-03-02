@@ -31,6 +31,7 @@ export class SwaggerSchemaEditorComponent implements OnInit
 {
 	@Input() schema: any;
 	@Input() id: string;
+	@Input() allowComposite: boolean = true;
 
 	private _obj: any;
 	@Input() 
@@ -120,5 +121,55 @@ export class SwaggerSchemaEditorComponent implements OnInit
 			}
 			this.obj['required'].push(propKey);
 		}
+	}
+
+	deleteAllOfItem(event: any, index: number)
+	{
+		this.obj["allOf"].splice(index, 1);
+	}
+
+	convertToAllOf(obj: any)
+	{
+		let items = [];
+		let o = {};
+		for (let k of Object.keys(obj)) {
+			o[k] = obj[k];
+			delete obj[k];
+		}
+		items.push(o);
+		obj['allOf'] = items;
+	}
+
+	convertToSingleSchema(obj: any)
+	{
+		let o = {};
+		if (Array.isArray(obj['allOf']) && obj['allOf'].length > 0) {
+			o = obj['allOf'][0];
+		}
+		delete obj['allOf'];
+		for (let k of Object.keys(o)) {
+			obj[k] = o[k];
+		}
+	}
+
+	addToAllOf(obj: any)
+	{
+		obj['allOf'].push({});
+		return 0;
+	}
+
+	getType(obj: any)
+	{
+		if (obj['type']) {
+			return obj['type'];
+		} else if (Array.isArray(obj['allOf']) && obj['allOf'].length > 0) {
+			if (obj['allOf'][0]['type']) {
+				return obj['allOf'][0]['type'] + "*";
+
+			} else if (obj['allOf'][0]['$ref']) {
+				return "$ref*";
+			}
+		}
+		return "";
 	}
 }

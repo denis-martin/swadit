@@ -70,7 +70,7 @@ export class DefinitionEditComponent implements OnInit
 			return;
 		}
 
-		if (!this.obj['type'] && !this.obj['$ref']) {
+		if (!this.obj['type'] && !this.obj['$ref'] && !Array.isArray(this.obj['allOf'])) {
 			this.errorStr = "Please enter a type or $ref.";
 			return;
 		}
