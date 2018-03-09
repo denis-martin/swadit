@@ -103,7 +103,7 @@ export class ApisService
 	constructor(private modalService: NgbModal, private router: Router) 
 	{
 		console.info("APIs service initialized");
-		this.openFile("/assets/petstore.yaml", null);
+		this.openFile("assets/petstore.yaml", null);
 	}
 
 	openFile(pathName: string, fobj)
