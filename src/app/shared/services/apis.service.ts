@@ -103,7 +103,7 @@ export class ApisService
 	constructor(private modalService: NgbModal, private router: Router) 
 	{
 		console.info("APIs service initialized");
-		this.openFile("assets/petstore.yaml", null);
+		//this.openFile("assets/petstore.yaml", null);
 	}
 
 	openFile(pathName: string, fobj)
@@ -243,6 +243,12 @@ export class ApisService
 						});
 					}
 					*/
+					// remove undefined properties
+					this.keys(api).forEach(p => {
+						if (!schema['properties'][p] && (api[p] === undefined || api[p] === null)) {
+							delete api[p];
+						}
+					});
 				// TODO: properties AND additionalProperties
 				} else if (schema['additionalProperties']) {
 					this.keys(api).forEach(p => {
