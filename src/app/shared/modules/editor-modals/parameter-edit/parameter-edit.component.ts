@@ -53,7 +53,6 @@ export class ParameterEditComponent implements OnInit
 		this.obj_orig = this.obj;
 		if (!this.obj_orig) this.obj_orig = {};
 		this.obj = _.cloneDeep(this.obj_orig);
-		if (!this.obj['schema']) this.obj['schema'] = { type: 'object' };
 	}
 
 	ok() 
