@@ -43,7 +43,8 @@ export class FileModalComponent implements OnInit
     ok()
     {
 		if (this.dialogType == "fileOpen" || this.dialogType == "fileAdd") {
-			this.activeModal.close(this.files);
+			console.log("fileModal addSource", this.addSource)
+			this.activeModal.close({ files: this.files, addSource: this.addSource });
 		} else {
 			FileSaver.saveAs(this.blob, this.fileName);
 			this.activeModal.close(this.fileName);

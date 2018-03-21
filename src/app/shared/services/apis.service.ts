@@ -87,6 +87,9 @@ export class ApisService
 	public lastLoaded: string;
 	public hasLoadingErrors: boolean = false;
 
+	filesToAdd = [];
+	filesToAddIndex = 0;
+
 	private _eventApiChanged = new Subject<string>();
 	eventApiChanged = this._eventApiChanged.asObservable();
 
@@ -121,6 +124,30 @@ export class ApisService
 				try {
 					SwaggerParser.parse(YAML.safeLoad(reader.result))
 						.then(api => { apis.swaggerLoaded(api, fobj.name); })
+						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
+				} catch (ex) {
+					apis.swaggerLoadingError(ex, fobj.name);
+				}
+			}
+			reader.readAsText(fobj);
+		}
+	}
+
+	addFile(pathName: string, fobj: any = null, addSource = false)
+	{
+		console.log("addFile", pathName, fobj, addSource);
+		if (pathName) {
+			SwaggerParser.parse(pathName)
+				.then(api => { this.mergeSwagger(api, null, addSource); })
+				.catch(err => { this.swaggerLoadingError(err); });
+		} else {
+			let apis = this;
+			let reader = new FileReader();
+			reader.onload = function(e) {
+				apis.lastLoaded = reader.result;
+				try {
+					SwaggerParser.parse(YAML.safeLoad(reader.result))
+						.then(api => { apis.mergeSwagger(api, fobj.name, addSource); })
 						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {
 					apis.swaggerLoadingError(ex, fobj.name);
@@ -167,6 +194,127 @@ export class ApisService
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
 		this._eventApiChanged.next(this.currentFileName);
 		this.router.navigate(['/source']);
+	}
+
+	mergeSwagger(api, sourceName: string = null, addSource = false)
+	{
+		console.log("mergeSwagger", api, sourceName, addSource);
+		let apis = this;
+
+		var addedPath = [];
+		var replacedPath = [];
+		var addedParameters = [];
+		var replacedParameters = [];
+		var addedDefinitions = [];
+		var replacedDefinitions = [];
+		var addedResponses = [];
+		var replacedResponses = [];
+		
+		if (api.hasOwnProperty('paths')) {
+			Object.keys(api.paths).forEach(function(element) {
+				if (apis.current['paths'].hasOwnProperty(element)) {
+					// replace path
+					console.log("Replacing " + element);
+					apis.current['paths'][element] = api.paths[element];
+					replacedPath.push(element);
+
+				} else {
+					// add new path
+					console.log("Adding " + element);
+					apis.current['paths'][element] = api.paths[element];
+					addedPath.push(element);
+				}
+				if (addSource && sourceName) {
+					for (let k of Object.keys(apis.current['paths'][element])) {
+						if (k != "parameters") {
+							if (!apis.current['paths'][element][k].description) {
+								apis.current['paths'][element][k].description = "";
+							}
+							apis.current['paths'][element][k].description = "Source: " + sourceName + "\n\n" + 
+								apis.current['paths'][element][k].description;
+						}
+					}
+				}
+				apis.selectedPaths[element] = true;
+			});
+			console.log("Replaced paths", replacedPath);
+			console.log("Added paths", addedPath);
+		}
+
+		if (api.hasOwnProperty('parameters')) {
+			if (!apis.current['parameters']) {
+				apis.current['parameters'] = {};
+			}
+			Object.keys(api.parameters).forEach(function(element) {
+				if (apis.current['parameters'].hasOwnProperty(element)) {
+					// replace parameter
+					console.log("Replacing " + element);
+					apis.current['parameters'][element] = api.parameters[element];
+					replacedParameters.push(element);
+
+				} else {
+					// add new parameter
+					console.log("Adding " + element);
+					apis.current['parameters'][element] = api.parameters[element];
+					addedParameters.push(element);
+				}
+			});
+			console.log("Replaced parameters", replacedParameters);
+			console.log("Added parameters", addedParameters);
+		}
+
+		if (api.hasOwnProperty('definitions')) {
+			if (!apis.current['definitions']) {
+				apis.current['definitions'] = {};
+			}
+			Object.keys(api.definitions).forEach(function(element) {
+				if (apis.current['definitions'].hasOwnProperty(element)) {
+					// replace definitions
+					console.log("Replacing " + element);
+					apis.current['definitions'][element] = api.definitions[element];
+					replacedDefinitions.push(element);
+
+				} else {
+					// add new definitions
+					console.log("Adding " + element);
+					apis.current['definitions'][element] = api.definitions[element];
+					addedDefinitions.push(element);
+				}
+			});
+			console.log("Replaced definitions", replacedDefinitions);
+			console.log("Added definitions", addedDefinitions);
+		}
+
+		if (api.hasOwnProperty('responses')) {
+			if (!apis.current['responses']) {
+				apis.current['responses'] = {};
+			}
+			Object.keys(api.responses).forEach(function(element) {
+				if (apis.current['responses'].hasOwnProperty(element)) {
+					// replace response
+					console.log("Replacing " + element);
+					apis.current['responses'][element] = api.responses[element];
+					replacedResponses.push(element);
+
+				} else {
+					// add new response
+					console.log("Adding " + element);
+					apis.current['responses'][element] = api.responses[element];
+					addedResponses.push(element);
+				}
+			});
+			console.log("Replaced responses", replacedResponses);
+			console.log("Added responses", addedResponses);
+		}
+		
+		this.filesToAddIndex++;
+		if (this.filesToAddIndex < this.filesToAdd.length) {
+			this.addFile(null, this.filesToAdd[this.filesToAddIndex], addSource);
+			
+		} else {
+			this.filesToAdd = [];
+
+		}
 	}
 
 	toYaml(obj: Object): string
@@ -317,13 +465,34 @@ export class ApisService
 		this.fileModal.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 			console.info("openFileModal(): " + this.closeResult);
-			if (result.length > 0) {
-				this.openFile(null, result[0]);
+			if (result.files.length > 0) {
+				this.openFile(null, result.files[0]);
 			}
 			
         }, (reason) => {
 			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
 			console.warn("openFileModal(): " + this.closeResult);
+
+        });
+	}
+	
+	addFilesModal()
+	{
+		console.log("addFileModal()");
+		this.fileModal = this.modalService.open(FileModalComponent, FileModalComponent.modalOptions);
+		this.fileModal.componentInstance.dialogType = "fileAdd";
+		this.fileModal.result.then((result) => {
+			this.closeResult = `Closed with: ${result}`;
+			console.info("addFileModal(): closed with ", result);
+			if (result.files.length > 0) {
+				this.filesToAddIndex = 0;
+				this.filesToAdd = result.files;
+				this.addFile(null, this.filesToAdd[this.filesToAddIndex], result.addSource);
+			}
+			
+        }, (reason) => {
+			this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+			console.warn("addFileModal(): dismissed with ", this.getDismissReason(reason));
 
         });
 	}
@@ -366,11 +535,6 @@ export class ApisService
 			console.warn("downloadFileModal(): " + this.closeResult);
 
         });
-	}
-
-	addFilesModal()
-	{
-		alert('Not yet implemented');
 	}
 
 	filterList(list: Array<string>, filterText: string, sorted: boolean = false): Array<string>

@@ -5,7 +5,10 @@
 	<div class="modal-body" id="modal-body">
 		<p *ngIf="dialogType=='fileOpen'"><input type="file" (change)="onFileChange($event)" class="form-control"></p>
 		<p *ngIf="dialogType=='fileAdd'"><input type="file" (change)="onFileChange($event)" multiple class="form-control"></p>
-		<p *ngIf="dialogType=='fileAdd'"><input type="checkbox" [(ngModel)]="addSource" class="form-control"> Add source file name to path descriptions</p>
+		<p *ngIf="dialogType=='fileAdd'" class="form-check">
+			<input type="checkbox" [(ngModel)]="addSource" name="addSource" id="addSource">
+			<label for="addSource">Add source file name to path descriptions</label>
+		</p>
 		<p *ngIf="dialogType=='fileDownload'">
 			<label for="fileName">File name to download</label>
 			<input type="text" [(ngModel)]="fileName" class="form-control" name="fileName">
