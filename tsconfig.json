@@ -10,11 +10,18 @@
     "experimentalDecorators": true,
     "target": "es5",
     "typeRoots": [
-      "node_modules/@types"
+      "./node_modules/@types"
     ],
     "lib": [
-      "es2016",
+      "es2017",
       "dom"
-    ]
+    ],
+    "paths": {
+      // json-schema-ref-parser has http/https require()s which angular-cli >= 6 does not support anymore:
+      // https://github.com/angular/angular-cli/issues/9827#issuecomment-369578814
+      // json-schema-ref-parser is a dependency for swagger-parser. By including the dist-version of
+      // swagger-parser, we avoid the direct inclusion of json-schema-ref-parser.
+      "swagger-parser": ["./node_modules/swagger-parser/dist/swagger-parser.js"]
+    },
   }
 }

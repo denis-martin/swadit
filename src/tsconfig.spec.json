@@ -2,17 +2,24 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "outDir": "../out-tsc/spec",
-        "module": "commonjs",
+        "module": "es2015",
         "target": "es5",
-        "baseUrl": "",
+        "baseUrl": "./",
+        "typeRoots": [
+            "../node_modules/@types"
+        ],
         "types": [
             "jasmine",
             "node"
-        ]
+        ],
+        "paths": {
+            "swagger-parser": ["../node_modules/swagger-parser/dist/swagger-parser.js"]
+        },
     },
     "files": [
-        "test.ts"
-    ],
+        "test.ts",
+      "polyfills.ts"
+  ],
     "include": [
         "**/*.spec.ts",
         "**/*.d.ts"
