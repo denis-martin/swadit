@@ -35,7 +35,8 @@
 	</markdown>
 	<div *ngIf="apis.current.externalDocs" class="api-info-element">
 		<a href="{{apis.current.externalDocs['url']}}" target="_blanc">
-			<span *ngIf="apis.current.externalDocs.description; else 'More'">{{apis.current.externalDocs.description}}</span>
+			<span *ngIf="apis.current.externalDocs.description; else noExternalDocsDescription">{{apis.current.externalDocs.description}}</span>
+			<ng-template #noExternalDocsDescription>More</ng-template>
 		</a>
 	</div>
 	<div *ngIf="apis.current['info']['termsOfService'] || apis.current['info']['license']" class="api-info-element">

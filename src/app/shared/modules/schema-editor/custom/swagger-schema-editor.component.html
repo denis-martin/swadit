@@ -50,7 +50,7 @@
 		</td>
 	</tr>
 
-	<tr *ngIf="!obj['$ref']">
+	<tr *ngIf="!obj['$ref'] && schema['properties']">
 		<td class="label-text">type</td>
 		<td class="no-padding">
 			<table>
