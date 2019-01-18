@@ -42,15 +42,15 @@
 </div>
 
 <div *ngFor="let resp of apis.filterList(keys(apis.current['responses']), filterText, sortItems); let index = index" 
-	class="card mb-1">
+	class="card mb-2">
 	<div class="card-header clickable" (click)="uncollapsed[resp] = !uncollapsed[resp]">
 		<div class="row">
-			<div class="col-md-11 preview">
+			<div class="col-md-10 preview">
 				{{resp}}
 				<span *ngIf="apis.current['responses'][resp]['schema'] && apis.current['responses'][resp]['schema']['type']" class="headerType">({{apis.current['responses'][resp]['schema']['type']}})</span>
 				<span *ngIf="apis.current['responses'][resp]['description']">{{apis.current['responses'][resp]['description']}}</span>
 			</div>
-			<div class="col-md-1">
+			<div class="col-md-2">
 				<div class="edit-card" (click)="edit($event, resp)">
 					<i class="fa fa-fw fa-pencil"></i>
 				</div>

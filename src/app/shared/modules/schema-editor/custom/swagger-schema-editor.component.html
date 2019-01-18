@@ -153,7 +153,7 @@
 						class="form-control schema-control" id="{{id}}_{{propKey}}" name="{{id}}_{{propKey}}"
 						[ngModel]="propKey"
 						(ngModelChange)="changeProperty($event, propKey)"
-						(keydown.enter)="changeProperty($event, propKey)">
+						(keydown.enter)="changePropertyKeyDown($event, propKey)">
 					<span class="input-group-addon clickable" (click)="deleteProperty($event, propKey)">
 						<i class="fa fa-fw fa-trash"></i>
 					</span>

@@ -1,9 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+@import "theme";
 @import "bootstrap/bootstrap";
 @import "spinner";
 @import "utils";
 @import "rtl";
 @import "responsive";
+@import "themeOverrides";
 
 p, table {
 	margin-bottom: 0.5rem;

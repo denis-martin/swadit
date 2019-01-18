@@ -38,7 +38,7 @@ export class SchemaPrintViewComponent implements OnInit
 	ngOnInit() 
 	{
 		this.flattenObject(this.schema, 0);
-		this.example = '```json\n' + this.apis.toJson(this.apis.generateExample(this.schema)) + '\n```';
+		this.example = '```json\n' + this.apis.toJson(this.apis.generateExample(this.schema, {})) + '\n```';
 	}
 
 	flattenObject = function(schema, level)

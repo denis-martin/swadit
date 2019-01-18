@@ -50,20 +50,20 @@ export class ApisService
 	private readonly _schemas = 
 	{
 		"2.0": {
-			root: Swagger20SchemaRoot,
-			info: Swagger20SchemaInfo,
-			contact: Swagger20SchemaContact,
-			license: Swagger20SchemaLicense,
-			externalDocs: Swagger20SchemaExternalDocs,
-			tags: Swagger20SchemaTags,
-			securityDefinitions: Swagger20SchemaSecurityDefinitions,
-			security: Swagger20SchemaSecurity,
-			schema: Swagger20SchemaSchema,
-			parameterBody: Swagger20SchemaParameterBody,
-			parameterNonBody: Swagger20SchemaParameterNonBody,
-			response: Swagger20SchemaResponse,
-			operation: Swagger20SchemaOperation,
-			header: Swagger20SchemaHeader
+			root: Swagger20SchemaRoot.default,
+			info: Swagger20SchemaInfo.default,
+			contact: Swagger20SchemaContact.default,
+			license: Swagger20SchemaLicense.default,
+			externalDocs: Swagger20SchemaExternalDocs.default,
+			tags: Swagger20SchemaTags.default,
+			securityDefinitions: Swagger20SchemaSecurityDefinitions.default,
+			security: Swagger20SchemaSecurity.default,
+			schema: Swagger20SchemaSchema.default,
+			parameterBody: Swagger20SchemaParameterBody.default,
+			parameterNonBody: Swagger20SchemaParameterNonBody.default,
+			response: Swagger20SchemaResponse.default,
+			operation: Swagger20SchemaOperation.default,
+			header: Swagger20SchemaHeader.default
 		}
 	};
 
@@ -584,33 +584,42 @@ export class ApisService
 		return null;
 	}
 
-	resolveObj(obj: any): any
+	resolveObj(obj: any, refStack: { [k: string]: boolean } ): any
 	{
 		if (obj) {
 			if (obj['$ref']) {
-				obj = this.resolveRef(obj['$ref']);
+				if (obj['$ref'] in refStack) {
+					//console.info("resolveObj: circular reference detected, skipping", obj['$ref']);
+					return null;
+				} else {
+					//console.info("resolveObj: stacking", obj['$ref']);
+					refStack[obj['$ref']] = true;
+					obj = this.resolveRef(obj['$ref']);
+				}
 			}
 			if (Array.isArray(obj['allOf'])) {
 				let mergedObj = {};
 				obj['allOf'].forEach(o => {
-					o = this.resolveObj(o);
-					for (let key of Object.keys(o)) {
-						if (!mergedObj[key]) {
-							mergedObj[key] = _.cloneDeep(o[key]);
+					o = this.resolveObj(o, refStack);
+					if (o) {
+						for (let key of Object.keys(o)) {
+							if (!mergedObj[key]) {
+								mergedObj[key] = _.cloneDeep(o[key]);
+							}
+						}	
+						if (o["properties"]) {
+							if (!mergedObj["properties"]) {
+								mergedObj["properties"] = {};
+							}
+							for (let p of Object.keys(o["properties"])) {
+								// no recursive resolving
+								mergedObj["properties"][p] = o["properties"][p];
+							}
 						}
-					}	
-					if (o["properties"]) {
-						if (!mergedObj["properties"]) {
-							mergedObj["properties"] = {};
+						// TODO: additionalProperties? patternedProperties?
+						if (mergedObj["type"] != o["type"]) {
+							console.warn("allOf objects have different types");
 						}
-						for (let p of Object.keys(o["properties"])) {
-							// no recursive resolving
-							mergedObj["properties"][p] = o["properties"][p];
-						}
-					}
-					// TODO: additionalProperties? patternedProperties?
-					if (mergedObj["type"] != o["type"]) {
-						console.warn("allOf objects have different types");
 					}
 				});
 				obj = mergedObj;
@@ -718,10 +727,13 @@ export class ApisService
 		}
 	}
 
-	generateExample(schema: any, noReadOnly: boolean = false, forceGeneration: boolean = false): any
+	generateExample(schema: any, refStack: { [k: string]: boolean }, noReadOnly: boolean = false, forceGeneration: boolean = false): any
 	{
 		let res: any = undefined;
-		schema = this.resolveObj(schema);
+		schema = this.resolveObj(schema, refStack);
+		if (!schema) {
+			return null;
+		}
 		if (!noReadOnly || !schema.readOnly) {
 			if (schema.type == "string") {
 				if (schema.example) {
@@ -753,7 +765,7 @@ export class ApisService
 				} else if (schema.default && !forceGeneration) {
 					res = schema.default;
 				} else {
-					let r = this.generateExample(schema.items, noReadOnly);
+					let r = this.generateExample(schema.items, refStack, noReadOnly);
 					if (r !== undefined) {
 						res = [ r ];
 					}
@@ -766,7 +778,8 @@ export class ApisService
 				} else {
 					res = {};
 					this.keys(schema.properties).forEach(k => {
-						let r = this.generateExample(schema.properties[k], noReadOnly);
+						let refStackCopy = _.cloneDeep(refStack);
+						let r = this.generateExample(schema.properties[k], refStackCopy, noReadOnly);
 						if (r !== undefined) {
 							res[k] = r;
 						}

@@ -105,7 +105,7 @@
 					Generated example<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
 				</span>
 				<markdown *ngIf="showGeneratedExample"
-					[data]="apis.toJson(apis.generateExample(obj, false, true)) | language: 'json'">
+					[data]="apis.toJson(apis.generateExample(obj, {}, false, true)) | language: 'json'">
 				</markdown>
 			</td>
 		</tr>

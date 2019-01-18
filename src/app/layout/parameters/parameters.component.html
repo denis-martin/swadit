@@ -42,16 +42,16 @@
 </div>
 
 <div *ngFor="let param of apis.filterList(keys(apis.current['parameters']), filterText, sortItems); let index = index" 
-	class="card mb-1">
+	class="card mb-2">
 	<div class="card-header clickable" (click)="uncollapsed[param] = !uncollapsed[param]">
 		<div class="row">
-			<div class="col-md-11 preview">
+			<div class="col-md-10 preview">
 				{{param}}
 				<span *ngIf="apis.current['parameters'][param]['in']" class="headerType">in {{apis.current['parameters'][param]['in']}}</span>
 				<span *ngIf="apis.current['parameters'][param]['type']" class="headerType">({{apis.current['parameters'][param]['type']}})</span>
 				<span *ngIf="apis.current['parameters'][param]['description']">{{apis.current['parameters'][param]['description']}}</span>
 			</div>
-			<div class="col-md-1">
+			<div class="col-md-2">
 				<div class="edit-card" (click)="edit($event, param)">
 					<i class="fa fa-fw fa-pencil"></i>
 				</div>
