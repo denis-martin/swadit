@@ -1,6 +1,6 @@
 {
   "name": "swadit",
-  "version": "1.0.4alpha",
+  "version": "1.0.5beta",
   "license": "GPLv3",
   "scripts": {
     "ng": "ng",
