@@ -36,4 +36,8 @@ export class ResponseViewComponent implements OnInit {
 	ngOnInit() {
 		this.showGeneratedExample = !this.obj['examples'];
 	}
+
+	generateExample(schema: any) {
+		return this.apis.toJson(this.apis.generateExample(schema, {}, false, true));
+	}
 }

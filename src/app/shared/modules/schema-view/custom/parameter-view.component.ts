@@ -36,4 +36,8 @@ export class ParameterViewComponent implements OnInit {
 	ngOnInit() {
 		this.showGeneratedExample = !this.obj['example'];
 	}
+
+	generateExample(schema: any) {
+		return this.apis.toJson(this.apis.generateExample(schema, {}, false, true));
+	}
 }

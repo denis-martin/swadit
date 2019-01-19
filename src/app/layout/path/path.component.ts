@@ -117,7 +117,7 @@ export class PathComponent implements OnInit {
 	resolveObj(obj: any)
 	{
 		return new Promise((resolve, reject) => {
-			resolve(this.apis.resolveObj(obj, {}));
+			resolve(this.apis.resolveObj(obj));
 		});
 	}
 

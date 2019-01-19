@@ -31,7 +31,7 @@
 				Example (generated)<span *ngIf="!showGeneratedExample">:</span><span *ngIf="showGeneratedExample">...</span>
 			</p>
 			<markdown *ngIf="!showGeneratedExample"
-				[data]="apis.toJson(apis.generateExample(obj['schema'], true, true)) | language: 'json'">
+				[data]="generateExample(obj['schema']) | language: 'json'">
 			</markdown>
 		</div>
 	</div>

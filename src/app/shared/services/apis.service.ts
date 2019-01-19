@@ -584,23 +584,16 @@ export class ApisService
 		return null;
 	}
 
-	resolveObj(obj: any, refStack: { [k: string]: boolean } ): any
+	resolveObj(obj: any): any
 	{
 		if (obj) {
 			if (obj['$ref']) {
-				if (obj['$ref'] in refStack) {
-					//console.info("resolveObj: circular reference detected, skipping", obj['$ref']);
-					return null;
-				} else {
-					//console.info("resolveObj: stacking", obj['$ref']);
-					refStack[obj['$ref']] = true;
-					obj = this.resolveRef(obj['$ref']);
-				}
-			}
+				obj = this.resolveRef(obj['$ref']);
+			} 
 			if (Array.isArray(obj['allOf'])) {
 				let mergedObj = {};
 				obj['allOf'].forEach(o => {
-					o = this.resolveObj(o, refStack);
+					o = this.resolveObj(o);
 					if (o) {
 						for (let key of Object.keys(o)) {
 							if (!mergedObj[key]) {
@@ -730,7 +723,15 @@ export class ApisService
 	generateExample(schema: any, refStack: { [k: string]: boolean }, noReadOnly: boolean = false, forceGeneration: boolean = false): any
 	{
 		let res: any = undefined;
-		schema = this.resolveObj(schema, refStack);
+		if (schema['$ref']) {
+			if (refStack['$ref']) {
+				// recursion detected
+				return null;
+			} else {
+				refStack['$ref'] = true;
+			}
+		}
+		schema = this.resolveObj(schema);
 		if (!schema) {
 			return null;
 		}
