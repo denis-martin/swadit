@@ -49,7 +49,8 @@
 				<button type="button" class="btn btn-secondary btn-sm" disabled title="not yet implemented">By...</button>
 			</div>
 			<button type="button" class="btn btn-secondary btn-sm" (click)="apis.deleteSelectedPaths()">Delete</button>
-			<button type="button" class="btn btn-secondary btn-sm" disabled title="not yet implemented">Modify...</button>
+			<button type="button" class="btn btn-secondary btn-sm" (click)="modify($event)"
+				[disabled]="apis.getLength(apis.selectedPaths) == 0">Modify...</button>
 		</div>
 	</div>
 </div>
@@ -57,11 +58,12 @@
 <div *ngFor="let path of apis.filterList(apis.keys(apis.current['paths']), filterText, sortItems); let index = index"
 	class="path clickable"
 	[ngClass]="{ 'path-unselected': !apis.selectedPaths.hasOwnProperty(path), 'path-selected': apis.selectedPaths.hasOwnProperty(path), 'path-active': path==apis.activePath }"
-	(click)="apis.activePath=path">
+	(click)="apis.activePath=path"
+	(dblclick)="routeToPath(path)">
 	<div style="float: left">
 		<input type="checkbox" [ngModel]="apis.selectedPaths.hasOwnProperty(path)" 
 			(click)="apis.selectPath(path, $event)">
-		<span>{{path}}</span>
+		<span>&nbsp;{{path}}</span>
 	</div>
 	<div style="float: right">
 		<span *ngFor="let method of methods">

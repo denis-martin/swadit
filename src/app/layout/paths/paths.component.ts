@@ -17,8 +17,10 @@
 
 import { Component, OnInit } from '@angular/core';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { Router } from '@angular/router';
 
 import { ApisService } from '../../shared/services';
+import { ModifyComponent } from '../../shared/modules/editor-modals/modify/modify.component';
 import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
 
 @Component({
@@ -36,7 +38,7 @@ export class PathsComponent implements OnInit
 	closeResult: string;
 	editModal: NgbModalRef;
 
-	constructor(public apis: ApisService, private modalService: NgbModal) 
+	constructor(public apis: ApisService, private modalService: NgbModal, private router: Router) 
 	{
 	}
 
@@ -74,5 +76,55 @@ export class PathsComponent implements OnInit
         } else {
             return  `with: ${reason}`;
         }
+	}
+
+	modify(event)
+	{
+		let self = this;
+
+		console.log("modify()");
+		if (event) event.stopPropagation();
+
+		ModifyComponent.open(this.modalService, this.apis.getLength(this.apis.selectedPaths))
+			.then((result) => {
+				console.info("modify()", result);
+				if (result.deprecationSet) {
+					for (let p in self.apis.selectedPaths) {
+						if (self.apis.current['paths'][p]) {
+							for (let m in self.apis.current['paths'][p]) {
+								if (m != 'parameters') {
+									self.apis.current['paths'][p][m]['deprecated'] = true;
+								}
+							}
+						} else {
+							delete self.apis.selectedPaths[p];
+						}
+					}
+
+				} else if (result.deprecationRemove) {
+					for (let p in self.apis.selectedPaths) {
+						if (self.apis.current['paths'][p]) {
+							for (let m in self.apis.current['paths'][p]) {
+								if (m != 'parameters') {
+									delete self.apis.current['paths'][p][m]['deprecated'];
+								}
+							}
+						} else {
+							delete self.apis.selectedPaths[p];
+						}
+					}
+
+				}
+				
+			}, (reason) => {
+				this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+				console.warn("modify(): " + this.closeResult);
+
+			});
+	}
+
+	routeToPath(path: string)
+	{
+		this.router.navigate(['/path', path]);
 	}
 }

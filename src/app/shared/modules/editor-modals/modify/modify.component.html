@@ -1,0 +1,20 @@
+<form (ngSubmit)="ok()" #editForm="ngForm">
+	<div class="modal-header" id="modal-header">
+		<h1>Modify {{pathCount}} paths...</h1>
+	</div>
+	<div class="modal-body" id="modal-body">
+		<input type="checkbox" id="deprecationSet" name="deprecationSet" 
+			[(ngModel)]="params.deprecationSet" (change)="deprecate(true)" class="mr-1">
+		<label for="deprecationSet">Set deprecation flag</label>
+		<br>
+		<input type="checkbox" id="deprecationRemove" name="deprecationRemove" 
+			[(ngModel)]="params.deprecationRemove" (change)="deprecate(false)" class="mr-1">
+		<label for="deprecationRemove">Remove deprecation flag</label>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" type="submit" title="Ok">
+			Ok</button>
+		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Cancel">
+			Cancel</button>
+	</div>
+</form>

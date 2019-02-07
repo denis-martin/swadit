@@ -11,6 +11,7 @@ import { ParameterEditComponent } from './parameter-edit/parameter-edit.componen
 import { ResponseEditComponent } from './response-edit/response-edit.component';
 import { PathEditComponent } from './path-edit/path-edit.component';
 import { ConfirmComponent } from './confirm/confirm.component';
+import { ModifyComponent } from './modify/modify.component';
 
 @NgModule({
 	imports: [
@@ -24,21 +25,24 @@ import { ConfirmComponent } from './confirm/confirm.component';
 		ParameterEditComponent,
 		ResponseEditComponent,
 		PathEditComponent,
-		ConfirmComponent
+		ConfirmComponent,
+		ModifyComponent
 	],
 	exports: [
 		DefinitionEditComponent,
 		ParameterEditComponent,
 		ResponseEditComponent,
 		PathEditComponent,
-		ConfirmComponent
+		ConfirmComponent,
+		ModifyComponent
 	],
 	entryComponents: [
 		DefinitionEditComponent,
 		ParameterEditComponent,
 		ResponseEditComponent,
 		PathEditComponent,
-		ConfirmComponent
+		ConfirmComponent,
+		ModifyComponent
 	]
 })
 export class EditorModalsModule { }
