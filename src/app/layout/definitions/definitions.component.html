@@ -47,8 +47,8 @@
 		<div class="row">
 			<div class="col-md-10 preview">
 				{{def}}
-				<span *ngIf="apis.current['definitions'][def]['type']" class="headerType">({{apis.current['definitions'][def]['type']}})</span>
-				<span *ngIf="apis.current['definitions'][def]['description']">{{apis.current['definitions'][def]['description']}}</span>
+				<span *ngIf="apis.current['definitions'][def]['type']" class="headerType"> ({{apis.current['definitions'][def]['type']}}) </span>
+				<span *ngIf="apis.current['definitions'][def]['description']"> {{apis.current['definitions'][def]['description']}} </span>
 			</div>
 			<div class="col-md-2">
 				<div class="edit-card" (click)="edit($event, def)">

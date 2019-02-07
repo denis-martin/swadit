@@ -67,7 +67,7 @@ export class SwaggerSchemaViewComponent implements OnInit
 		
 		tp = obj['type'] || obj['$ref'];
 		if (obj['type'] == 'array' && obj['items']) {
-			tp = tp + " (" + obj['items']['type'] || obj['items']['$ref'] + ")";
+			tp = tp + " (" + (obj['items']['type'] || obj['items']['$ref']) + ")";
 		}
 		if (obj['format']) {
 			tp = tp + " (" + obj['format'] + ")";
