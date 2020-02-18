@@ -18,7 +18,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs/Subject';
+import { Subject } from 'rxjs';
 
 import { Spec as Swagger } from 'swagger-schema-official';
 import * as SwaggerParser from 'swagger-parser';

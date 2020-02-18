@@ -2,8 +2,6 @@
     "extends": "../tsconfig.json",
     "compilerOptions": {
         "outDir": "../out-tsc/spec",
-        "module": "es2015",
-        "target": "es5",
         "baseUrl": "./",
         "typeRoots": [
             "../node_modules/@types"
