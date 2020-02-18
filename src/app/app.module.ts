@@ -37,7 +37,7 @@ export function createTranslateLoader(http: HttpClient) {
                 deps: [HttpClient]
             }
         }),
-        NgbModule.forRoot(),
+        NgbModule,
         EditorModalsModule
     ],
     providers: [AuthGuard, ApisService],

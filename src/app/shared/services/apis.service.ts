@@ -50,20 +50,20 @@ export class ApisService
 	private readonly _schemas = 
 	{
 		"2.0": {
-			root: Swagger20SchemaRoot.default,
-			info: Swagger20SchemaInfo.default,
-			contact: Swagger20SchemaContact.default,
-			license: Swagger20SchemaLicense.default,
-			externalDocs: Swagger20SchemaExternalDocs.default,
-			tags: Swagger20SchemaTags.default,
-			securityDefinitions: Swagger20SchemaSecurityDefinitions.default,
-			security: Swagger20SchemaSecurity.default,
-			schema: Swagger20SchemaSchema.default,
-			parameterBody: Swagger20SchemaParameterBody.default,
-			parameterNonBody: Swagger20SchemaParameterNonBody.default,
-			response: Swagger20SchemaResponse.default,
-			operation: Swagger20SchemaOperation.default,
-			header: Swagger20SchemaHeader.default
+			root: Swagger20SchemaRoot['default'],
+			info: Swagger20SchemaInfo['default'],
+			contact: Swagger20SchemaContact['default'],
+			license: Swagger20SchemaLicense['default'],
+			externalDocs: Swagger20SchemaExternalDocs['default'],
+			tags: Swagger20SchemaTags['default'],
+			securityDefinitions: Swagger20SchemaSecurityDefinitions['default'],
+			security: Swagger20SchemaSecurity['default'],
+			schema: Swagger20SchemaSchema['default'],
+			parameterBody: Swagger20SchemaParameterBody['default'],
+			parameterNonBody: Swagger20SchemaParameterNonBody['default'],
+			response: Swagger20SchemaResponse['default'],
+			operation: Swagger20SchemaOperation['default'],
+			header: Swagger20SchemaHeader['default']
 		}
 	};
 
@@ -120,9 +120,9 @@ export class ApisService
 			let apis = this;
 			let reader = new FileReader();
 			reader.onloadend = function(e) {
-				apis.lastLoaded = reader.result;
+				apis.lastLoaded = reader.result.toString();
 				try {
-					SwaggerParser.parse(YAML.safeLoad(reader.result))
+					SwaggerParser.parse(YAML.safeLoad(reader.result.toString()))
 						.then(api => { apis.swaggerLoaded(api, fobj.name); })
 						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {
@@ -144,9 +144,9 @@ export class ApisService
 			let apis = this;
 			let reader = new FileReader();
 			reader.onload = function(e) {
-				apis.lastLoaded = reader.result;
+				apis.lastLoaded = reader.result.toString();
 				try {
-					SwaggerParser.parse(YAML.safeLoad(reader.result))
+					SwaggerParser.parse(YAML.safeLoad(reader.result.toString()))
 						.then(api => { apis.mergeSwagger(api, fobj.name, addSource); })
 						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {

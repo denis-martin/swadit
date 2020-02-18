@@ -11,7 +11,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2015",
+    "target": "es5", //"es2015",
     "typeRoots": [
       "./node_modules/@types"
     ],
@@ -26,5 +26,6 @@
       // swagger-parser, we avoid the direct inclusion of json-schema-ref-parser.
       "swagger-parser": ["./node_modules/swagger-parser/dist/swagger-parser.js"]
     },
+    "resolveJsonModule": true,
   }
 }

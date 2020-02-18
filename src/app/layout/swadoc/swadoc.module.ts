@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { AceEditorModule } from 'ng2-ace-editor';
+import { AceEditorModule } from 'ngx-ace-editor-wrapper';
 
 import { SwadocRoutingModule } from './swadoc-routing.module';
 import { SwadocComponent } from './swadoc.component';

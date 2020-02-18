@@ -12,7 +12,7 @@ import { HeaderComponent, SidebarComponent } from '../shared';
     imports: [
         CommonModule,
         FormsModule,
-        NgbDropdownModule.forRoot(),
+        NgbDropdownModule,
         LayoutRoutingModule,
         TranslateModule
     ],
