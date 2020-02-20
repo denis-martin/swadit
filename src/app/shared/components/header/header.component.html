@@ -4,43 +4,51 @@
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<span class="navbar-brand">
-			<a href="https://github.com/denis-martin/swadit" target="_blank">swadit</a>
-			<div class="swadit-copyright">
-				&copy; Denis Martin
-			</div>
-			<span style="font-size: 75%; font-weight: bold; color: yellow">BETA</span>
+			<span *ngIf="apis.config.logo">
+				<a href="https://github.com/denis-martin/swadit" target="_blank">swadit</a>
+				<div class="swadit-copyright">
+					&copy; Denis Martin
+				</div>
+				<span style="font-size: 75%; font-weight: bold; color: yellow">BETA</span>
+			</span>
+			<span *ngIf="apis.config.title" [innerHTML]="apis.config.title"></span>
 			<span *ngIf="apis.current != null && apis.current['info'] != null && apis.current['info']['title'] != null">
-				&ndash; {{apis.current['info']['title']}}
+				<span *ngIf="apis.config.logo || apis.config.title"> &ndash;</span> {{apis.current['info']['title']}}
 			</span>
 		</span>
 		<div class="collapse navbar-collapse">
 			<ul class="navbar-nav ml-auto mt-2 mt-md-0">
 				<li class="nav-item dropdown" ngbDropdown>
 					<a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
-						<i class="fa fa-fw fa-folder-open"></i>&nbsp;File <b class="caret"></b>
+						<i class="fa fa-fw fa-folder-open"></i>&nbsp;{{ apis.config.menu.title }} <b class="caret"></b>
 					</a>
 					<div class="dropdown-menu dropdown-menu-right">
-						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.newFile()">
+
+						<a class="dropdown-item" href="javascript:void(0)" *ngFor="let catItem of apis.config.catalog" (click)="apis.openFile(catItem.path)">
+							<i class="fa fa-fw fa-folder-open"></i> {{ catItem.title }}</a>
+						<div class="dropdown-divider" *ngIf="apis.config.catalog.length > 0"></div>
+
+						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.newFile()" *ngIf="!apis.config.menu.hideItems['new']">
 							<i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a>
-						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFileModal()">
+						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFileModal()" *ngIf="!apis.config.menu.hideItems['open']">
 							<i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a>
-						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()">
+						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()" *ngIf="!apis.config.menu.hideItems['add']">
 							<i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a>
-						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.downloadFileModal()">
+						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.downloadFileModal()" *ngIf="!apis.config.menu.hideItems['download']">
 							<i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a>
 
 						<div class="dropdown-divider"></div>
-						<a class="dropdown-item" [routerLink]="['/source']">
-							<i class="fa fa-fw fa-align-left"></i> {{ 'Edit Source' | translate }}</a>
+						<a class="dropdown-item" [routerLink]="['/source']" *ngIf="!apis.config.menu.hideItems['source']">
+							<i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a>
 
 						<div class="dropdown-divider"></div>
 						<!--
 						<a class="dropdown-item" [routerLink]="['/print']">
 							<i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a>
 						-->
-						<a class="dropdown-item" [routerLink]="['/swadoc']" title="Print preview (e.g. for PDF export)">
+						<a class="dropdown-item" [routerLink]="['/swadoc']" title="Print preview (e.g. for PDF export)" *ngIf="!apis.config.menu.hideItems['printPreview']">
 							<i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a>
-						<a class="dropdown-item" [routerLink]="['/swaggerui']" title="Preview in Swagger UI">
+						<a class="dropdown-item" [routerLink]="['/swaggerui']" title="Preview in Swagger UI" *ngIf="!apis.config.menu.hideItems['swaggerUi']">
 							<i class="fa fa-fw fa-eye"></i> {{ 'Swagger UI' | translate }}</a>
 						<!--
 						<div class="dropdown-divider"></div>

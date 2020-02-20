@@ -2,27 +2,37 @@
     <ul class="list-group">
         <div class="nested-menu when-collapsed">
             <a class="list-group-item" (click)="addExpandClass('file')">
-                <span><i class="fa fa-fw fa-folder-open"></i> {{ 'File' | translate }}</span>
+                <span><i class="fa fa-fw fa-folder-open"></i> {{ apis.config.menu.title }}</span>
             </a>
             <li class="nested" [class.expand]="showMenu === 'file'">
                 <ul class="submenu">
-                    <li><a href="javascript:void(0)" (click)="apis.newFile()">
+                    <li *ngFor="let catItem of apis.config.catalog">
+                        <a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFile(catItem.path)">
+                        <i class="fa fa-fw fa-folder-open"></i> {{ catItem.title }}</a></li>
+                    <li *ngIf="!apis.config.menu.hideItems['new']">
+                        <a href="javascript:void(0)" (click)="apis.newFile()">
                         <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a></li>
-                    <li><a href="javascript:void(0)" (click)="apis.openFileModal()">
+                    <li *ngIf="!apis.config.menu.hideItems['open']">
+                        <a href="javascript:void(0)" (click)="apis.openFileModal()">
                         <i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a></li>
-                    <li><a href="javascript:void(0)" (click)="apis.addFilesModal()">
+                    <li *ngIf="!apis.config.menu.hideItems['add']">
+                        <a href="javascript:void(0)" (click)="apis.addFilesModal()">
                         <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>
-                    <li><a href="javascript:void(0)" (click)="apis.downloadFileModal()">
+                    <li *ngIf="!apis.config.menu.hideItems['download']">
+                        <a href="javascript:void(0)" (click)="apis.downloadFileModal()">
                         <i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a></li>
-                    <li><a [routerLink]="['/source']">
-                        <i class="fa fa-fw fa-align-left"></i> {{ 'Edit Source' | translate }}</a></li>
+                    <li *ngIf="!apis.config.menu.hideItems['source']">
+                        <a [routerLink]="['/source']">
+                        <i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a></li>
                     <!--
                     <li><a [routerLink]="['/print']">
                         <i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a></li>
                     -->
-                    <li><a [routerLink]="['/swadoc']">
+                    <li *ngIf="!apis.config.menu.hideItems['printPreview']">
+                        <a [routerLink]="['/swadoc']">
                         <i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a></li>
-                    <li><a [routerLink]="['/swaggerui']">
+                    <li *ngIf="!apis.config.menu.hideItems['swaggerUi']">
+                        <a [routerLink]="['/swaggerui']">
                         <i class="fa fa-fw fa-eye"></i> Swagger UI</a></li>
                     <!--
                     <li><a href="javascript:void(0)" (click)="apis.settingsModal()">

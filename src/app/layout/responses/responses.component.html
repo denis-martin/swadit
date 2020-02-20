@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="edit($event)" title="Add item">
+<div class="edit-section" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly">
 	<i class="fa fa-plus"></i>
 </div>
 <div class="filterBox">
@@ -47,11 +47,11 @@
 		<div class="row">
 			<div class="col-md-10 preview">
 				{{resp}}
-				<span *ngIf="apis.current['responses'][resp]['schema'] && apis.current['responses'][resp]['schema']['type']" class="headerType">({{apis.current['responses'][resp]['schema']['type']}})</span>
-				<span *ngIf="apis.current['responses'][resp]['description']">{{apis.current['responses'][resp]['description']}}</span>
+				<span *ngIf="apis.current['responses'][resp]['schema'] && apis.current['responses'][resp]['schema']['type']" class="headerType"> ({{apis.current['responses'][resp]['schema']['type']}})</span>
+				<span *ngIf="apis.current['responses'][resp]['description']"> {{apis.current['responses'][resp]['description']}}</span>
 			</div>
 			<div class="col-md-2">
-				<div class="edit-card" (click)="edit($event, resp)">
+				<div class="edit-card" (click)="edit($event, resp)" *ngIf="!apis.config.readOnly">
 					<i class="fa fa-fw fa-pencil"></i>
 				</div>
 			</div>

@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="editPath($event, path, method)">
+<div class="edit-section" (click)="editPath($event, path, method)" *ngIf="!apis.config.readOnly">
 	<i class="fa fa-pencil"></i>
 </div>
 
@@ -31,7 +31,7 @@
 				<span *ngIf="apis.current['paths'][path][m]['deprecated']" class="badge badge-warning">deprecated</span>
 			</a>
 		</li>
-		<li class="nav-item">
+		<li class="nav-item" *ngIf="!apis.config.readOnly">
 			<a class="nav-link" [ngClass]="{ 'active': !method }" 
 				href="javascript:void(0)" (click)="editPath($event, path)">
 				<i class="fa fa-plus"></i>
@@ -57,7 +57,7 @@
 		
 		<h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
 			Parameters
-			<span class="edit-subsection" (click)="editParameter($event)" title="Add parameter">
+			<span class="edit-subsection" (click)="editParameter($event)" title="Add parameter" *ngIf="!apis.config.readOnly">
 				<i class="fa fa-plus"></i>
 			</span>
 		</h2>
@@ -71,12 +71,12 @@
 					<div class="row">
 						<div class="col-md-11 preview">
 							{{local.values.obj['name']}}<span *ngIf="local.values.obj['required']" style="color: red">*</span>
-							<span *ngIf="local.values.obj['in']" class="headerType">in {{local.values.obj['in']}}</span>
-							<span *ngIf="local.values.obj['type']" class="headerType">({{local.values.obj['type']}})</span>
-							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
+							<span *ngIf="local.values.obj['in']" class="headerType"> in {{local.values.obj['in']}}</span>
+							<span *ngIf="local.values.obj['type']" class="headerType"> ({{local.values.obj['type']}})</span>
+							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
-							<div class="edit-card" (click)="editParameter($event, param, true)">
+							<div class="edit-card" (click)="editParameter($event, param, true)" *ngIf="!apis.config.readOnly">
 								<i class="fa fa-fw fa-pencil"></i>
 							</div>
 						</div>
@@ -98,12 +98,12 @@
 					<div class="row">
 						<div class="col-md-11 preview">
 							{{local.values.obj['name']}}<span *ngIf="local.values.obj['required']" style="color: red">*</span>
-							<span *ngIf="local.values.obj['in']" class="headerType">in {{local.values.obj['in']}}</span>
-							<span *ngIf="local.values.obj['type']" class="headerType">({{local.values.obj['type']}})</span>
-							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
+							<span *ngIf="local.values.obj['in']" class="headerType"> in {{local.values.obj['in']}}</span>
+							<span *ngIf="local.values.obj['type']" class="headerType"> ({{local.values.obj['type']}})</span>
+							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
-							<div class="edit-card" (click)="editParameter($event, param)">
+							<div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly">
 								<i class="fa fa-fw fa-pencil"></i>
 							</div>
 						</div>
@@ -120,7 +120,7 @@
 		
 		<h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">
 			Responses
-			<span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response">
+			<span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response" *ngIf="!apis.config.readOnly">
 				<i class="fa fa-plus"></i>
 			</span>
 		</h2>
@@ -132,12 +132,12 @@
 					<div class="row">
 						<div class="col-md-11 preview">
 							{{resp}}
-							<span *ngIf="local.values.obj['schema'] && local.values.obj['schema']['type']" class="headerType">({{local.values.obj['schema']['type']}})</span>
-							<span *ngIf="local.values.obj['schema'] && local.values.obj['$ref']" class="headerType">({{local.values.obj['$ref']}})</span>
-							<span *ngIf="local.values.obj['description']">{{local.values.obj['description']}}</span>
+							<span *ngIf="local.values.obj['schema'] && local.values.obj['schema']['type']" class="headerType"> ({{local.values.obj['schema']['type']}})</span>
+							<span *ngIf="local.values.obj['schema'] && local.values.obj['$ref']" class="headerType"> ({{local.values.obj['$ref']}})</span>
+							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
-							<div class="edit-card" (click)="editResponse($event, path, method, resp)">
+							<div class="edit-card" (click)="editResponse($event, path, method, resp)" *ngIf="!apis.config.readOnly">
 								<i class="fa fa-fw fa-pencil"></i>
 							</div>
 						</div>

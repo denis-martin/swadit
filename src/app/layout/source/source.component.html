@@ -16,7 +16,7 @@
 -->
 
 <div class="editor-header">
-	<button class="btn btn-primary" (click)="apply()">Apply</button>
+	<button class="btn btn-primary" (click)="apply()" *ngIf="!apis.config.readOnly">Apply</button>
 	<button class="btn btn-success" (click)="validate()">Validate</button>
 	<button class="btn btn-warning" (click)="revert()">Revert</button>
 	<div class="mt-1" style="float: right">

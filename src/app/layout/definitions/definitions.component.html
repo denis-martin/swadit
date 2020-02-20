@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="edit($event)" title="Add item">
+<div class="edit-section" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly">
 	<i class="fa fa-plus"></i>
 </div>
 <div class="filterBox">
@@ -51,7 +51,7 @@
 				<span *ngIf="apis.current['definitions'][def]['description']"> {{apis.current['definitions'][def]['description']}} </span>
 			</div>
 			<div class="col-md-2">
-				<div class="edit-card" (click)="edit($event, def)">
+				<div class="edit-card" (click)="edit($event, def)" *ngIf="!apis.config.readOnly">
 					<i class="fa fa-fw fa-pencil"></i>
 				</div>
 			</div>

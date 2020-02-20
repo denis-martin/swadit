@@ -17,8 +17,10 @@
 
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { HttpClient } from  "@angular/common/http";
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { Subject, Observable, throwError } from 'rxjs';
+import { retry, catchError } from 'rxjs/operators';
 
 import { Spec as Swagger } from 'swagger-schema-official';
 import * as SwaggerParser from 'swagger-parser';
@@ -43,6 +45,35 @@ import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
 import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
 import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
 import { YAMLException } from 'js-yaml';
+
+class CatalogItem
+{
+	title: string;
+	path: string;
+}
+
+class MenuConfig
+{
+	title: string = "File";
+	hideItems = {
+		"new": false,
+		"open": false,
+		"add": false,
+		"download": false,
+		"source": false,
+		"printPreview": false,
+		"swaggerUi": false
+	}
+}
+
+class SwaditConfig
+{
+	title: string;
+	logo: boolean = true;
+	menu: MenuConfig = new MenuConfig();
+	catalog: Array<CatalogItem> = [];
+	readOnly: false;
+}
 
 @Injectable()
 export class ApisService 
@@ -75,6 +106,8 @@ export class ApisService
 		return null;
 	}
 
+	public config: SwaditConfig = new SwaditConfig();
+
 	public current: Object = { 
 		swagger: "2.0",
 		info: { 
@@ -103,10 +136,29 @@ export class ApisService
 
 	methodKeys = ["get", "post", "put", "delete", "options", "head", "patch" ];
 
-	constructor(private modalService: NgbModal, private router: Router) 
+	constructor(private modalService: NgbModal, private router: Router, private http: HttpClient) 
 	{
 		console.info("APIs service initialized");
 		this.openFile("assets/petstore.yaml", null);
+		this.loadConfig();
+	}
+
+	loadConfig()
+	{
+		this.http.get("assets/config.yaml", { observe: 'response', responseType: 'text' })
+			.subscribe(resp => {
+				if (resp.status == 200) {
+					this.config = YAML.load(resp.body);
+					console.info("Config loaded");
+				} else {
+					console.error("Unexpected status code", resp);
+				}
+				//this.config = resp.body;
+			}, error => {
+				if (error.status != 404) {
+					console.error("Unexpected error code", error);
+				}
+			});
 	}
 
 	openFile(pathName: string, fobj)

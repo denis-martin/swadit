@@ -1,0 +1,15 @@
+title: "<b>PE<span class=\"grey\">T</span>AP<span class=\"grey\">I</span></b>"
+logo: false
+menu:
+  title: Catalog
+  hideItems:
+    new: true
+    open: true
+    add: true
+    printPreview: true
+catalog:
+- title: Pet Store v1
+  path: assets/petstore.yaml
+- title: Pet Store v2
+  path: assets/petstore2.yaml
+readOnly: true
