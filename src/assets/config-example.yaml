@@ -14,4 +14,4 @@ catalog:
   path: assets/petstore2.yaml
 readOnly: true
 imprintLink: https://example.com/imprint/
-dataPrivacyLink: https://example.com/privacy/
+privacyPolicyLink: https://example.com/privacy/

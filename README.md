@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/denis-martin/swadit.svg?branch=master)](https://travis-ci.org/denis-martin/swadit)
 
 # Swadit
-A visual editor for Swagger/OpenAPI files supporting the 'API first' approach ([Demo](https://swadit.misc-net.de)): Design your API first, then start coding with generated code stubs!
+A visual editor for Swagger/OpenAPI files supporting the 'API first' approach ([Demo](https://swadit.froschbach.io)): Design your API first, then start coding with generated code stubs!
 
 Currently supported features include:
 *  Design your REST API visually (no need to understand the Swagger/OpenAPI specification).
