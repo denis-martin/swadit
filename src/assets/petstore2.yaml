@@ -1,11 +1,6 @@
 swagger: '2.0'
 info:
   description: >-
-    <div class="alert alert-success">
-      Looking for the old <strong>swadit</strong>-version? It can be found <a href="https://swaditjs.misc-net.de" target="_blanc">here</a>.
-    </div>
-
-
     This is a sample server Petstore server.  You can find out more about    
     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,
     #swagger](http://swagger.io/irc/).      For this sample, you can use the api
