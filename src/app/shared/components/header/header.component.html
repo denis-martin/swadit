@@ -7,9 +7,8 @@
 			<span *ngIf="apis.config.logo">
 				<a href="https://github.com/denis-martin/swadit" target="_blank">swadit</a>
 				<div class="swadit-copyright">
-					&copy; Denis Martin
+					<a href="https://froschbach.io" target="_blank" style="color: #609444">froschbach.io</a>
 				</div>
-				<span style="font-size: 75%; font-weight: bold; color: yellow">BETA</span>
 			</span>
 			<span *ngIf="apis.config.title" [innerHTML]="apis.config.title"></span>
 			<span *ngIf="apis.current != null && apis.current['info'] != null && apis.current['info']['title'] != null">
