@@ -21,6 +21,7 @@ $topnav-background-color: #222;
             transition: all 0.2s ease-in-out;
     // border-top: 1px solid rgba(255,255,255,0.3);
     .list-group{
+        padding-bottom: 16pt;
         a.list-group-item, div.list-group-item {
             background: $topnav-background-color;
             border: 0;
@@ -132,5 +133,24 @@ $topnav-background-color: #222;
 @media (max-width: 992px) {
     .when-collapsed {
         display: block;
+    }
+}
+
+.legalLinks {
+    position: fixed;
+    bottom: 0;
+    width: 250px;
+    color: #999;
+    background: $topnav-background-color;
+    font-size: 75%;
+    text-align: center;
+    padding: 2px;
+
+    a {
+        color: #999;
+    }
+
+    a:hover {
+        color: #fff;
     }
 }

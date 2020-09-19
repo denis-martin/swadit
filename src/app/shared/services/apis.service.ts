@@ -73,6 +73,8 @@ class SwaditConfig
 	menu: MenuConfig = new MenuConfig();
 	catalog: Array<CatalogItem> = [];
 	readOnly: false;
+	imprintLink: string = "#";
+	privacyPolicyLink: string = "#";
 }
 
 @Injectable()
@@ -148,7 +150,11 @@ export class ApisService
 		this.http.get("assets/config.yaml", { observe: 'response', responseType: 'text' })
 			.subscribe(resp => {
 				if (resp.status == 200) {
-					this.config = YAML.load(resp.body);
+					//this.config = YAML.load(resp.body);
+					let config = YAML.load(resp.body);
+					for (let k of Object.keys(config)) {
+						this.config[k] = config[k];
+					}
 					console.info("Config loaded");
 				} else {
 					console.error("Unexpected status code", resp);

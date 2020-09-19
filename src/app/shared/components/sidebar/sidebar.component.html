@@ -94,4 +94,7 @@
         </a>
         -->
     </ul>
+    <div class="legalLinks" *ngIf="apis.config.privacyPolicyLink || apis.config.imprintLink">
+        <a href="{{ apis.config.privacyPolicyLink }}" target="_blank">Privacy Policy</a> &nbsp;&bull;&nbsp; <a href="{{ apis.config.imprintLink }}" target="_blank">Imprint</a>
+    </div>
 </nav>
