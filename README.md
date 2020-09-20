@@ -14,6 +14,7 @@ Swadit is completely run within your browser:
 *  No need to install server-side software (except for a web server, of course).
 *  Your API definition remains within your browser and is not sent to any server. You may even use, e.g., [NW.js](https://nwjs.io/) to run it as a local tool, so not even a web server is necessary (see below).
 
+More information can be found [here](https://froschbach.io/apps/swadit/).
 
 ## Prepare
 Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies:
