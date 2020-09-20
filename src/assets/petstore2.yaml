@@ -1,35 +1,38 @@
 swagger: '2.0'
 info:
   description: >-
-    This is a sample server Petstore server.  You can find out more about    
-    Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net,
-    #swagger](http://swagger.io/irc/).      For this sample, you can use the api
-    key `special-key` to test the authorization     filters.
+    This is version 2 of a sample server Petstore API.  You can find out more about    
+    Swagger at [https://swagger.io](https://swagger.io).
+
+
+    <div class="alert alert-success">
+    <strong>Swadit</strong> is a visual editor for OpenAPI/Swagger 
+    files. Feel free to explore it's functionality with this sample 
+    API or with your own API (see File / Open).
+    </div>
   version: 2.0.0
-  title: Swagger Petstore v2
-  termsOfService: 'http://swagger.io/terms/'
+  title: Swagger Petstore
   contact:
-    email: apiteam@swagger.io
+    email: demo@froschbach.io
   license:
     name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
-host: petstore.swagger.io
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 basePath: /v2
 tags:
   - name: pet
     description: Everything about your Pets
     externalDocs:
       description: Find out more
-      url: 'http://swagger.io'
+      url: 'https://froschbach.io/apps/swadit/'
   - name: store
     description: Access to Petstore orders
   - name: user
     description: Operations about user
     externalDocs:
       description: Find out more about our store
-      url: 'http://swagger.io'
+      url: 'https://froschbach.io/apps/swadit/'
 schemes:
-  - http
+  - https
 paths:
   /pet:
     post:
@@ -577,7 +580,7 @@ paths:
 securityDefinitions:
   petstore_auth:
     type: oauth2
-    authorizationUrl: 'http://petstore.swagger.io/oauth/dialog'
+    authorizationUrl: 'https://demo.froschbach.io/oauth/'
     flow: implicit
     scopes:
       'write:pets': modify pets in your account
@@ -706,5 +709,5 @@ definitions:
       message:
         type: string
 externalDocs:
-  description: Find out more about Swagger
-  url: 'http://swagger.io'
+  description: Find out more about Swadit
+  url: 'https://froschbach.io/apps/swadit/'
