@@ -42,7 +42,7 @@
     "ng-trim-value-accessor": "^2.0.4",
     "ng2-charts": "^1.6.0",
     "ngx-ace-editor-wrapper": "^9.1.12",
-    "ngx-markdown": "^9.0.0",
+    "ngx-markdown": "^10.1.1",
     "path": "^0.12.7",
     "prismjs": "^1.21.0",
     "rxjs": "^6.5.4",
