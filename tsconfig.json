@@ -26,6 +26,6 @@
       // swagger-parser, we avoid the direct inclusion of json-schema-ref-parser.
       "swagger-parser": ["./node_modules/swagger-parser/dist/swagger-parser.js"]
     },
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   }
 }
