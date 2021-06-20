@@ -152,9 +152,7 @@
   },
   "defaultProject": "sb-admin-angular4-bootstrap4",
   "cli": {
-    "warnings": {
-      "typescriptMismatch": false
-    }
+    "warnings": {}
   },
   "schematics": {
     "@schematics/angular:component": {
