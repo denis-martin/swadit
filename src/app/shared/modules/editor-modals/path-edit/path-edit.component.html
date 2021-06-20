@@ -41,33 +41,37 @@
 				</div>
 			</div>
 		</div>
-		<ngb-tabset>
-			<ngb-tab title="Info">
-				<ng-template ngbTabContent>
+		<ul ngbNav #nav="ngbNav" class="nav-tabs">
+			<li ngbNavItem>
+				<a ngbNavLink>Info</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="0">
 						</swadit-schema-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-			<ngb-tab title="General">
-				<ng-template ngbTabContent>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink>General</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="1">
 						</swadit-schema-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-			<ngb-tab title="Docs">
-				<ng-template ngbTabContent>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink>Docs</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="2">
 						</swadit-schema-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-			<ngb-tab title="Security" *ngIf="apis.current['securityDefinitions'] || obj['security']">
-				<ng-template ngbTabContent>
+			</li>
+			<li ngbNavItem *ngIf="apis.current['securityDefinitions'] || obj['security']">
+				<a ngbNavLink>Security</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<label for="security">Security</label>
 						<swadit-security-editor [schema]="apis.schemas.security" [(obj)]="obj['security']" [id]="'security'"
@@ -75,8 +79,9 @@
 						</swadit-security-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-		</ngb-tabset>
+			</li>
+		</ul>
+		<div [ngbNavOutlet]="nav" class="mt-2"></div>
 	</div>
 	<div class="modal-footer">
 		<button *ngIf="pathKey_orig" class="btn btn-danger" type="button" 

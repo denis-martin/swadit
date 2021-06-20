@@ -22,16 +22,18 @@
 	</div>
 	-->
 	<div class="modal-body" id="modal-body">
-		<ngb-tabset>
-			<ngb-tab title="Info" >
-				<ng-template ngbTabContent>
+		<ul ngbNav #nav="ngbNav" class="nav-tabs">
+			<li ngbNavItem>
+				<a ngbNavLink>Info</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<swadit-object-editor [schema]="apis.schemas.info" [(obj)]="api['info']" [title]="false"></swadit-object-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-			<ngb-tab title="Contact">
-				<ng-template ngbTabContent>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink>Contact</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<div class="row">
 							<div class="col col-sm-12">
@@ -48,23 +50,26 @@
 						</div>
 					</div>
 				</ng-template>
-			</ngb-tab>
-			<ngb-tab title="General">
-				<ng-template ngbTabContent>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink>General</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<swadit-object-editor [schema]="apis.schemas.root" [(obj)]="api"></swadit-object-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-			<ngb-tab title="Tags">
-				<ng-template ngbTabContent>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink>Tags</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<swadit-array-editor [schema]="apis.schemas.tags" [(obj)]="api['tags']"></swadit-array-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-			<ngb-tab title="Security">
-				<ng-template ngbTabContent>
+			</li>
+			<li ngbNavItem>
+				<a ngbNavLink>Security</a>
+				<ng-template ngbNavContent>
 					<div class="tab-content">
 						<p>Security Definitions:</p>
 						<swadit-object-editor [schema]="apis.schemas.securityDefinitions" [(obj)]="api['securityDefinitions']"></swadit-object-editor>
@@ -74,8 +79,9 @@
 						</swadit-security-editor>
 					</div>
 				</ng-template>
-			</ngb-tab>
-		</ngb-tabset>
+			</li>
+		</ul>
+		<div [ngbNavOutlet]="nav" class="mt-2"></div>
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">Apply</button>

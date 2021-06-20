@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ParameterEditComponent } from './parameter-edit.component';
 
@@ -6,7 +6,7 @@ describe('ParameterEditComponent', () => {
   let component: ParameterEditComponent;
   let fixture: ComponentFixture<ParameterEditComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ ParameterEditComponent ]
     })

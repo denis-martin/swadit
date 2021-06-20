@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SchemaPrintViewComponent } from './schema-print-view.component';
 
@@ -6,7 +6,7 @@ describe('SchemaPrintViewComponent', () => {
   let component: SchemaPrintViewComponent;
   let fixture: ComponentFixture<SchemaPrintViewComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SchemaPrintViewComponent ]
     })

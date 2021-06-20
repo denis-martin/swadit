@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { SchemaEditorComponent } from './schema-editor.component';
 
@@ -6,7 +6,7 @@ describe('SchemaEditorComponent', () => {
   let component: SchemaEditorComponent;
   let fixture: ComponentFixture<SchemaEditorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ SchemaEditorComponent ]
     })

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { FileModalComponent } from './file-modal.component';
 
@@ -6,7 +6,7 @@ describe('FileModalComponent', () => {
   let component: FileModalComponent;
   let fixture: ComponentFixture<FileModalComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ FileModalComponent ]
     })
