@@ -1,25 +1,25 @@
 {
-    "extends": "../tsconfig.json",
-    "compilerOptions": {
-        "outDir": "../out-tsc/spec",
-        "baseUrl": "./",
-        "typeRoots": [
-            "../node_modules/@types"
-        ],
-        "types": [
-            "jasmine",
-            "node"
-        ],
-        "paths": {
-            "swagger-parser": ["../node_modules/swagger-parser/dist/swagger-parser.js"]
-        },
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/spec",
+    "baseUrl": "./",
+    "typeRoots": [
+      "../node_modules/@types"
+    ],
+    "types": [
+      "jasmine",
+      "node"
+    ],
+    "paths": {
+      "swagger-parser": ["../node_modules/swagger-parser/dist/swagger-parser.js"]
     },
-    "files": [
-        "test.ts",
-      "polyfills.ts"
+  },
+  "files": [
+    "test.ts",
+    "polyfills.ts"
   ],
-    "include": [
-        "**/*.spec.ts",
-        "**/*.d.ts"
-    ]
+  "include": [
+    "**/*.spec.ts",
+    "**/*.d.ts"
+  ]
 }
