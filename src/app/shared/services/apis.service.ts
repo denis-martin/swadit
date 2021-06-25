@@ -22,8 +22,8 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 import { Subject, Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 
-import { Spec as Swagger } from 'swagger-schema-official';
-import * as SwaggerParser from 'swagger-parser';
+import { OpenAPI } from 'openapi-types';
+import * as SwaggerParser from '@apidevtools/swagger-parser';
 import * as YAML from 'js-yaml';
 import * as _ from "lodash";
 
@@ -45,6 +45,13 @@ import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
 import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
 import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
 import { YAMLException } from 'js-yaml';
+
+const swaggerParserOptions: SwaggerParser.Options = {
+	resolve: {
+		file: false,
+		http: false
+	}
+}
 
 class CatalogItem
 {
@@ -170,17 +177,33 @@ export class ApisService
 	openFile(pathName: string, fobj)
 	{
 		//Swadit.thinking = "Loading file...";
+		let apis = this;
 		if (pathName) {
-			SwaggerParser.parse(pathName)
-				.then(api => { this.swaggerLoaded(api); })
-				.catch(err => { this.swaggerLoadingError(err); });
+			this.http.get(pathName, { observe: 'response', responseType: 'text' })
+				.subscribe(resp => {
+					if (resp.status == 200) {
+						apis.lastLoaded = resp.body;
+						try {
+							SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(resp.body), swaggerParserOptions)
+								.then(api => { apis.swaggerLoaded(api); })
+								.catch(err => { apis.swaggerLoadingError(err); });
+						} catch (ex) {
+							apis.swaggerLoadingError(ex, pathName);
+						}
+					} else {
+						console.error("Unexpected status code", resp);
+					}
+				}, error => {
+					if (error.status != 404) {
+						console.error("Unexpected error code", error);
+					}
+				});
 		} else {
-			let apis = this;
 			let reader = new FileReader();
 			reader.onloadend = function(e) {
 				apis.lastLoaded = reader.result.toString();
 				try {
-					SwaggerParser.parse(YAML.safeLoad(reader.result.toString()))
+					SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(reader.result.toString()), swaggerParserOptions)
 						.then(api => { apis.swaggerLoaded(api, fobj.name); })
 						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {
@@ -194,17 +217,33 @@ export class ApisService
 	addFile(pathName: string, fobj: any = null, addSource = false)
 	{
 		console.log("addFile", pathName, fobj, addSource);
+		let apis = this;
 		if (pathName) {
-			SwaggerParser.parse(pathName)
-				.then(api => { this.mergeSwagger(api, null, addSource); })
-				.catch(err => { this.swaggerLoadingError(err); });
+			this.http.get(pathName, { observe: 'response', responseType: 'text' })
+				.subscribe(resp => {
+					if (resp.status == 200) {
+						apis.lastLoaded = resp.body;
+						try {
+							SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(resp.body), swaggerParserOptions)
+								.then(api => { apis.mergeSwagger(api, null, addSource); })
+								.catch(err => { apis.swaggerLoadingError(err); });
+						} catch (ex) {
+							apis.swaggerLoadingError(ex, pathName);
+						}
+					} else {
+						console.error("Unexpected status code", resp);
+					}
+				}, error => {
+					if (error.status != 404) {
+						console.error("Unexpected error code", error);
+					}
+				});
 		} else {
-			let apis = this;
 			let reader = new FileReader();
 			reader.onload = function(e) {
 				apis.lastLoaded = reader.result.toString();
 				try {
-					SwaggerParser.parse(YAML.safeLoad(reader.result.toString()))
+					SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(reader.result.toString()), swaggerParserOptions)
 						.then(api => { apis.mergeSwagger(api, fobj.name, addSource); })
 						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {
@@ -223,7 +262,7 @@ export class ApisService
 
 		let self = this;
 		let apiClone: any = _.cloneDeep(this.current);
-		SwaggerParser.validate(apiClone)
+		SwaggerParser.validate(apiClone, swaggerParserOptions)
 			.then(function(api) {
 				console.log("This API is a valid Swagger file.");
 				self.hasLoadingErrors = false;
@@ -862,7 +901,7 @@ export class ApisService
 				reject("YAML Error: " + ye.message);
 				return;
 			}
-			SwaggerParser.validate(api)
+			SwaggerParser.validate(api, swaggerParserOptions)
 				.then(function(api) {
 					console.log("This API is a valid Swagger file.");
 					// 'api' is modified by SwaggerParser.validate (references are dereferenced)
@@ -880,7 +919,7 @@ export class ApisService
 		let apis = this;
 		return new Promise((resolve, reject) => {
 			let apiClone = _.cloneDeep(obj);
-			SwaggerParser.validate(apiClone)
+			SwaggerParser.validate(apiClone, swaggerParserOptions)
 				.then(function(api) {
 					console.log("This API is a valid Swagger file.");
 					// 'apiClone' is modified by SwaggerParser.validate (references are dereferenced)
