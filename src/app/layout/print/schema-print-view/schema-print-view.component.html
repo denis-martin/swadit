@@ -44,7 +44,7 @@
 				</td>
 				<td class="type">{{p.def['type']}} <span *ngIf="p.def['type']=='array'">({{p.def['items'].type}})</span></td>
 				<td style="padding-bottom: 0">
-					<div marked="p.def['description']"></div>
+					<markdown [data]="p.def['description']"></markdown>
 					<p *ngIf="p.def['default']">Default: <span *ngIf="p.def['type']=='string'">"</span>{{p.def['default']}}<span ng-if="p.def['type']=='string'">"</span></p>
 					<p *ngIf="p.def['example']">Example: <span *ngIf="p.def['type']=='string'">"</span>{{p.def['example']}}<span ng-if="p.def['type']=='string'">"</span></p>
 				</td>

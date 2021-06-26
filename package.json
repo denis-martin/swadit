@@ -38,7 +38,6 @@
     "file-saver": "^1.3.8",
     "font-awesome": "^4.7.0",
     "js-yaml": "^3.14.1",
-    "marked": "^0.8.0",
     "ng-trim-value-accessor": "^2.0.4",
     "ng2-charts": "^1.6.0",
     "ngx-ace-editor-wrapper": "^9.1.12",
