@@ -77,7 +77,7 @@ export class ParameterEditComponent implements OnInit
 
 		if (!this.obj['$ref']) {
 			if (this.obj['in'] == 'body') {
-				let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterBody, this.obj);
+				const missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterBody, this.obj);
 				if (missing.length > 0) {
 					this.errorStr = "Missing required properties: ";
 					missing.forEach(p => {
@@ -87,7 +87,7 @@ export class ParameterEditComponent implements OnInit
 				}
 
 			} else {
-				let missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterNonBody, this.obj);
+				const missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterNonBody, this.obj);
 				if (missing.length > 0) {
 					this.errorStr = "Missing required properties: ";
 					missing.forEach(p => {

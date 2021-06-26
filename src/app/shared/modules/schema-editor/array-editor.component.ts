@@ -31,9 +31,10 @@ export class ArrayEditorComponent implements OnInit
 	@Input() 
 	get obj() { 
 		return this._obj; 
-	};
+	}
 
 	@Output() objChange = new EventEmitter<any>();
+	// eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
 	set obj(val) 
 	{
 		this._obj = val;
@@ -83,7 +84,7 @@ export class ArrayEditorComponent implements OnInit
 	moveItemUp(event: any, i: number)
 	{
 		if (i > 0) {
-			let items = this.obj.splice(i, 1);
+			const items = this.obj.splice(i, 1);
 			this.obj.splice(i-1, 0, items[0]);
 		}
 	}
@@ -91,7 +92,7 @@ export class ArrayEditorComponent implements OnInit
 	moveItemDown(event: any, i: number)
 	{
 		if (i < this.obj.length) {
-			let items = this.obj.splice(i, 1);
+			const items = this.obj.splice(i, 1);
 			this.obj.splice(i+1, 0, items[0]);
 		}
 	}

@@ -55,8 +55,8 @@ export class SchemaPrintViewComponent implements OnInit
 			return;
 		}
 		Object.keys(_schema['properties']).forEach(k => {
-			let v = _schema['properties'][k];
-			let required = _schema['required'] ? _schema['required'].indexOf(k)>-1 : false;
+			const v = _schema['properties'][k];
+			const required = _schema['required'] ? _schema['required'].indexOf(k)>-1 : false;
 			this.flatProperties.push({ "prop": k, "def": v, "level": level, "required": required });
 			if (v.type=='object') {
 				this.flattenObject(v, level+1);

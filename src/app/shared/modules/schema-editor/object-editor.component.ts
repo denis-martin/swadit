@@ -39,9 +39,10 @@ export class ObjectEditorComponent implements OnInit
 	@Input() 
 	get obj() { 
 		return this._obj; 
-	};
+	}
 
 	@Output() objChange = new EventEmitter<any>();
+	// eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
 	set obj(val) 
 	{
 		this._obj = val;
@@ -117,7 +118,7 @@ export class ObjectEditorComponent implements OnInit
 	propertyIsRequired(schema: any, property: string): boolean
 	{
 		if (schema.required == null) return false;
-		for (let rp of schema.required) {
+		for (const rp of schema.required) {
 			if (rp == property) return true;
 		}
 		return false;
@@ -157,7 +158,7 @@ export class ObjectEditorComponent implements OnInit
 		if (newp != p) {
 			this.collapsed[newp] = this.collapsed[p];
 			Object.keys(this.obj).forEach(op => {
-				let val = this.obj[op];
+				const val = this.obj[op];
 				delete this.obj[op];
 				if (op == p) {
 					this.obj[newp] = val;

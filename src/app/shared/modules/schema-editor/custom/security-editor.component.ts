@@ -34,9 +34,10 @@ export class SecurityEditorComponent implements OnInit
 	@Input() 
 	get obj() { 
 		return this._obj; 
-	};
+	}
 
 	@Output() objChange = new EventEmitter<any>();
+	// eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
 	set obj(val) 
 	{
 		this._obj = val;
@@ -90,7 +91,7 @@ export class SecurityEditorComponent implements OnInit
 		if (!this.securityDefinitions || !this.securityDefinitions[secdef]) {
 			return this.securityScope;
 		}
-		let s = _.cloneDeep(this.securityScope);
+		const s = _.cloneDeep(this.securityScope);
 		s['items']['enum'] = this.securityDefinitions[secdef]['scopes'] ? 
 			this.keys(this.securityDefinitions[secdef]['scopes']) : [];
 		return s;
@@ -105,7 +106,7 @@ export class SecurityEditorComponent implements OnInit
 			return;
 		}
 		this.noItemToAdd = false;
-		let req = {};
+		const req = {};
 		req[this.propertyToAdd] = [];
 		this.obj.push(req);
 		this.propertyToAdd = "";
@@ -121,7 +122,7 @@ export class SecurityEditorComponent implements OnInit
 	changeProperty(newp: any, i: number, p: string)
 	{
 		if (newp != p) {
-			let oldScopes = this.obj[i][p];
+			const oldScopes = this.obj[i][p];
 			this.obj[i] = {};
 			this.obj[i][newp] = oldScopes;
 			this.collapsed[newp] = this.collapsed[p];

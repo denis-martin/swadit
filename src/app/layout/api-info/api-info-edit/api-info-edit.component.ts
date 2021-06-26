@@ -77,7 +77,7 @@ export class ApiInfoEditComponent implements OnInit
 	{
 		console.log("ApiInfoEditComponent.ok()");
 
-		let api = _.cloneDeep(this.api);
+		const api = _.cloneDeep(this.api);
 
 		// apply changes
 		this.apis.current['info'] = api['info'];

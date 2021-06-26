@@ -53,7 +53,7 @@ export class PathComponent implements OnInit {
 			this.path = params['path'];
 			this.method = params['method'];
 			if (!this.method) {
-				let methods = this.getMethods();
+				const methods = this.getMethods();
 				//console.log(this.apis.current['paths'], this.path, methods);
 				if (methods.length > 0) {
 					this.method = methods[0];
@@ -72,7 +72,7 @@ export class PathComponent implements OnInit {
 					this.router.navigate(['/api-info']);
 				}
 			} else if (this.method && !this.apis.current['paths'][this.path][this.method]) {
-				let methods = this.getMethods();
+				const methods = this.getMethods();
 				console.log(this.apis.current['paths'], this.path, methods);
 				if (methods.length > 0) {
 					this.method = methods[0];
@@ -86,7 +86,7 @@ export class PathComponent implements OnInit {
 	ngOnInit() {
 		console.log("init", this.method);
 		if (!this.method) {
-			let methods = this.getMethods();
+			const methods = this.getMethods();
 			console.log(this.apis.current['paths'], this.path, methods);
 			if (methods.length > 0) {
 				this.method = methods[0];
@@ -98,17 +98,19 @@ export class PathComponent implements OnInit {
 
 	getMethods(): Array<string> {
 		if (!this.apis.current['paths']) return [];
-		let methods = this.apis.keys(this.apis.current['paths'][this.path]);
+		const methods = this.apis.keys(this.apis.current['paths'][this.path]);
 		_.pull(methods, "parameters");
 		return methods;
 	}
 
 	getParameters(path: string, method: string): Array<any> {
-		let params: Array<any> = [];
+		const params: Array<any> = [];
 		if (this.apis.current['paths'][path]['parameters']) {
+			// eslint-disable-next-line prefer-spread
 			params.push.apply(params, this.apis.current['paths'][path]['parameters']);
 		}
 		if (this.apis.current['paths'][path][method]['parameters']) {
+			// eslint-disable-next-line prefer-spread
 			params.push.apply(params, this.apis.current['paths'][path][method]['parameters']);
 		}
 		return params;

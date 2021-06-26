@@ -158,8 +158,8 @@ export class ApisService
 			.subscribe(resp => {
 				if (resp.status == 200) {
 					//this.config = YAML.load(resp.body);
-					let config = YAML.load(resp.body);
-					for (let k of Object.keys(config)) {
+					const config = YAML.load(resp.body);
+					for (const k of Object.keys(config)) {
 						this.config[k] = config[k];
 					}
 					console.info("Config loaded");
@@ -177,7 +177,7 @@ export class ApisService
 	openFile(pathName: string, fobj)
 	{
 		//Swadit.thinking = "Loading file...";
-		let apis = this;
+		const apis = this;
 		if (pathName) {
 			this.http.get(pathName, { observe: 'response', responseType: 'text' })
 				.subscribe(resp => {
@@ -199,7 +199,7 @@ export class ApisService
 					}
 				});
 		} else {
-			let reader = new FileReader();
+			const reader = new FileReader();
 			reader.onloadend = function(e) {
 				apis.lastLoaded = reader.result.toString();
 				try {
@@ -217,7 +217,7 @@ export class ApisService
 	addFile(pathName: string, fobj: any = null, addSource = false)
 	{
 		console.log("addFile", pathName, fobj, addSource);
-		let apis = this;
+		const apis = this;
 		if (pathName) {
 			this.http.get(pathName, { observe: 'response', responseType: 'text' })
 				.subscribe(resp => {
@@ -239,7 +239,7 @@ export class ApisService
 					}
 				});
 		} else {
-			let reader = new FileReader();
+			const reader = new FileReader();
 			reader.onload = function(e) {
 				apis.lastLoaded = reader.result.toString();
 				try {
@@ -260,8 +260,8 @@ export class ApisService
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
 
-		let self = this;
-		let apiClone: any = _.cloneDeep(this.current);
+		const self = this;
+		const apiClone: any = _.cloneDeep(this.current);
 		SwaggerParser.validate(apiClone, swaggerParserOptions)
 			.then(function(api) {
 				console.log("This API is a valid Swagger file.");
@@ -296,16 +296,16 @@ export class ApisService
 	mergeSwagger(api, sourceName: string = null, addSource = false)
 	{
 		console.log("mergeSwagger", api, sourceName, addSource);
-		let apis = this;
+		const apis = this;
 
-		var addedPath = [];
-		var replacedPath = [];
-		var addedParameters = [];
-		var replacedParameters = [];
-		var addedDefinitions = [];
-		var replacedDefinitions = [];
-		var addedResponses = [];
-		var replacedResponses = [];
+		const addedPath = [];
+		const replacedPath = [];
+		const addedParameters = [];
+		const replacedParameters = [];
+		const addedDefinitions = [];
+		const replacedDefinitions = [];
+		const addedResponses = [];
+		const replacedResponses = [];
 		
 		if (api.hasOwnProperty('paths')) {
 			Object.keys(api.paths).forEach(function(element) {
@@ -322,7 +322,7 @@ export class ApisService
 					addedPath.push(element);
 				}
 				if (addSource && sourceName) {
-					for (let k of Object.keys(apis.current['paths'][element])) {
+					for (const k of Object.keys(apis.current['paths'][element])) {
 						if (k != "parameters") {
 							if (!apis.current['paths'][element][k].description) {
 								apis.current['paths'][element][k].description = "";
@@ -427,7 +427,7 @@ export class ApisService
 	hasExtensions(obj: Object): boolean
 	{
 		if (obj == null) return false;
-		for (let k of Object.keys(obj)) {
+		for (const k of Object.keys(obj)) {
 			if (k.startsWith("x-")) {
 				return true;
 			}
@@ -438,7 +438,7 @@ export class ApisService
 	propertyIsRequired(schema: any, property: string): boolean
 	{
 		if (schema.required == null) return false;
-		for (let rp of schema.required) {
+		for (const rp of schema.required) {
 			if (rp == property) return true;
 		}
 		return false;
@@ -537,7 +537,7 @@ export class ApisService
 
 	createBlobUrl()
 	{
-		let content = YAML.dump(this.current);
+		const content = YAML.dump(this.current);
 		this.blob = new Blob([ content ], { type : 'text/plain' });
 		if (this.blobUrl != '') {
 			window.URL.revokeObjectURL(this.blobUrl);
@@ -622,7 +622,7 @@ export class ApisService
 		if (this.hasLoadingErrors) {
 			this.fileModal.componentInstance.validationErrors = true;
 		} else {
-			let fileModal = this.fileModal;
+			const fileModal = this.fileModal;
 			this.validate(this.current)
 				.then(api => { fileModal.componentInstance.validationErrors = false })
 				.catch(err => { fileModal.componentInstance.validationErrors = true });
@@ -644,9 +644,9 @@ export class ApisService
 	{
 		let filteredList = list;
 		if (filterText) {
-			let fl = filterText.toLowerCase();
+			const fl = filterText.toLowerCase();
 			filteredList = list.filter(s => {
-				let sl = s.toLowerCase();
+				const sl = s.toLowerCase();
 				return sl.indexOf(fl) > -1;
 			});
 		}
@@ -667,15 +667,15 @@ export class ApisService
 	resolveRef(ref: string): any
 	{
 		if (ref.startsWith("#/definitions/")) {
-			let refParts = ref.split('/');
+			const refParts = ref.split('/');
 			return this.current['definitions'][refParts[2]];
 		}
 		if (ref.startsWith("#/parameters/")) {
-			let refParts = ref.split('/');
+			const refParts = ref.split('/');
 			return this.current['parameters'][refParts[2]];
 		}
 		if (ref.startsWith("#/responses/")) {
-			let refParts = ref.split('/');
+			const refParts = ref.split('/');
 			return this.current['responses'][refParts[2]];
 		}
 		return null;
@@ -688,11 +688,11 @@ export class ApisService
 				obj = this.resolveRef(obj['$ref']);
 			} 
 			if (Array.isArray(obj['allOf'])) {
-				let mergedObj = {};
+				const mergedObj = {};
 				obj['allOf'].forEach(o => {
 					o = this.resolveObj(o);
 					if (o) {
-						for (let key of Object.keys(o)) {
+						for (const key of Object.keys(o)) {
 							if (!mergedObj[key]) {
 								mergedObj[key] = _.cloneDeep(o[key]);
 							}
@@ -701,7 +701,7 @@ export class ApisService
 							if (!mergedObj["properties"]) {
 								mergedObj["properties"] = {};
 							}
-							for (let p of Object.keys(o["properties"])) {
+							for (const p of Object.keys(o["properties"])) {
 								// no recursive resolving
 								mergedObj["properties"][p] = o["properties"][p];
 							}
@@ -720,7 +720,7 @@ export class ApisService
 
 	renameObjectKey(obj: any, key: string, newKey: string) 
 	{
-		var newObj = _.clone(obj);
+		const newObj = _.clone(obj);
 		Object.keys(obj).forEach(k => delete obj[k]);
 		Object.keys(newObj).forEach(k => {
 			if (k != key) {
@@ -753,7 +753,7 @@ export class ApisService
 
 	missingRequiredProperties(schema: any, obj: any): Array<string>
 	{
-		let missingFields = [];
+		const missingFields = [];
 		if (schema['required']) {
 			schema['required'].forEach(p => {
 				if (!obj[p]) {
@@ -785,7 +785,7 @@ export class ApisService
 
 	deleteSelectedPaths()
 	{
-		var paths = Object.keys(this.selectedPaths);
+		const paths = Object.keys(this.selectedPaths);
 		if (paths.length == 0) {
 			ConfirmComponent.open(this.modalService, "Please select a path.", "Ok", null);
 		} else {
@@ -801,7 +801,7 @@ export class ApisService
 
 	inverseSelectedPaths()
 	{
-		var paths = Object.keys(this.selectedPaths);
+		const paths = Object.keys(this.selectedPaths);
 		if (paths.length == 0) {
 			this.selectAllPaths();
 		} else if (paths.length == Object.keys(this.current['paths']).length) {
@@ -863,7 +863,7 @@ export class ApisService
 				} else if (schema.default && !forceGeneration) {
 					res = schema.default;
 				} else {
-					let r = this.generateExample(schema.items, refStack, noReadOnly);
+					const r = this.generateExample(schema.items, refStack, noReadOnly);
 					if (r !== undefined) {
 						res = [ r ];
 					}
@@ -876,8 +876,8 @@ export class ApisService
 				} else {
 					res = {};
 					this.keys(schema.properties).forEach(k => {
-						let refStackCopy = _.cloneDeep(refStack);
-						let r = this.generateExample(schema.properties[k], refStackCopy, noReadOnly);
+						const refStackCopy = _.cloneDeep(refStack);
+						const r = this.generateExample(schema.properties[k], refStackCopy, noReadOnly);
 						if (r !== undefined) {
 							res[k] = r;
 						}
@@ -890,7 +890,7 @@ export class ApisService
 
 	validateStr(input: string): any
 	{
-		let apis = this;
+		const apis = this;
 		return new Promise((resolve, reject) => {
 			let api;
 			let apiClone;
@@ -916,9 +916,9 @@ export class ApisService
 	
 	validate(obj: any): any
 	{
-		let apis = this;
+		const apis = this;
 		return new Promise((resolve, reject) => {
-			let apiClone = _.cloneDeep(obj);
+			const apiClone = _.cloneDeep(obj);
 			SwaggerParser.validate(apiClone, swaggerParserOptions)
 				.then(function(api) {
 					console.log("This API is a valid Swagger file.");
@@ -938,9 +938,9 @@ export class ApisService
 			api = this.current;
 		}
 		if (!api['paths']) return [];
-		let methodKeys = this.keys(api['paths'][path]);
+		const methodKeys = this.keys(api['paths'][path]);
 		_.pull(methodKeys, "parameters");
-		let methods: Array<object> = [];
+		const methods: Array<object> = [];
 		methodKeys.forEach(m => methods.push({ 
 			key: m,
 			obj: api['paths'][path][m] 

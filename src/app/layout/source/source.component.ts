@@ -67,7 +67,7 @@ export class SourceComponent implements OnInit
 
 	apply()
 	{
-		let self = this;
+		const self = this;
 		self.validationPassed = null;
 		self.applied = null;
 		this.apis.validateStr(this.text)
@@ -87,7 +87,7 @@ export class SourceComponent implements OnInit
 
 	validate()
 	{
-		let self = this;
+		const self = this;
 		self.validationPassed = null;
 		self.applied = null;
 		this.apis.validateStr(this.text)

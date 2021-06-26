@@ -53,8 +53,8 @@ export class SchemaViewComponent implements OnInit
 		if (this.schema['additionalProperties'] === true) {
 			return Object.keys(this.obj);
 		} else {
-			let schemaKeys = Object.keys(this.schema['properties']);
-			let objKeys = Object.keys(this.obj);
+			const schemaKeys = Object.keys(this.schema['properties']);
+			const objKeys = Object.keys(this.obj);
 			_.remove(schemaKeys, k => { return objKeys.indexOf(k) < 0; });
 			_.remove(schemaKeys, k => { return this.doSkip(k); });
 			return schemaKeys;

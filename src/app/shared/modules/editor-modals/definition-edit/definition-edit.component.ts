@@ -75,7 +75,7 @@ export class DefinitionEditComponent implements OnInit
 			return;
 		}
 
-		let o = _.cloneDeep(this.obj);
+		const o = _.cloneDeep(this.obj);
 		this.apis.cleanUpSwaggerSchema(o);
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);

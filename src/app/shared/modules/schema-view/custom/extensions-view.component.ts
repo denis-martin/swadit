@@ -35,7 +35,7 @@ export class ExtensionsViewComponent implements OnInit {
 	getAdditionalKeys(obj: Object): Array<string>
 	{
 		if (obj == null) return null;
-		let res: Array<string> = [];
+		const res: Array<string> = [];
 		Object.keys(obj).forEach(k => {
 			if (k.startsWith("x-")) {
 				res.push(k);

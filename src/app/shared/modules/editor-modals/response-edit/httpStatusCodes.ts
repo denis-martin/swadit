@@ -1,5 +1,5 @@
 // source: http://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
-export let httpStatusCodes = {
+export const httpStatusCodes = {
 	'100': "Continue",
 	'101': "Switching Protocols",
 	'102': "Processing",

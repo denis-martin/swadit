@@ -80,7 +80,7 @@ export class PathsComponent implements OnInit
 
 	modify(event)
 	{
-		let self = this;
+		const self = this;
 
 		console.log("modify()");
 		if (event) event.stopPropagation();
@@ -89,9 +89,9 @@ export class PathsComponent implements OnInit
 			.then((result) => {
 				console.info("modify()", result);
 				if (result.deprecationSet) {
-					for (let p in self.apis.selectedPaths) {
+					for (const p in self.apis.selectedPaths) {
 						if (self.apis.current['paths'][p]) {
-							for (let m in self.apis.current['paths'][p]) {
+							for (const m in self.apis.current['paths'][p]) {
 								if (m != 'parameters') {
 									self.apis.current['paths'][p][m]['deprecated'] = true;
 								}
@@ -102,9 +102,9 @@ export class PathsComponent implements OnInit
 					}
 
 				} else if (result.deprecationRemove) {
-					for (let p in self.apis.selectedPaths) {
+					for (const p in self.apis.selectedPaths) {
 						if (self.apis.current['paths'][p]) {
-							for (let m in self.apis.current['paths'][p]) {
+							for (const m in self.apis.current['paths'][p]) {
 								if (m != 'parameters') {
 									delete self.apis.current['paths'][p][m]['deprecated'];
 								}

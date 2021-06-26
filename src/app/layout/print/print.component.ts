@@ -44,10 +44,10 @@ export class PrintComponent implements OnInit
 
 	print()
 	{
-		var contentToPrint = document.getElementById('contentToPrint').innerHTML;
+		const contentToPrint = document.getElementById('contentToPrint').innerHTML;
 
 		if (window) {
-			var popup = window.open('', '_blank', 
+			const popup = window.open('', '_blank', 
 				'width=800,height=600,menubar=no,toolbar=no,location=no,status=no,titlebar=no');
 			popup.window.focus();
 

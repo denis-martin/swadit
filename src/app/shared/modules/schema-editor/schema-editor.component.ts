@@ -36,9 +36,10 @@ export class SchemaEditorComponent implements OnInit
 	@Input() 
 	get obj() { 
 		return this._obj; 
-	};
+	}
 
 	@Output() objChange = new EventEmitter<any>();
+	// eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
 	set obj(val) 
 	{
 		this._obj = val;

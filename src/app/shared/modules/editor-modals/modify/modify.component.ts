@@ -30,8 +30,7 @@ export class ModifyComponent implements OnInit
 
 	public static open(modalService: NgbModal, pathCount: number): any
 	{
-		let modal: NgbModalRef;
-		modal = modalService.open(ModifyComponent, ModifyComponent.modalOptions);
+		const modal = modalService.open(ModifyComponent, ModifyComponent.modalOptions);
 		modal.componentInstance.pathCount = pathCount;
 		return modal.result;
 	}

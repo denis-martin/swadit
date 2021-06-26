@@ -15,7 +15,7 @@ export class SwadocComponent implements OnInit {
 
 		this.apis.eventApiChanged.subscribe(param => {
 			this.apis.createBlobUrl();
-			let swadocFrame = document.getElementById("swadocFrame");
+			const swadocFrame = document.getElementById("swadocFrame");
 			swadocFrame['contentWindow']['Swadoc'].openFile(null, this.apis.blob);
 		});
 	}

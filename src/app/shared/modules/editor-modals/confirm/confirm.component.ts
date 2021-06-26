@@ -29,8 +29,7 @@ export class ConfirmComponent implements OnInit
 	public static open(modalService: NgbModal, text: string, 
 		okText: string = "Ok", cancelText: string = "Cancel"): any
 	{
-		let modal: NgbModalRef;
-		modal = modalService.open(ConfirmComponent, ConfirmComponent.modalOptions);
+		const modal = modalService.open(ConfirmComponent, ConfirmComponent.modalOptions);
 		modal.componentInstance.text = text;
 		modal.componentInstance.okText = okText;
 		modal.componentInstance.cancelText = cancelText;

@@ -81,7 +81,7 @@ export class ResponseEditComponent implements OnInit
 		}
 
 		if (!this.obj['$ref']) {
-			let missing = this.apis.missingRequiredProperties(this.apis.schemas.response, this.obj);
+			const missing = this.apis.missingRequiredProperties(this.apis.schemas.response, this.obj);
 			if (missing.length > 0) {
 				this.errorStr = "Missing required properties: ";
 				missing.forEach(p => {
@@ -91,7 +91,7 @@ export class ResponseEditComponent implements OnInit
 			}
 		}
 
-		let o = _.cloneDeep(this.obj);
+		const o = _.cloneDeep(this.obj);
 		this.apis.cleanUp(this.apis.schemas.response, o);
 		this.apis.cleanUpSwaggerSchema(o['schema']);
 

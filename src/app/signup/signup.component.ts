@@ -9,7 +9,9 @@ import { routerTransition } from '../router.animations';
 })
 export class SignupComponent implements OnInit {
 
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     constructor() { }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-empty-function
     ngOnInit() { }
 }

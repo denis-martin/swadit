@@ -37,9 +37,10 @@ export class SwaggerSchemaEditorComponent implements OnInit
 	@Input() 
 	get obj() { 
 		return this._obj; 
-	};
+	}
 
 	@Output() objChange = new EventEmitter<any>();
+	// eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
 	set obj(val) 
 	{
 		this._obj = val;
@@ -135,9 +136,9 @@ export class SwaggerSchemaEditorComponent implements OnInit
 
 	convertToAllOf(obj: any)
 	{
-		let items = [];
-		let o = {};
-		for (let k of Object.keys(obj)) {
+		const items = [];
+		const o = {};
+		for (const k of Object.keys(obj)) {
 			o[k] = obj[k];
 			delete obj[k];
 		}
@@ -152,7 +153,7 @@ export class SwaggerSchemaEditorComponent implements OnInit
 			o = obj['allOf'][0];
 		}
 		delete obj['allOf'];
-		for (let k of Object.keys(o)) {
+		for (const k of Object.keys(o)) {
 			obj[k] = o[k];
 		}
 	}

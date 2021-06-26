@@ -1,0 +1,20 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "rules": {
+        "@typescript-eslint/no-explicit-any": 0,
+        "@typescript-eslint/no-inferrable-types": 0,
+        "@typescript-eslint/no-this-alias": 1,
+        "no-prototype-builtins": 1,
+        "@typescript-eslint/no-empty-function": 1,
+        "@typescript-eslint/ban-types": 1
+    }
+}

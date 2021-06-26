@@ -103,7 +103,7 @@ export class PathEditComponent implements OnInit
 			return;
 		}
 
-		let o = _.cloneDeep(this.obj);
+		const o = _.cloneDeep(this.obj);
 		this.apis.cleanUp(this.apis.schemas.operation, o);
 		if (o['externalDocs'] && !o['externalDocs']['url'] && !o['externalDocs']['description']) {
 			delete o['externalDocs'];
