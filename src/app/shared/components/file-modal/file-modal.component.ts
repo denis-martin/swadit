@@ -19,7 +19,7 @@ export class FileModalComponent implements OnInit
 	blob: Blob;
 	fileName: string;
 	modalHint: string = "";
-	files: any;
+	files: FileList | null;
 	validationErrors: boolean = null;
 
 	get modalTitle(): string
@@ -37,10 +37,11 @@ export class FileModalComponent implements OnInit
 
 	constructor(public activeModal: NgbActiveModal) { }
 
-	ngOnInit() {
+	ngOnInit(): void {
+		// nothing
 	}
 
-    ok()
+    ok(): void
     {
 		if (this.dialogType == "fileOpen" || this.dialogType == "fileAdd") {
 			console.log("fileModal addSource", this.addSource)
@@ -51,8 +52,9 @@ export class FileModalComponent implements OnInit
 		}
 	}
 	
-	onFileChange(event)
+	onFileChange(event: Event): void
 	{
-		this.files = event.target.files;
+		const element = event.target as HTMLInputElement;
+		this.files = element.files;
 	}
 }

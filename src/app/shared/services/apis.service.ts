@@ -19,8 +19,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from  "@angular/common/http";
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { Subject, Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 import { OpenAPI } from 'openapi-types';
 import * as SwaggerParser from '@apidevtools/swagger-parser';
@@ -44,7 +43,6 @@ import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-paramet
 import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
 import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
 import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
-import { YAMLException } from 'js-yaml';
 
 const swaggerParserOptions: SwaggerParser.Options = {
 	resolve: {
@@ -107,7 +105,7 @@ export class ApisService
 		}
 	};
 
-	get schemas()
+	get schemas(): any
 	{
 		if (this.current['swagger'] == "2.0") {
 			return this._schemas["2.0"];
@@ -152,7 +150,7 @@ export class ApisService
 		this.loadConfig();
 	}
 
-	loadConfig()
+	loadConfig(): void
 	{
 		this.http.get("assets/config.yaml", { observe: 'response', responseType: 'text' })
 			.subscribe(resp => {
@@ -174,7 +172,7 @@ export class ApisService
 			});
 	}
 
-	openFile(pathName: string, fobj)
+	openFile(pathName: string, fobj: File): void
 	{
 		//Swadit.thinking = "Loading file...";
 		const apis = this;
@@ -214,7 +212,7 @@ export class ApisService
 		}
 	}
 
-	addFile(pathName: string, fobj: any = null, addSource = false)
+	addFile(pathName: string, fobj: any = null, addSource = false): void
 	{
 		console.log("addFile", pathName, fobj, addSource);
 		const apis = this;
@@ -254,7 +252,7 @@ export class ApisService
 		}
 	}
 
-	swaggerLoaded(api, fileName: string = null) 
+	swaggerLoaded(api, fileName: string = null): void
 	{
 		console.log("swaggerLoaded");
 		this.current = api;
@@ -276,7 +274,7 @@ export class ApisService
 			});
 	}
 
-	swaggerLoadingError(err, fileName: string = null)
+	swaggerLoadingError(err, fileName: string = null): void
 	{
 		console.log("error loading yaml: ", err);
 		this.hasLoadingErrors = true;
@@ -293,7 +291,7 @@ export class ApisService
 		this.router.navigate(['/source']);
 	}
 
-	mergeSwagger(api, sourceName: string = null, addSource = false)
+	mergeSwagger(api, sourceName: string = null, addSource = false): void
 	{
 		console.log("mergeSwagger", api, sourceName, addSource);
 		const apis = this;
@@ -444,7 +442,7 @@ export class ApisService
 		return false;
 	}
 
-	cleanUp(schema: any, api: any)
+	cleanUp(schema: any, api: any): void
 	{
 		if (!api) return;
 
@@ -513,7 +511,7 @@ export class ApisService
 		}
 	}
 
-	cleanUpSwaggerSchema(obj: any)
+	cleanUpSwaggerSchema(obj: any): void
 	{
 		if (!obj) return;
 
@@ -535,7 +533,7 @@ export class ApisService
 		// todo: check for additional optional attributes
 	}
 
-	createBlobUrl()
+	createBlobUrl(): void
 	{
 		const content = YAML.dump(this.current);
 		this.blob = new Blob([ content ], { type : 'text/plain' });
@@ -546,7 +544,7 @@ export class ApisService
 		console.log("Download URL: " + this.blobUrl);
 	}
 
-	newFile()
+	newFile(): void
 	{
 		this.current = { 
 			swagger: "2.0",
@@ -560,7 +558,7 @@ export class ApisService
 		this._eventApiChanged.next(this.currentFileName);
 	}
 
-	openFileModal()
+	openFileModal(): void
 	{
 		console.log("openFileModal()");
 		this.fileModal = this.modalService.open(FileModalComponent, FileModalComponent.modalOptions);
@@ -568,8 +566,9 @@ export class ApisService
 		this.fileModal.result.then((result) => {
 			this.closeResult = `Closed with: ${result}`;
 			console.info("openFileModal(): " + this.closeResult);
-			if (result.files.length > 0) {
-				this.openFile(null, result.files[0]);
+			const files: FileList | null = result.files;
+			if (files && files.length > 0) {
+				this.openFile(null, files[0]);
 			}
 			
         }, (reason) => {
@@ -579,7 +578,7 @@ export class ApisService
         });
 	}
 	
-	addFilesModal()
+	addFilesModal(): void
 	{
 		console.log("addFileModal()");
 		this.fileModal = this.modalService.open(FileModalComponent, FileModalComponent.modalOptions);
@@ -610,7 +609,7 @@ export class ApisService
         }
 	}
 	
-	downloadFileModal()
+	downloadFileModal(): void
 	{
 		console.log("downloadFileModal()");
 		this.createBlobUrl();
@@ -718,7 +717,7 @@ export class ApisService
 		return obj;
 	}
 
-	renameObjectKey(obj: any, key: string, newKey: string) 
+	renameObjectKey(obj: any, key: string, newKey: string): any
 	{
 		const newObj = _.clone(obj);
 		Object.keys(obj).forEach(k => delete obj[k]);
@@ -732,12 +731,12 @@ export class ApisService
 		return obj;
 	}
 
-	settingsModal()
+	settingsModal(): void
 	{
 		alert('Not yet implemented');
 	}
 
-	keys(obj)
+	keys(obj: Object): string[]
 	{
 		if (!obj) return [];
 		return Object.keys(obj);
@@ -764,7 +763,7 @@ export class ApisService
 		return missingFields;
 	}
 
-	selectPath(path: string, event: any)
+	selectPath(path: string, event: any): void
 	{
 		if (this.selectedPaths.hasOwnProperty(path)) {
 			delete this.selectedPaths[path];
@@ -773,17 +772,17 @@ export class ApisService
 		}
 	}
 
-	selectAllPaths()
+	selectAllPaths(): void
 	{
 		Object.keys(this.current['paths']).forEach(p => this.selectedPaths[p] = true);
 	}
 
-	deselectAllPaths()
+	deselectAllPaths(): void
 	{
 		this.selectedPaths = {};
 	}
 
-	deleteSelectedPaths()
+	deleteSelectedPaths(): void
 	{
 		const paths = Object.keys(this.selectedPaths);
 		if (paths.length == 0) {
@@ -799,7 +798,7 @@ export class ApisService
 		}
 	}
 
-	inverseSelectedPaths()
+	inverseSelectedPaths(): void
 	{
 		const paths = Object.keys(this.selectedPaths);
 		if (paths.length == 0) {

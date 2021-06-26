@@ -17,10 +17,6 @@
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
-import { SchemaEditorComponent } from './schema-editor.component';
-import { PrimitiveEditorComponent } from './primitive-editor.component';
-import { ArrayEditorComponent } from './array-editor.component';
-
 @Component({
 	selector: 'swadit-object-editor',
 	templateUrl: './object-editor.component.html',
@@ -37,6 +33,7 @@ export class ObjectEditorComponent implements OnInit
 
 	private _obj: any;
 	@Input() 
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	get obj() { 
 		return this._obj; 
 	}
@@ -71,7 +68,7 @@ export class ObjectEditorComponent implements OnInit
 		}
 	}
 
-	ngOnInit() 
+	ngOnInit(): void
 	{
 		if (!this.card && this.schema["x-swadit-editor-card"]) {
 			this.card = true;
@@ -90,7 +87,7 @@ export class ObjectEditorComponent implements OnInit
 		}
 	}
 
-	schemaProperties() 
+	schemaProperties(): string[]
 	{
 		if (!this.schema.properties) {
 			return [];
@@ -99,7 +96,7 @@ export class ObjectEditorComponent implements OnInit
 		}
 	}
 
-	objectProperties()
+	objectProperties(): string[]
 	{
 		if (!this.obj) {
 			return [];
@@ -108,7 +105,7 @@ export class ObjectEditorComponent implements OnInit
 		}
 	}
 
-	deCamelize(s: string)
+	deCamelize(s: string): string
 	{
 		let r = s.replace(/[A-Z]/g, " $&");
 		r = r.replace(/^[a-z]/, r[0].toUpperCase());
@@ -124,7 +121,7 @@ export class ObjectEditorComponent implements OnInit
 		return false;
 	}
 
-	addProperty(event: any)
+	addProperty(event: any): void
 	{
 		event.preventDefault();
 		console.log("addProperty", this.propertyToAdd);
@@ -146,14 +143,14 @@ export class ObjectEditorComponent implements OnInit
 		this.propertyToAdd = "";
 	}
 
-	deleteProperty(event: any, p: string)
+	deleteProperty(event: any, p: string): void
 	{
 		event.stopPropagation();
 		console.log("deleteProperty", p);
 		delete this.obj[p];
 	}
 
-	changeProperty(newp: any, p: string)
+	changeProperty(newp: any, p: string): void
 	{
 		if (newp != p) {
 			this.collapsed[newp] = this.collapsed[p];
@@ -170,7 +167,7 @@ export class ObjectEditorComponent implements OnInit
 		}
 	}
 
-	trackByIndex(index: any, item: any) {
+	trackByIndex(index: number, item: any): number {
 		return index;
 	}
 

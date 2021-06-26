@@ -32,6 +32,7 @@ export class SecurityEditorComponent implements OnInit
 
 	private _obj: any;
 	@Input() 
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	get obj() { 
 		return this._obj; 
 	}
@@ -68,16 +69,14 @@ export class SecurityEditorComponent implements OnInit
 	public propertyToAdd = "";
 	public noItemToAdd: boolean = false;
 
-	constructor() { }
-
-	ngOnInit() 
+	ngOnInit(): void
 	{
 		this.keys(this.securityDefinitions).forEach(p => {
 			this.collapsed[p] = true;
 		});
 	}
 
-	keys(o)
+	keys(o): string[]
 	{
 		if (!o) {
 			return [];
@@ -86,7 +85,7 @@ export class SecurityEditorComponent implements OnInit
 		}
 	}
 
-	scopes(secdef: string)
+	scopes(secdef: string): any
 	{
 		if (!this.securityDefinitions || !this.securityDefinitions[secdef]) {
 			return this.securityScope;
@@ -97,7 +96,7 @@ export class SecurityEditorComponent implements OnInit
 		return s;
 	}
 
-	addProperty(event: any)
+	addProperty(event: any): void
 	{
 		event.preventDefault();
 		console.log("addProperty", this.propertyToAdd);
@@ -112,14 +111,14 @@ export class SecurityEditorComponent implements OnInit
 		this.propertyToAdd = "";
 	}
 
-	deleteItem(event: any, i: number)
+	deleteItem(event: any, i: number): void
 	{
 		event.preventDefault();
 		console.log("deleteItem", i);
 		this.obj.splice(i, 1);
 	}
 
-	changeProperty(newp: any, i: number, p: string)
+	changeProperty(newp: any, i: number, p: string): void
 	{
 		if (newp != p) {
 			const oldScopes = this.obj[i][p];
@@ -130,7 +129,7 @@ export class SecurityEditorComponent implements OnInit
 		}
 	}
 
-	trackByIndex(index: any, item: any) 
+	trackByIndex(index: number, item: any): number
 	{
 		return index;
 	}

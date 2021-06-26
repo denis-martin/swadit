@@ -30,6 +30,7 @@ export class PrimitiveEditorComponent implements OnInit
 	
 	private _obj: any;
 	@Input() 
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	get obj() { 
 		return this._obj; 
 	}
@@ -47,7 +48,7 @@ export class PrimitiveEditorComponent implements OnInit
 		this.wrapClass = "";
 	}
 
-	ngOnInit() 
+	ngOnInit(): void
 	{
 		if (this.schema['type'] == "boolean" && this.schema['default'] != undefined && this.obj == undefined) {
 			this._obj = this.schema['default']

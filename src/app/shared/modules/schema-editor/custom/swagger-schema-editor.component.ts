@@ -35,6 +35,7 @@ export class SwaggerSchemaEditorComponent implements OnInit
 
 	private _obj: any;
 	@Input() 
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	get obj() { 
 		return this._obj; 
 	}
@@ -54,25 +55,25 @@ export class SwaggerSchemaEditorComponent implements OnInit
 
 	constructor(public apis: ApisService) { }
 
-	ngOnInit() 
+	ngOnInit(): void
 	{
 		if (!this.schema) {
 			this.schema = this.apis.schemas.schema;
 		}
 	}
 
-	keys(obj) 
+	keys(obj): string[]
 	{
 		if (!obj) return [];
 		return Object.keys(obj);
 	}
 
-	trackByIndex(index: any, item: any) 
+	trackByIndex(index: number, item: any): number
 	{
 		return index;
 	}
 
-	addProperty(event: any)
+	addProperty(event: any): void
 	{
 		event.preventDefault();
 		console.log("addProperty", this.propertyToAdd);
@@ -93,31 +94,31 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		this.propertyToAdd = null;
 	}
 
-	deleteProperty(event: any, propKey: string)
+	deleteProperty(event: any, propKey: string): void
 	{
 		event.preventDefault();
 		console.log("deleteProperty", propKey);
 		delete this.obj['properties'][propKey];
 	}
 
-	changeProperty(newPropKey: any, propKey: any)
+	changeProperty(newPropKey: any, propKey: any): void
 	{
 		if (newPropKey && newPropKey != propKey) {
 			this.apis.renameObjectKey(this.obj['properties'], propKey, newPropKey);
 		}
 	}
 
-	changePropertyKeyDown(event: any, propKey: any)
+	changePropertyKeyDown(event: any, propKey: any): void
 	{
 		event.preventDefault();
 	}
 
-	propertyIsRequired(propKey)
+	propertyIsRequired(propKey): boolean
 	{
 		return this.obj['required'] && this.obj['required'].indexOf(propKey) >= 0;
 	}
 
-	changePropertyIsRequired(propKey)
+	changePropertyIsRequired(propKey): void
 	{
 		if (this.propertyIsRequired(propKey)) {
 			this.obj['required'].splice(this.obj['required'].indexOf(propKey), 1);
@@ -129,12 +130,12 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		}
 	}
 
-	deleteAllOfItem(event: any, index: number)
+	deleteAllOfItem(event: any, index: number): void
 	{
 		this.obj["allOf"].splice(index, 1);
 	}
 
-	convertToAllOf(obj: any)
+	convertToAllOf(obj: any): void
 	{
 		const items = [];
 		const o = {};
@@ -146,7 +147,7 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		obj['allOf'] = items;
 	}
 
-	convertToSingleSchema(obj: any)
+	convertToSingleSchema(obj: any): void
 	{
 		let o = {};
 		if (Array.isArray(obj['allOf']) && obj['allOf'].length > 0) {
@@ -158,13 +159,13 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		}
 	}
 
-	addToAllOf(obj: any)
+	addToAllOf(obj: any): number
 	{
 		obj['allOf'].push({});
 		return 0;
 	}
 
-	getType(obj: any)
+	getType(obj: any): string
 	{
 		if (obj['type']) {
 			return obj['type'];

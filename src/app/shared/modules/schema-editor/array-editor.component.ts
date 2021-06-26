@@ -29,6 +29,7 @@ export class ArrayEditorComponent implements OnInit
 
 	private _obj: any;
 	@Input() 
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	get obj() { 
 		return this._obj; 
 	}
@@ -43,10 +44,8 @@ export class ArrayEditorComponent implements OnInit
 
 	public itemToAdd: any;
 	public noItemToAdd: boolean = false;
-	
-	constructor() { }
 
-	ngOnInit() {
+	ngOnInit(): void {
 		if (!this._obj) {
 			this._obj = [];
 		}
@@ -57,7 +56,7 @@ export class ArrayEditorComponent implements OnInit
 		}
 	}
 
-	addItem(event: any)
+	addItem(event: any): void
 	{
 		event.preventDefault();
 		console.log("addItem", this.itemToAdd);
@@ -74,14 +73,14 @@ export class ArrayEditorComponent implements OnInit
 		}
 	}
 
-	deleteItem(event: any, i: number)
+	deleteItem(event: any, i: number): void
 	{
 		event.preventDefault();
 		console.log("deleteItem", i);
 		this.obj.splice(i, 1);
 	}
 
-	moveItemUp(event: any, i: number)
+	moveItemUp(event: any, i: number): void
 	{
 		if (i > 0) {
 			const items = this.obj.splice(i, 1);
@@ -89,7 +88,7 @@ export class ArrayEditorComponent implements OnInit
 		}
 	}
 
-	moveItemDown(event: any, i: number)
+	moveItemDown(event: any, i: number): void
 	{
 		if (i < this.obj.length) {
 			const items = this.obj.splice(i, 1);
@@ -97,7 +96,7 @@ export class ArrayEditorComponent implements OnInit
 		}
 	}
 
-	trackByIndex(index: any, item: any) {
+	trackByIndex(index: number, item: any): number {
 		return index;
 	}
 }

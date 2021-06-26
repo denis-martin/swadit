@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgbModal, ModalDismissReasons, NgbModalRef, NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
 	selector: 'app-confirm',
@@ -18,10 +18,11 @@ export class ConfirmComponent implements OnInit
 
 	constructor(public activeModal: NgbActiveModal) { }
 
-	ngOnInit() {
+	ngOnInit(): void {
+		// nothing
 	}
 
-	ok()
+	ok(): void
 	{
 		this.activeModal.close('ok');
 	}

@@ -17,10 +17,6 @@
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
-import { PrimitiveEditorComponent } from './primitive-editor.component';
-import { ObjectEditorComponent } from './object-editor.component';
-import { ArrayEditorComponent } from './array-editor.component';
-
 @Component({
 	selector: 'swadit-schema-editor',
 	templateUrl: './schema-editor.component.html',
@@ -34,6 +30,7 @@ export class SchemaEditorComponent implements OnInit
 
 	private _obj: any;
 	@Input() 
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 	get obj() { 
 		return this._obj; 
 	}
@@ -46,9 +43,8 @@ export class SchemaEditorComponent implements OnInit
 		this.objChange.emit(this._obj);
 	}
 
-	constructor() { }
-
-	ngOnInit() {
+	ngOnInit(): void {
+		// nothing
 	}
 
 }

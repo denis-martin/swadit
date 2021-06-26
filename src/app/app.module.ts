@@ -16,7 +16,7 @@ import { FileModalComponent } from './shared/components/file-modal/file-modal.co
 import { EditorModalsModule } from './shared/modules/editor-modals/editor-modals.module';
 
 // AoT requires an exported function for factories
-export function createTranslateLoader(http: HttpClient) {
+export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
 }
 @NgModule({
