@@ -9,10 +9,7 @@
     "types": [
       "jasmine",
       "node"
-    ],
-    "paths": {
-      "swagger-parser": ["../node_modules/swagger-parser/dist/swagger-parser.js"]
-    }
+    ]
   },
   "files": [
     "test.ts",

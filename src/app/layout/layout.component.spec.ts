@@ -14,7 +14,7 @@ describe('LayoutComponent', () => {
     TestBed.configureTestingModule({
     imports: [
       RouterTestingModule,
-      NgbDropdownModule.forRoot(),
+      NgbDropdownModule,
       TranslateModule.forRoot(),
     ],
       declarations: [

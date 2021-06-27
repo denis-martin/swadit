@@ -91,9 +91,17 @@
             "karmaConfig": "./karma.conf.js",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
+            "assets": [
+              "src/assets",
+              "src/favicon.ico"
+            ],
+            "styles": [
+              "node_modules/font-awesome/css/font-awesome.css",
+              "node_modules/prismjs/themes/prism-coy.css",
+              "node_modules/swagger-ui-dist/swagger-ui.css",
+              "src/styles/app.scss"
+            ],
             "scripts": [
-              "node_modules/json-schema-ref-parser/dist/ref-parser.min.js",
-              "node_modules/marked/lib/marked.js",
               "node_modules/prismjs/prism.js",
               "node_modules/prismjs/components/prism-json.min.js",
               "node_modules/ace-builds/src-min/ace.js",
@@ -102,16 +110,6 @@
               "node_modules/ace-builds/src-min/ext-searchbox.js",
               "node_modules/swagger-ui-dist/swagger-ui-bundle.js",
               "node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js"
-            ],
-            "styles": [
-              "node_modules/font-awesome/css/font-awesome.css",
-              "node_modules/prismjs/themes/prism-coy.css",
-              "node_modules/swagger-ui-dist/swagger-ui.css",
-              "src/styles/app.scss"
-            ],
-            "assets": [
-              "src/assets",
-              "src/favicon.ico"
             ]
           }
         },
