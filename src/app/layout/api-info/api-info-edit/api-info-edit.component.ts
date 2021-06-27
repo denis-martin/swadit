@@ -18,7 +18,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import * as _ from "lodash";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 
 import { ApisService } from '../../../shared/services';
 
@@ -38,7 +38,7 @@ export class ApiInfoEditComponent implements OnInit
 	constructor(public activeModal: NgbActiveModal, public apis: ApisService) 
 	{
 		console.log(apis.current);
-		this.api = _.cloneDeep(apis.current);
+		this.api = _cloneDeep(apis.current);
 		if (!this.api['info']) {
 			this.api['info'] = {};
 		}
@@ -77,7 +77,7 @@ export class ApiInfoEditComponent implements OnInit
 	{
 		console.log("ApiInfoEditComponent.ok()");
 
-		const api = _.cloneDeep(this.api);
+		const api = _cloneDeep(this.api);
 
 		// apply changes
 		this.apis.current['info'] = api['info'];

@@ -18,7 +18,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import * as _ from "lodash";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 
 import { ApisService } from '../../../services';
 
@@ -52,7 +52,7 @@ export class ParameterEditComponent implements OnInit
 		this.key_orig = this.key;
 		this.obj_orig = this.obj;
 		if (!this.obj_orig) this.obj_orig = {};
-		this.obj = _.cloneDeep(this.obj_orig);
+		this.obj = _cloneDeep(this.obj_orig);
 	}
 
 	ok() 
@@ -105,7 +105,7 @@ export class ParameterEditComponent implements OnInit
 
 		let o;
 		if (!this.obj['$ref']) {
-			o = _.cloneDeep(this.obj);
+			o = _cloneDeep(this.obj);
 			if (o['in'] == "body") {
 				this.apis.cleanUp(this.apis.schemas.parameterBody, o);
 				this.apis.cleanUpSwaggerSchema(o['schema']);

@@ -17,7 +17,7 @@
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
-import * as _ from "lodash";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 
 @Component({
 	selector: 'swadit-security-editor',
@@ -90,7 +90,7 @@ export class SecurityEditorComponent implements OnInit
 		if (!this.securityDefinitions || !this.securityDefinitions[secdef]) {
 			return this.securityScope;
 		}
-		const s = _.cloneDeep(this.securityScope);
+		const s = _cloneDeep(this.securityScope);
 		s['items']['enum'] = this.securityDefinitions[secdef]['scopes'] ? 
 			this.keys(this.securityDefinitions[secdef]['scopes']) : [];
 		return s;

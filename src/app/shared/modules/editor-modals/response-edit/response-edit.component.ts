@@ -18,7 +18,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import * as _ from "lodash";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 
 import { ApisService } from '../../../services';
 
@@ -56,7 +56,7 @@ export class ResponseEditComponent implements OnInit
 		this.key_orig = this.key;
 		this.obj_orig = this.obj;
 		if (!this.obj_orig) this.obj_orig = {};
-		this.obj = _.cloneDeep(this.obj_orig);
+		this.obj = _cloneDeep(this.obj_orig);
 		//if (!this.obj['schema']) this.obj['schema'] = { type: 'object' };
 	}
 
@@ -91,7 +91,7 @@ export class ResponseEditComponent implements OnInit
 			}
 		}
 
-		const o = _.cloneDeep(this.obj);
+		const o = _cloneDeep(this.obj);
 		this.apis.cleanUp(this.apis.schemas.response, o);
 		this.apis.cleanUpSwaggerSchema(o['schema']);
 

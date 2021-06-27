@@ -17,7 +17,7 @@
 
 import { Component, Input, OnInit, Directive } from '@angular/core';
 
-import * as _ from "lodash";
+import { remove as _remove } from "lodash-es";
 
 import { ApisService } from '../../services';
 
@@ -55,8 +55,8 @@ export class SchemaViewComponent implements OnInit
 		} else {
 			const schemaKeys = Object.keys(this.schema['properties']);
 			const objKeys = Object.keys(this.obj);
-			_.remove(schemaKeys, k => { return objKeys.indexOf(k) < 0; });
-			_.remove(schemaKeys, k => { return this.doSkip(k); });
+			_remove(schemaKeys, k => { return objKeys.indexOf(k) < 0; });
+			_remove(schemaKeys, k => { return this.doSkip(k); });
 			return schemaKeys;
 		}
 	}

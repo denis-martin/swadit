@@ -24,7 +24,7 @@ import { Subject } from 'rxjs';
 import { OpenAPI } from 'openapi-types';
 import * as SwaggerParser from '@apidevtools/swagger-parser';
 import * as YAML from 'js-yaml';
-import * as _ from "lodash";
+import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _remove } from "lodash-es";
 
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
 import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
@@ -182,7 +182,7 @@ export class ApisService
 					if (resp.status == 200) {
 						apis.lastLoaded = resp.body;
 						try {
-							SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(resp.body), swaggerParserOptions)
+							SwaggerParser.parse(<OpenAPI.Document> YAML.load(resp.body), swaggerParserOptions)
 								.then(api => { apis.swaggerLoaded(api); })
 								.catch(err => { apis.swaggerLoadingError(err); });
 						} catch (ex) {
@@ -201,7 +201,7 @@ export class ApisService
 			reader.onloadend = function(e) {
 				apis.lastLoaded = reader.result.toString();
 				try {
-					SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(reader.result.toString()), swaggerParserOptions)
+					SwaggerParser.parse(<OpenAPI.Document> YAML.load(reader.result.toString()), swaggerParserOptions)
 						.then(api => { apis.swaggerLoaded(api, fobj.name); })
 						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {
@@ -222,7 +222,7 @@ export class ApisService
 					if (resp.status == 200) {
 						apis.lastLoaded = resp.body;
 						try {
-							SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(resp.body), swaggerParserOptions)
+							SwaggerParser.parse(<OpenAPI.Document> YAML.load(resp.body), swaggerParserOptions)
 								.then(api => { apis.mergeSwagger(api, null, addSource); })
 								.catch(err => { apis.swaggerLoadingError(err); });
 						} catch (ex) {
@@ -241,7 +241,7 @@ export class ApisService
 			reader.onload = function(e) {
 				apis.lastLoaded = reader.result.toString();
 				try {
-					SwaggerParser.parse(<OpenAPI.Document> YAML.safeLoad(reader.result.toString()), swaggerParserOptions)
+					SwaggerParser.parse(<OpenAPI.Document> YAML.load(reader.result.toString()), swaggerParserOptions)
 						.then(api => { apis.mergeSwagger(api, fobj.name, addSource); })
 						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
 				} catch (ex) {
@@ -259,7 +259,7 @@ export class ApisService
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
 
 		const self = this;
-		const apiClone: any = _.cloneDeep(this.current);
+		const apiClone: any = _cloneDeep(this.current);
 		SwaggerParser.validate(apiClone, swaggerParserOptions)
 			.then(function(api) {
 				console.log("This API is a valid Swagger file.");
@@ -693,7 +693,7 @@ export class ApisService
 					if (o) {
 						for (const key of Object.keys(o)) {
 							if (!mergedObj[key]) {
-								mergedObj[key] = _.cloneDeep(o[key]);
+								mergedObj[key] = _cloneDeep(o[key]);
 							}
 						}	
 						if (o["properties"]) {
@@ -719,7 +719,7 @@ export class ApisService
 
 	renameObjectKey(obj: any, key: string, newKey: string): any
 	{
-		const newObj = _.clone(obj);
+		const newObj = _clone(obj);
 		Object.keys(obj).forEach(k => delete obj[k]);
 		Object.keys(newObj).forEach(k => {
 			if (k != key) {
@@ -875,7 +875,7 @@ export class ApisService
 				} else {
 					res = {};
 					this.keys(schema.properties).forEach(k => {
-						const refStackCopy = _.cloneDeep(refStack);
+						const refStackCopy = _cloneDeep(refStack);
 						const r = this.generateExample(schema.properties[k], refStackCopy, noReadOnly);
 						if (r !== undefined) {
 							res[k] = r;
@@ -894,8 +894,8 @@ export class ApisService
 			let api;
 			let apiClone;
 			try {
-				api = YAML.safeLoad(input);
-				apiClone = _.cloneDeep(api);
+				api = YAML.load(input);
+				apiClone = _cloneDeep(api);
 			} catch (ye) {
 				reject("YAML Error: " + ye.message);
 				return;
@@ -917,7 +917,7 @@ export class ApisService
 	{
 		const apis = this;
 		return new Promise((resolve, reject) => {
-			const apiClone = _.cloneDeep(obj);
+			const apiClone = _cloneDeep(obj);
 			SwaggerParser.validate(apiClone, swaggerParserOptions)
 				.then(function(api) {
 					console.log("This API is a valid Swagger file.");
@@ -938,7 +938,7 @@ export class ApisService
 		}
 		if (!api['paths']) return [];
 		const methodKeys = this.keys(api['paths'][path]);
-		_.pull(methodKeys, "parameters");
+		_pull(methodKeys, "parameters");
 		const methods: Array<object> = [];
 		methodKeys.forEach(m => methods.push({ 
 			key: m,
@@ -961,7 +961,7 @@ export class ApisService
 			parameters = parameters.concat(api['paths'][path][method]['parameters']);
 		}
 		if (!includeBody) {
-			_.remove(parameters, p => { return p['in'] == 'body'; });
+			_remove(parameters, p => { return p['in'] == 'body'; });
 		}
 		return parameters;
 	}

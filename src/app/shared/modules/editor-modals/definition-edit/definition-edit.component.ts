@@ -18,7 +18,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import * as _ from "lodash";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 
 import { ApisService } from '../../../services';
 
@@ -49,7 +49,7 @@ export class DefinitionEditComponent implements OnInit
 		this.key_orig = this.key;
 		this.obj_orig = this.obj;
 		if (!this.obj_orig) this.obj_orig = {};
-		this.obj = _.cloneDeep(this.obj_orig);
+		this.obj = _cloneDeep(this.obj_orig);
 	}
 
 	ok() 
@@ -75,7 +75,7 @@ export class DefinitionEditComponent implements OnInit
 			return;
 		}
 
-		const o = _.cloneDeep(this.obj);
+		const o = _cloneDeep(this.obj);
 		this.apis.cleanUpSwaggerSchema(o);
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);

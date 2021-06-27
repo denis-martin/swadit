@@ -19,7 +19,7 @@ import { Component, OnInit, Directive } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
-import * as _ from "lodash";
+import { pull as _pull } from "lodash-es";
 
 import { ApisService } from '../../shared/services';
 import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
@@ -99,7 +99,7 @@ export class PathComponent implements OnInit {
 	getMethods(): Array<string> {
 		if (!this.apis.current['paths']) return [];
 		const methods = this.apis.keys(this.apis.current['paths'][this.path]);
-		_.pull(methods, "parameters");
+		_pull(methods, "parameters");
 		return methods;
 	}
 

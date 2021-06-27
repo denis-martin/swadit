@@ -38,8 +38,7 @@
               "node_modules/swagger-ui-dist/swagger-ui-standalone-preset.js"
             ],
             "allowedCommonJsDependencies": [
-              "lodash",
-              "js-yaml",
+              "@apidevtools/swagger-parser",
               "swagger-ui-dist"
             ]
           },

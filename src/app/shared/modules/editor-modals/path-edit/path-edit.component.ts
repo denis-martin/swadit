@@ -18,7 +18,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
-import * as _ from "lodash";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 
 import { ApisService } from '../../../services';
 
@@ -53,7 +53,7 @@ export class PathEditComponent implements OnInit
 		this.obj_orig = this.obj;
 		if (!this.obj_orig) this.obj_orig = {};
 
-		this.obj = _.cloneDeep(this.obj_orig);
+		this.obj = _cloneDeep(this.obj_orig);
 		if (!this.obj['consumes']) {
 			this.obj['consumes'] = [];
 		}
@@ -103,7 +103,7 @@ export class PathEditComponent implements OnInit
 			return;
 		}
 
-		const o = _.cloneDeep(this.obj);
+		const o = _cloneDeep(this.obj);
 		this.apis.cleanUp(this.apis.schemas.operation, o);
 		if (o['externalDocs'] && !o['externalDocs']['url'] && !o['externalDocs']['description']) {
 			delete o['externalDocs'];
