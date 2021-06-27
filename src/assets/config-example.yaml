@@ -13,5 +13,7 @@ catalog:
 - title: Pet Store v2
   path: assets/petstore2.yaml
 readOnly: true
+licenseLink: 3rdpartylicenses.txt
+termsOfUseLink: https://example.com/terms/
 imprintLink: https://example.com/imprint/
 privacyPolicyLink: https://example.com/privacy/

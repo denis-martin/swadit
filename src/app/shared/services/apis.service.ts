@@ -78,6 +78,8 @@ class SwaditConfig
 	menu: MenuConfig = new MenuConfig();
 	catalog: Array<CatalogItem> = [];
 	readOnly: false;
+	licensesLink: string = "3rdpartylicenses.txt";
+	termsOfUseLink: string = "#";
 	imprintLink: string = "#";
 	privacyPolicyLink: string = "#";
 }
