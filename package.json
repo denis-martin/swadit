@@ -40,7 +40,6 @@
     "font-awesome": "^4.7.0",
     "js-yaml": "^4.1.0",
     "lodash-es": "^4.17.21",
-    "ng-trim-value-accessor": "^2.0.4",
     "ng2-charts": "^1.6.0",
     "ngx-ace-editor-wrapper": "^9.1.12",
     "ngx-markdown": "^11.1.3",

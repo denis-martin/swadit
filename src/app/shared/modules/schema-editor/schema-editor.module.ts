@@ -21,7 +21,7 @@ import { FormsModule } from '@angular/forms';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
-import { TrimValueAccessorModule } from 'ng-trim-value-accessor';
+import { TrimValueAccessorModule } from '../trim-value-accessor/trim-value-accessor.module';
 
 import { SchemaEditorComponent } from './schema-editor.component';
 import { PrimitiveEditorComponent } from './primitive-editor.component';
