@@ -254,11 +254,19 @@ export class ApisService
 		}
 	}
 
-	swaggerLoaded(api, fileName: string = null): void
+	swaggerLoaded(api: OpenAPI.Document, fileName: string = null): void
 	{
 		console.log("swaggerLoaded");
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
+
+		if ('openapi' in api) {
+			ConfirmComponent.open(this.modalService, 
+				"OpenAPI 3.0 is not yet fully supported by Swadit. " +
+				"Visual editing is limited.", 
+				"Ok", null);
+			this.router.navigate(['/source']);
+		}
 
 		const self = this;
 		const apiClone: any = _cloneDeep(this.current);
