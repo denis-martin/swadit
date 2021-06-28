@@ -16,9 +16,9 @@
 -->
 
 <div class="editor-header">
-	<button class="btn btn-primary" (click)="apply()" *ngIf="!apis.config.readOnly">Apply</button>
-	<button class="btn btn-success" (click)="validate()">Validate</button>
-	<button class="btn btn-warning" (click)="revert()">Revert</button>
+	<button class="btn btn-primary mr-2" (click)="apply()" *ngIf="!apis.config.readOnly">Apply</button>
+	<button class="btn btn-success mr-2" (click)="validate()">Validate</button>
+	<button class="btn btn-warning mr-2" (click)="revert()">Revert</button>
 	<div class="mt-1" style="float: right">
 		<span *ngIf="applied===true" style="color: #5cb85c">
 			<i class="fa fa-check-square"></i> changes applied
