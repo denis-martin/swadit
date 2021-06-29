@@ -29,20 +29,22 @@ import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _rem
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
 import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
 
-import * as Swagger20SchemaRoot from '../schemas/2.0/swagger-root.json';
-import * as Swagger20SchemaInfo from '../schemas/2.0/swagger-info.json';
-import * as Swagger20SchemaContact from '../schemas/2.0/swagger-contact.json';
-import * as Swagger20SchemaLicense from '../schemas/2.0/swagger-license.json';
-import * as Swagger20SchemaExternalDocs from '../schemas/2.0/swagger-externalDocs.json';
-import * as Swagger20SchemaTags from '../schemas/2.0/swagger-tags.json';
-import * as Swagger20SchemaSecurityDefinitions from '../schemas/2.0/swagger-securityDefinitions.json';
-import * as Swagger20SchemaSecurity from '../schemas/2.0/swagger-security.json';
-import * as Swagger20SchemaSchema from '../schemas/2.0/swagger-schema.json';
-import * as Swagger20SchemaParameterBody from '../schemas/2.0/swagger-parameterBody.json';
-import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-parameterNonBody.json';
-import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
-import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
-import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
+import * as Oas20SchemaRoot from '../schemas/oas2.0/swagger-root.json';
+import * as Oas20SchemaInfo from '../schemas/oas2.0/swagger-info.json';
+import * as Oas20SchemaContact from '../schemas/oas2.0/swagger-contact.json';
+import * as Oas20SchemaLicense from '../schemas/oas2.0/swagger-license.json';
+import * as Oas20SchemaExternalDocs from '../schemas/oas2.0/swagger-externalDocs.json';
+import * as Oas20SchemaTags from '../schemas/oas2.0/swagger-tags.json';
+import * as Oas20SchemaSecurityDefinitions from '../schemas/oas2.0/swagger-securityDefinitions.json';
+import * as Oas20SchemaSecurity from '../schemas/oas2.0/swagger-security.json';
+import * as Oas20SchemaSchema from '../schemas/oas2.0/swagger-schema.json';
+import * as Oas20SchemaParameterBody from '../schemas/oas2.0/swagger-parameterBody.json';
+import * as Oas20SchemaParameterNonBody from '../schemas/oas2.0/swagger-parameterNonBody.json';
+import * as Oas20SchemaResponse from '../schemas/oas2.0/swagger-response.json';
+import * as Oas20SchemaOperation from '../schemas/oas2.0/swagger-operation.json';
+import * as Oas20SchemaHeader from '../schemas/oas2.0/swagger-header.json';
+
+import * as Oas30Schema from '../schemas/oas3.0/schema.json';
 
 const swaggerParserOptions: SwaggerParser.Options = {
 	resolve: {
@@ -89,28 +91,36 @@ export class ApisService
 {
 	private readonly _schemas = 
 	{
-		"2.0": {
-			root: Swagger20SchemaRoot['default'],
-			info: Swagger20SchemaInfo['default'],
-			contact: Swagger20SchemaContact['default'],
-			license: Swagger20SchemaLicense['default'],
-			externalDocs: Swagger20SchemaExternalDocs['default'],
-			tags: Swagger20SchemaTags['default'],
-			securityDefinitions: Swagger20SchemaSecurityDefinitions['default'],
-			security: Swagger20SchemaSecurity['default'],
-			schema: Swagger20SchemaSchema['default'],
-			parameterBody: Swagger20SchemaParameterBody['default'],
-			parameterNonBody: Swagger20SchemaParameterNonBody['default'],
-			response: Swagger20SchemaResponse['default'],
-			operation: Swagger20SchemaOperation['default'],
-			header: Swagger20SchemaHeader['default']
+		"oas2.0": {
+			root: Oas20SchemaRoot['default'],
+			info: Oas20SchemaInfo['default'],
+			contact: Oas20SchemaContact['default'],
+			license: Oas20SchemaLicense['default'],
+			externalDocs: Oas20SchemaExternalDocs['default'],
+			tags: Oas20SchemaTags['default'],
+			securityDefinitions: Oas20SchemaSecurityDefinitions['default'],
+			security: Oas20SchemaSecurity['default'],
+			schema: Oas20SchemaSchema['default'],
+			parameterBody: Oas20SchemaParameterBody['default'],
+			parameterNonBody: Oas20SchemaParameterNonBody['default'],
+			response: Oas20SchemaResponse['default'],
+			operation: Oas20SchemaOperation['default'],
+			header: Oas20SchemaHeader['default']
+		},
+		"oas3.0": {
+			root: Oas30Schema['default'],
+			schema: Oas30Schema['default']['definitions']['Schema']
 		}
 	};
 
 	get schemas(): any
 	{
-		if (this.current['swagger'] == "2.0") {
-			return this._schemas["2.0"];
+		if (this.isOas2) {
+			return this._schemas["oas2.0"];
+		} else if (this.isOas3) {
+			if (this.specVersion.startsWith('3.0')) {
+				return this._schemas["oas3.0"];
+			}
 		}
 		return null;
 	}
@@ -128,6 +138,10 @@ export class ApisService
 	public currentFileName: string = "swagger.yaml";
 	public lastLoaded: string;
 	public hasLoadingErrors: boolean = false;
+
+	public specVersion = '2.0';
+	public isOas2 = true;
+	public isOas3 = false;
 
 	filesToAdd = [];
 	filesToAddIndex = 0;
@@ -259,6 +273,17 @@ export class ApisService
 		console.log("swaggerLoaded");
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
+
+		if ('swagger' in this.current) {
+			this.specVersion = this.current['swagger'];
+		} else if ('openapi' in this.current) {
+			this.specVersion = this.current['openapi'];
+		} else {
+			this.specVersion = "";
+		}
+
+		this.isOas2 = this.specVersion.startsWith('2.0');
+		this.isOas3 = this.specVersion.startsWith('3.0');
 
 		if ('openapi' in api) {
 			ConfirmComponent.open(this.modalService, 
@@ -739,11 +764,6 @@ export class ApisService
 			}
 		});
 		return obj;
-	}
-
-	settingsModal(): void
-	{
-		alert('Not yet implemented');
 	}
 
 	keys(obj: Object): string[]

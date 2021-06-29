@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly">
+<div class="edit-section" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly && apis.isOas2">
 	<i class="fa fa-plus"></i>
 </div>
 <div class="filterBox">
@@ -52,7 +52,7 @@
 				<span *ngIf="apis.current['parameters'][param]['description']"> {{apis.current['parameters'][param]['description']}}</span>
 			</div>
 			<div class="col-md-2">
-				<div class="edit-card" (click)="edit($event, param)" *ngIf="!apis.config.readOnly">
+				<div class="edit-card" (click)="edit($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
 					<i class="fa fa-fw fa-pencil"></i>
 				</div>
 			</div>

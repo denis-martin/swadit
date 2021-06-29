@@ -15,14 +15,17 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="edit()" *ngIf="!apis.config.readOnly">
+<div class="edit-section" (click)="edit()" *ngIf="!apis.config.readOnly && apis.isOas2">
 	<i class="fa fa-pencil"></i>
 </div>
 
 <div *ngIf="apis.current['info']" class="api-info">
+	<!-- .info.title -->
 	<h1>{{apis.current['info']['title']}}
+		<!-- .info.version -->
 		<span *ngIf="apis.current['info']['version']" style="font-size: 70%"> v{{apis.current['info']['version']}}</span>
 	</h1>
+	<!-- .info.contact -->
 	<div *ngIf="apis.current['info']['contact']" class="api-info-element">
 		{{apis.current['info']['contact']['name']}} 
 		<span *ngIf="apis.current['info']['contact']['email']">
@@ -30,9 +33,11 @@
 		</span>
 		<span *ngIf="apis.current['info']['contact']['url']">{{apis.current['info']['contact']['url']}}</span>
 	</div>
+	<!-- .info.description -->
 	<markdown *ngIf="apis.current['info'].description" class="api-info-element markdown" 
 		[data]="apis.current['info'].description">
 	</markdown>
+	<!-- .externalDocs -->
 	<div *ngIf="apis.current.externalDocs" class="api-info-element">
 		<a href="{{apis.current.externalDocs['url']}}" target="_blanc">
 			<span *ngIf="apis.current.externalDocs.description; else noExternalDocsDescription">{{apis.current.externalDocs.description}}</span>
@@ -40,9 +45,11 @@
 		</a>
 	</div>
 	<div *ngIf="apis.current['info']['termsOfService'] || apis.current['info']['license']" class="api-info-element">
+		<!-- .info.termsOfService -->
 		<p *ngIf="apis.current['info']['termsOfService']">
 			Terms of service: {{apis.current['info']['termsOfService']}}
 		</p>
+		<!-- .info.license -->
 		<p *ngIf="apis.current['info']['license']">
 			License: {{apis.current['info']['license']['name']}}
 			<span *ngIf="apis.current['info']['license']['url']">
@@ -52,6 +59,7 @@
 	</div>
 </div>
 
+<!-- .tags -->
 <div *ngIf="apis.current['tags']" class="api-info api-info-element">
 	<h2>Tags</h2>
 	<table class="tag-table">
@@ -72,7 +80,8 @@
 	</table>
 </div>
 
-<div *ngIf="apis.current['schemes'] || apis.current['host'] || apis.current['basePath'] || apis.current['consumes'] || apis.current['produces']"
+<!-- [OAS2] .schemes, .host, .basePath, .consumes, .produces -->
+<div *ngIf="apis.isOas2 && (apis.current['schemes'] || apis.current['host'] || apis.current['basePath'] || apis.current['consumes'] || apis.current['produces'])"
 	class="api-info api-info-element">
 	<h2>General Information</h2>
 	<table>
@@ -111,7 +120,8 @@
 	</table>
 </div>
 
-<div *ngIf="apis.current['securityDefinitions'] || apis.current['security']" class="api-info api-info-element">
+<!-- [OAS2] .security -->
+<div *ngIf="apis.isOas2 && (apis.current['securityDefinitions'] || apis.current['security'])" class="api-info api-info-element">
 	<h2>Security</h2>
 	<div *ngFor="let def of keys(apis.current['securityDefinitions'])">
 		<p>Security definition: <b>{{def}}</b></p>

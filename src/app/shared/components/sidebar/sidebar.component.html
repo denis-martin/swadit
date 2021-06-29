@@ -15,7 +15,7 @@
                     <li *ngIf="!apis.config.menu.hideItems['open']">
                         <a href="javascript:void(0)" (click)="apis.openFileModal()">
                         <i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a></li>
-                    <li *ngIf="!apis.config.menu.hideItems['add']">
+                    <li *ngIf="!apis.config.menu.hideItems['add'] && apis.isOas2">
                         <a href="javascript:void(0)" (click)="apis.addFilesModal()">
                         <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>
                     <li *ngIf="!apis.config.menu.hideItems['download']">
@@ -28,7 +28,7 @@
                     <li><a [routerLink]="['/print']">
                         <i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a></li>
                     -->
-                    <li *ngIf="!apis.config.menu.hideItems['printPreview']">
+                    <li *ngIf="!apis.config.menu.hideItems['printPreview'] && apis.isOas2">
                         <a [routerLink]="['/swadoc']">
                         <i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a></li>
                     <li *ngIf="!apis.config.menu.hideItems['swaggerUi']">
@@ -44,13 +44,13 @@
         <a [routerLink]="['/api-info']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-info"></i>&nbsp;API Info
         </a>
-        <a [routerLink]="['/definitions']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+        <a [routerLink]="['/definitions']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="apis.isOas2">
             <i class="fa fa-fw fa-book"></i>&nbsp;Definitions
         </a>
-        <a [routerLink]="['/parameters']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+        <a [routerLink]="['/parameters']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="apis.isOas2">
             <i class="fa fa-fw fa-question"></i>&nbsp;Parameters
         </a>
-        <a [routerLink]="['/responses']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+        <a [routerLink]="['/responses']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="apis.isOas2">
             <i class="fa fa-fw fa-reply"></i>&nbsp;Responses
         </a>
         <a [routerLink]="['/paths']" [routerLinkActive]="['router-link-active']" class="list-group-item">
