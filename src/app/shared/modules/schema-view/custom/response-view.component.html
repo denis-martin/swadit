@@ -20,7 +20,8 @@
 		[data]="obj['description']">
 	</markdown>
 
-	<div *ngIf="obj['schema']">
+	<!-- OAS2: schema -->
+	<div *ngIf="apis.isOas2 && obj['schema']">
 		<p>
 			Response schema:
 			<span *ngIf="obj['schema']['$ref']" class="headerType">{{obj['schema']['$ref']}}</span>
@@ -29,14 +30,28 @@
 		</swadit-swagger-schema-view>
 	</div>
 
-	<!-- TODO: headers & examples -->
+	<!-- OAS3: content -->
+	<div *ngIf="apis.isOas3 && obj['content']">
+		<div *ngFor="let mediaType of apis.keys(obj['content'])">
+			<div *ngIf="obj['content'][mediaType]['schema']">
+				<p>
+					Response schema ({{ mediaType }}):
+					<span *ngIf="obj['content'][mediaType]['schema']['$ref']" class="headerType">{{obj['content'][mediaType]['schema']['$ref']}}</span>
+				</p>
+				<swadit-swagger-schema-view [obj]="apis.resolveObj(obj['content'][mediaType]['schema'])">
+				</swadit-swagger-schema-view>
+			</div>
+		</div>
+	</div>
 
+	<!-- headers -->
 	<div *ngIf="obj['headers']">
 		<p>Headers:</p>
 		<markdown [data]="apis.toYaml(obj['headers']) | language: 'yaml'"></markdown>
 	</div>
 
-	<div *ngIf="obj['examples']">
+	<!-- OAS2: examples -->
+	<div *ngIf="apis.isOas2 && obj['examples']">
 		<p>Examples:</p>
 		<div *ngFor="let k of apis.keys(obj['examples'])">
 			<p><label>{{k}}:</label><br>
@@ -44,7 +59,7 @@
 			</p>
 		</div>
 	</div>
-	<div *ngIf="obj['schema']">
+	<div *ngIf="apis.isOas2 && obj['schema']">
 		<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
 			Example (generated)<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
 		</p>

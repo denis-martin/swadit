@@ -117,7 +117,7 @@ export class ApisService
 
 	public config: SwaditConfig = new SwaditConfig();
 
-	public current: Object = { 
+	public current: any = { 
 		swagger: "2.0",
 		info: { 
 			title: "My new API",
@@ -128,6 +128,16 @@ export class ApisService
 	public currentFileName: string = "swagger.yaml";
 	public lastLoaded: string;
 	public hasLoadingErrors: boolean = false;
+
+	public get isOas3(): boolean
+	{
+		return 'openapi' in this.current && typeof this.current['openapi'] == 'string' && this.current['openapi'].startsWith('3.0');
+	}
+
+	public get isOas2(): boolean
+	{
+		return 'swagger' in this.current && typeof this.current['openapi'] == 'string' && this.current['swagger'].startsWith('2.0');
+	}
 
 	filesToAdd = [];
 	filesToAddIndex = 0;
@@ -260,12 +270,11 @@ export class ApisService
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
 
-		if ('openapi' in api) {
+		if (this.isOas3) {
 			ConfirmComponent.open(this.modalService, 
 				"OpenAPI 3.0 is not yet fully supported by Swadit. " +
 				"Visual editing is limited.", 
 				"Ok", null);
-			this.router.navigate(['/source']);
 		}
 
 		const self = this;
