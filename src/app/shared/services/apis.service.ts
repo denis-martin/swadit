@@ -128,7 +128,7 @@ export class ApisService
 
 	public config: SwaditConfig = new SwaditConfig();
 
-	public current: Object = { 
+	public current: any = { 
 		swagger: "2.0",
 		info: { 
 			title: "My new API",
@@ -291,7 +291,6 @@ export class ApisService
 				"OpenAPI 3.0 is not yet fully supported by Swadit. " +
 				"Visual editing is limited.", 
 				"Ok", null);
-			this.router.navigate(['/source']);
 		}
 
 		const self = this;

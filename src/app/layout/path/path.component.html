@@ -22,6 +22,7 @@
 <div class="api-info" *ngIf="apis.current && apis.current['paths']">
 	<h1 style="margin-bottom: 0.7em">{{path}}</h1>
 
+	<!-- methods -->
 	<ul class="nav nav-tabs">
 		<li *ngFor="let m of getMethods()"
 			class="nav-item">
@@ -39,6 +40,7 @@
 		</li>
 	</ul>
 
+	<!-- (selected) operation -->
 	<div class="api-info-element" *ngIf="method && apis.current['paths'][path][method]">
 		<div class="api-info-element" *ngIf="apis.current['paths'][path][method]['summary']">
 			{{apis.current['paths'][path][method]['summary']}}
@@ -54,7 +56,7 @@
 			</span>
 		</div>
 
-		
+		<!-- parameters -->
 		<h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
 			Parameters
 			<span class="edit-subsection" (click)="editParameter($event)" title="Add parameter" *ngIf="!apis.config.readOnly && apis.isOas2">
@@ -167,7 +169,7 @@
 			</div>
 		</div>
 
-		
+		<!-- responses -->
 		<h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">
 			Responses
 			<span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response" *ngIf="!apis.config.readOnly && apis.isOas2">

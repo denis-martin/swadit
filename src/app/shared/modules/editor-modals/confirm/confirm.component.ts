@@ -9,7 +9,7 @@ import { NgbModal, NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-boot
 export class ConfirmComponent implements OnInit 
 {
 	static readonly modalOptions: NgbModalOptions = {
-		size: "sm"
+		//size: "sm"
 	}
 
 	text: string;
