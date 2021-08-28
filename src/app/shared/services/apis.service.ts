@@ -109,6 +109,7 @@ export class ApisService
 		},
 		"oas3.0": {
 			root: Oas30Schema['default'],
+			definitions: Oas30Schema['default']['definitions'],
 			schema: Oas30Schema['default']['definitions']['Schema']
 		}
 	};
@@ -698,28 +699,34 @@ export class ApisService
 	}
 
 	// TODO
-	resolveRef(ref: string): any
+	resolveRef(ref: string, rootSchema: any = null): any
 	{
+		const source = rootSchema ? rootSchema : this.current;
+
 		if (ref.startsWith("#/definitions/")) {
 			const refParts = ref.split('/');
-			return this.current['definitions'][refParts[2]];
+			return source['definitions'][refParts[2]];
 		}
 		if (ref.startsWith("#/parameters/")) {
 			const refParts = ref.split('/');
-			return this.current['parameters'][refParts[2]];
+			return source['parameters'][refParts[2]];
 		}
 		if (ref.startsWith("#/responses/")) {
 			const refParts = ref.split('/');
-			return this.current['responses'][refParts[2]];
+			return source['responses'][refParts[2]];
+		}
+		if (ref.startsWith("#/components/")) {
+			const refParts = ref.split('/');
+			return source['components'][refParts[2]][refParts[3]];
 		}
 		return null;
 	}
 
-	resolveObj(obj: any): any
+	resolveObj(obj: any, rootSchema: any = null): any
 	{
 		if (obj) {
 			if (obj['$ref']) {
-				obj = this.resolveRef(obj['$ref']);
+				obj = this.resolveRef(obj['$ref'], rootSchema);
 			} 
 			if (Array.isArray(obj['allOf'])) {
 				const mergedObj = {};

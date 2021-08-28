@@ -249,4 +249,8 @@ export class PathComponent implements OnInit {
             return  `with: ${reason}`;
         }
 	}
+
+	generateExample(schema: any): any {
+		return this.apis.toJson(this.apis.generateExample(schema, {}, false, true));
+	}
 }

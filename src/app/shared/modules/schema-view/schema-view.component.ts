@@ -44,8 +44,12 @@ export class SchemaViewComponent implements OnInit
 
 	constructor(public apis: ApisService) { }
 
-	ngOnInit() 
+	ngOnInit()
 	{
+		if (this.schema['oneOf'] && this.schema['oneOf'].length > 0) {
+			// TODO: try to find best matching schema for obj
+			this.schema = this.apis.resolveObj(this.schema['oneOf'][0], this.apis.schemas.root);
+		}
 	}
 
 	getKeys()
