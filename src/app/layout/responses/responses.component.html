@@ -41,14 +41,14 @@
 	</div>
 </div>
 
-<div *ngFor="let resp of apis.filterList(keys(apis.current['responses']), filterText, sortItems); let index = index" 
+<div *ngFor="let resp of apis.filterList(keys(apis.getComponents('responses')), filterText, sortItems); let index = index" 
 	class="card mb-2">
 	<div class="card-header clickable" (click)="uncollapsed[resp] = !uncollapsed[resp]">
 		<div class="row">
 			<div class="col-md-10 preview">
 				{{resp}}
-				<span *ngIf="apis.current['responses'][resp]['schema'] && apis.current['responses'][resp]['schema']['type']" class="headerType"> ({{apis.current['responses'][resp]['schema']['type']}})</span>
-				<span *ngIf="apis.current['responses'][resp]['description']"> {{apis.current['responses'][resp]['description']}}</span>
+				<span *ngIf="apis.getComponents('responses')[resp]['schema'] && apis.getComponents('responses')[resp]['schema']['type']" class="headerType"> ({{apis.getComponents('responses')[resp]['schema']['type']}})</span>
+				<span *ngIf="apis.getComponents('responses')[resp]['description']"> {{apis.getComponents('responses')[resp]['description']}}</span>
 			</div>
 			<div class="col-md-2">
 				<div class="edit-card" (click)="edit($event, resp)" *ngIf="!apis.config.readOnly && apis.isOas2">
@@ -58,7 +58,7 @@
 		</div>
 	</div>
 	<div class="card-block" *ngIf="uncollapsed[resp]">
-		<swadit-response-view [obj]="apis.current['responses'][resp]">
+		<swadit-response-view [obj]="apis.getComponents('responses')[resp]">
 		</swadit-response-view>
 	</div>
 </div>

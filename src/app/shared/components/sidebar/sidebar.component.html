@@ -44,15 +44,17 @@
         <a [routerLink]="['/api-info']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-info"></i>&nbsp;API Info
         </a>
-        <a [routerLink]="['/definitions']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="apis.isOas2">
+        <a [routerLink]="['/definitions']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-book"></i>&nbsp;Definitions
         </a>
-        <a [routerLink]="['/parameters']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="apis.isOas2">
+        <!--
+        <a [routerLink]="['/parameters']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-question"></i>&nbsp;Parameters
         </a>
-        <a [routerLink]="['/responses']" [routerLinkActive]="['router-link-active']" class="list-group-item" *ngIf="apis.isOas2">
+        <a [routerLink]="['/responses']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-reply"></i>&nbsp;Responses
         </a>
+        -->
         <a [routerLink]="['/paths']" [routerLinkActive]="['router-link-active']" class="list-group-item">
             <i class="fa fa-fw fa-road"></i>&nbsp;Paths
         </a>

@@ -105,12 +105,28 @@ export class ApisService
 			parameterNonBody: Oas20SchemaParameterNonBody['default'],
 			response: Oas20SchemaResponse['default'],
 			operation: Oas20SchemaOperation['default'],
-			header: Oas20SchemaHeader['default']
+			header: Oas20SchemaHeader['default'],
+			_definitionCategories: [
+				'definitions', 
+				'parameters',
+				'responses'
+			]
 		},
 		"oas3.0": {
 			root: Oas30Schema['default'],
 			definitions: Oas30Schema['default']['definitions'],
-			schema: Oas30Schema['default']['definitions']['Schema']
+			schema: Oas30Schema['default']['definitions']['Schema'],
+			_definitionCategories: [
+				'schemas', 
+				'responses',
+				'parameters',
+				//'examples',
+				//'requestBodies',
+				//'headers',
+				//'securitySchemes',
+				//'links',
+				//'callbacks'
+			]
 		}
 	};
 
@@ -1052,5 +1068,54 @@ export class ApisService
 			return api['produces'];
 		}
 		return null;
+	}
+
+	getComponents(type: string): any
+	{
+		if (this.isOas2) {
+			if (type in this.current || type == 'schemas') {
+				if (type == 'definitions' ||
+					type == 'responses' ||
+					type == 'parameters')
+				{
+					return this.current[type];
+				} 
+				else if (type == 'schemas') 
+				{
+					return this.current['definitions'];
+				}
+			}
+		} else if (this.isOas3) {
+			if ('components' in this.current && type in this.current['components']) {
+				if (type == 'schemas' ||
+					type == 'responses' ||
+					type == 'parameters' ||
+					type == 'examples' ||
+					type == 'requestBodies' ||
+					type == 'headers' ||
+					type == 'securitySchemes' ||
+					type == 'links' ||
+					type == 'callbacks')
+				{
+					return this.current['components'][type];
+				}
+			}
+		}
+		return null;
+	}
+
+	getComponentsCount(type: string): number
+	{
+		const components = this.keys(this.getComponents(type));
+		if (components && components.length > 0) {
+			return components.length;
+		} else {
+			return 0;
+		}
+	}
+
+	getDefCategories(): Array<string>
+	{
+		return this.schemas._definitionCategories;
 	}
 }

@@ -41,15 +41,15 @@
 	</div>
 </div>
 
-<div *ngFor="let param of apis.filterList(keys(apis.current['parameters']), filterText, sortItems); let index = index" 
+<div *ngFor="let param of apis.filterList(keys(apis.getComponents('parameters')), filterText, sortItems); let index = index" 
 	class="card mb-2">
 	<div class="card-header clickable" (click)="uncollapsed[param] = !uncollapsed[param]">
 		<div class="row">
 			<div class="col-md-10 preview">
 				{{param}}
-				<span *ngIf="apis.current['parameters'][param]['in']" class="headerType"> in {{apis.current['parameters'][param]['in']}}</span>
-				<span *ngIf="apis.current['parameters'][param]['type']" class="headerType"> ({{apis.current['parameters'][param]['type']}})</span>
-				<span *ngIf="apis.current['parameters'][param]['description']"> {{apis.current['parameters'][param]['description']}}</span>
+				<span *ngIf="apis.getComponents('parameters')[param]['in']" class="headerType"> in {{apis.getComponents('parameters')[param]['in']}}</span>
+				<span *ngIf="apis.getComponents('parameters')[param]['type']" class="headerType"> ({{apis.getComponents('parameters')[param]['type']}})</span>
+				<span *ngIf="apis.getComponents('parameters')[param]['description']"> {{apis.getComponents('parameters')[param]['description']}}</span>
 			</div>
 			<div class="col-md-2">
 				<div class="edit-card" (click)="edit($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
@@ -59,7 +59,7 @@
 		</div>
 	</div>
 	<div class="card-block" *ngIf="uncollapsed[param]">
-		<swadit-parameter-view [obj]="apis.current['parameters'][param]">
+		<swadit-parameter-view [obj]="apis.getComponents('parameters')[param]">
 		</swadit-parameter-view>
 	</div>
 </div>
