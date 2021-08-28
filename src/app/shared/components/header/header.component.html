@@ -46,7 +46,7 @@
 						<a class="dropdown-item" [routerLink]="['/print']">
 							<i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a>
 						-->
-						<a class="dropdown-item" [routerLink]="['/swadoc']" title="Print preview (e.g. for PDF export)" *ngIf="!apis.config.menu.hideItems['printPreview']">
+						<a class="dropdown-item" [routerLink]="['/swadoc']" title="Print preview (e.g. for PDF export)" *ngIf="!apis.config.menu.hideItems['printPreview'] && apis.isOas2">
 							<i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a>
 						<a class="dropdown-item" [routerLink]="['/swaggerui']" title="Preview in Swagger UI" *ngIf="!apis.config.menu.hideItems['swaggerUi']">
 							<i class="fa fa-fw fa-eye"></i> {{ 'Swagger UI' | translate }}</a>
