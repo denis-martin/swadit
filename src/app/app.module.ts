@@ -11,6 +11,8 @@ import { AuthGuard } from './shared';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
+import { MarkdownModule } from 'ngx-markdown';
+
 import { ApisService } from './shared';
 import { FileModalComponent } from './shared/components/file-modal/file-modal.component';
 import { EditorModalsModule } from './shared/modules/editor-modals/editor-modals.module';
@@ -38,6 +40,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
             }
         }),
         NgbModule,
+        MarkdownModule.forRoot(),
         EditorModalsModule
     ],
     providers: [AuthGuard, ApisService],

@@ -34,7 +34,7 @@ import { ApiInfoEditComponent } from './api-info-edit/api-info-edit.component';
 		CommonModule,
 		FormsModule,
 		NgbModule,
-		MarkdownModule.forRoot(),
+		MarkdownModule.forChild(),
 		SchemaViewModule,
 		SchemaEditorModule,
 		ApiInfoRoutingModule,
