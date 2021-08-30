@@ -16,6 +16,7 @@
  */
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ApisService } from 'app/shared/services';
 
 @Component({
 	selector: 'swadit-schema-editor',
@@ -43,8 +44,10 @@ export class SchemaEditorComponent implements OnInit
 		this.objChange.emit(this._obj);
 	}
 
+	constructor(public apis: ApisService) {}
+
 	ngOnInit(): void {
-		// nothing
+		this.schema = this.apis.resolveObj(this.schema, this.apis.schemas.root);
 	}
 
 }

@@ -70,23 +70,31 @@
       ],
       "properties": {
         "title": {
-          "type": "string"
+          "type": "string",
+          "description": "The title of the API."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of the OpenAPI document (which is distinct from the OpenAPI Specification version or the API implementation version)."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "A short description of the API. CommonMark syntax MAY be used for rich text representation.",
+          "x-swadit-input-multiline": 20,
+			    "x-swadit-input-class": "monospace"
         },
         "termsOfService": {
           "type": "string",
-          "format": "uri-reference"
+          "format": "uri-reference",
+          "description": "A URL to the Terms of Service for the API. MUST be in the format of a URL."
         },
         "contact": {
-          "$ref": "#/definitions/Contact"
+          "$ref": "#/definitions/Contact",
+          "x-swadit-input-hidden": true
         },
         "license": {
-          "$ref": "#/definitions/License"
-        },
-        "version": {
-          "type": "string"
+          "$ref": "#/definitions/License",
+          "x-swadit-input-hidden": true
         }
       },
       "patternProperties": {
@@ -96,17 +104,21 @@
     },
     "Contact": {
       "type": "object",
+      "description": "Contact information",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "name": "The identifying name of the contact person/organization."
         },
         "url": {
           "type": "string",
-          "format": "uri-reference"
+          "format": "uri-reference",
+          "description": "The URL pointing to the contact information. MUST be in the format of a URL."
         },
         "email": {
           "type": "string",
-          "format": "email"
+          "format": "email",
+          "description": "The email address of the contact person/organization. MUST be in the format of an email address."
         }
       },
       "patternProperties": {
@@ -116,16 +128,19 @@
     },
     "License": {
       "type": "object",
+      "description": "License information",
       "required": [
         "name"
       ],
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The license name used for the API."
         },
         "url": {
           "type": "string",
-          "format": "uri-reference"
+          "format": "uri-reference",
+          "description": "A URL to the license used for the API. MUST be in the format of a URL."
         }
       },
       "patternProperties": {
@@ -946,18 +961,29 @@
     },
     "Tag": {
       "type": "object",
+      "x-swadit-editor-grid": [
+        [ "name", "description" ],
+        [ "externalDocs" ]
+      ],
+      "x-swadit-editor-grid-cols": {
+        "name": 4,
+        "description": 8
+      },
       "required": [
         "name"
       ],
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "The name of the tag."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "A short description for the tag. CommonMark syntax MAY be used for rich text representation."
         },
         "externalDocs": {
-          "$ref": "#/definitions/ExternalDocumentation"
+          "$ref": "#/definitions/ExternalDocumentation",
+          "x-swadit-editor-collapse": true
         }
       },
       "patternProperties": {
@@ -967,16 +993,19 @@
     },
     "ExternalDocumentation": {
       "type": "object",
+      "description": "Link to external documentation.",
       "required": [
         "url"
       ],
       "properties": {
-        "description": {
-          "type": "string"
-        },
         "url": {
           "type": "string",
-          "format": "uri-reference"
+          "format": "uri-reference",
+          "description": "The URL for the target documentation. Value MUST be in the format of a URL."
+        },
+        "description": {
+          "type": "string",
+          "description": "A short description of the target documentation. CommonMark syntax MAY be used for rich text representation."
         }
       },
       "patternProperties": {

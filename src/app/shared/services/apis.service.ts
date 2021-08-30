@@ -114,6 +114,11 @@ export class ApisService
 		},
 		"oas3.0": {
 			root: Oas30Schema['default'],
+			info: Oas30Schema['default']['definitions']['Info'],
+			contact: Oas30Schema['default']['definitions']['Contact'],
+			license: Oas30Schema['default']['definitions']['License'],
+			externalDocs: Oas30Schema['default']['definitions']['ExternalDocumentation'],
+			tags: Oas30Schema['default']['properties']['tags'],
 			definitions: Oas30Schema['default']['definitions'],
 			schema: Oas30Schema['default']['definitions']['Schema'],
 			_definitionCategories: [
@@ -504,22 +509,24 @@ export class ApisService
 				}
 			});
 		} else {
+			schema = this.resolveObj(schema, this.schemas.root);
 			if (schema['type'] == 'object') {
 				if (schema['properties']) {
 					this.keys(schema['properties']).forEach(p => {
 						if (api[p] != null) {
 							this.cleanUp(schema['properties'][p], api[p]);
-							if (schema['properties'][p]['type'] == 'array') {
+							const propertySchema = this.resolveObj(schema['properties'][p], this.schemas.root);
+							if (propertySchema['type'] == 'array') {
 								if (api[p].length == 0 && !this.propertyIsRequired(schema, p)) {
 									delete api[p];
 								}
 							}
-							if (schema['properties'][p]['type'] == 'object') {
+							if (propertySchema['type'] == 'object') {
 								if (this.keys(api[p]).length == 0 && !this.propertyIsRequired(schema, p)) {
 									delete api[p];
 								}
 							}
-							if (schema['properties'][p]['type'] == 'string') {
+							if (propertySchema['type'] == 'string') {
 								if (api[p] == "" && !this.propertyIsRequired(schema, p)) {
 									delete api[p];
 								}

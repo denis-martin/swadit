@@ -54,16 +54,19 @@ export class ApiInfoEditComponent implements OnInit
 		if (!this.api['tags']) {
 			this.api['tags'] = [];
 		}
-		if (!this.api['securityDefinitions']) {
-			this.api['securityDefinitions'] = {};
-		}
-		if (!this.api['security']) {
-			this.api['security'] = [];
+		if (this.apis.isOas2) {
+			if (!this.api['securityDefinitions']) {
+				this.api['securityDefinitions'] = {};
+			}
+			if (!this.api['security']) {
+				this.api['security'] = [];
+			}
 		}
 		Object.keys(this.apis.schemas.root['properties']).forEach(p => {
-			if (this.apis.schemas.root['properties'][p]['type'] == 'object' && !this.api[p]) {
+			const propertySchema = this.apis.resolveObj(this.apis.schemas.root['properties'][p], this.apis.schemas.root);
+			if (propertySchema['type'] == 'object' && !this.api[p]) {
 				this.api[p] = {};
-			} else if (this.apis.schemas.root['properties'][p]['type'] == 'array' && !this.api[p]) {
+			} else if (propertySchema['type'] == 'array' && !this.api[p]) {
 				this.api[p] = [];
 			}
 		});
@@ -95,27 +98,32 @@ export class ApiInfoEditComponent implements OnInit
 		this.apis.cleanUp(this.apis.schemas.info, this.apis.current['info']);
 		this.apis.cleanUp(this.apis.schemas.externalDocs, this.apis.current['externalDocs']);
 		this.apis.cleanUp(this.apis.schemas.tags, this.apis.current['tags']);
-		this.apis.cleanUp(this.apis.schemas.securityDefinitions, this.apis.current['securityDefinitions']);
-		this.apis.cleanUp(this.apis.schemas.security, this.apis.current['security']);
+		if (this.apis.isOas2) {
+			this.apis.cleanUp(this.apis.schemas.securityDefinitions, this.apis.current['securityDefinitions']);
+			this.apis.cleanUp(this.apis.schemas.security, this.apis.current['security']);
+		}
 		this.apis.cleanUp(this.apis.schemas.root, this.apis.current);
 
-		if (Object.keys(this.apis.current['info']['contact']).length == 0) {
-			delete this.apis.current['info']['contact'];
-		}
-		if (Object.keys(this.apis.current['info']['license']).length == 0) {
-			delete this.apis.current['info']['license'];
-		}
-		if (Object.keys(this.apis.current['externalDocs']).length == 0) {
-			delete this.apis.current['externalDocs'];
-		}
-		if (this.apis.current['tags'].length == 0) {
-			delete this.apis.current['tags'];
-		}
-		if (Object.keys(this.apis.current['securityDefinitions']).length == 0) {
-			delete this.apis.current['securityDefinitions'];
-		}
-		if (this.apis.current['security'].length == 0) {
-			delete this.apis.current['security'];
+		// In OAS2, we have incomplete schemas, therefore we need to clean up some more
+		if (this.apis.isOas2) {
+			if (Object.keys(this.apis.current['info']['contact']).length == 0) {
+				delete this.apis.current['info']['contact'];
+			}
+			if (Object.keys(this.apis.current['info']['license']).length == 0) {
+				delete this.apis.current['info']['license'];
+			}
+			if (Object.keys(this.apis.current['externalDocs']).length == 0) {
+				delete this.apis.current['externalDocs'];
+			}
+			if (this.apis.current['tags'].length == 0) {
+				delete this.apis.current['tags'];
+			}
+			if (Object.keys(this.apis.current['securityDefinitions']).length == 0) {
+				delete this.apis.current['securityDefinitions'];
+			}
+			if (this.apis.current['security'].length == 0) {
+				delete this.apis.current['security'];
+			}
 		}
 
 		console.log(this.apis.current);
