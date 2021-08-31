@@ -29,6 +29,8 @@ import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _rem
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
 import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
 
+import { convertOas2to3 } from './oas2to3';
+
 import * as Oas20SchemaRoot from '../schemas/oas2.0/swagger-root.json';
 import * as Oas20SchemaInfo from '../schemas/oas2.0/swagger-info.json';
 import * as Oas20SchemaContact from '../schemas/oas2.0/swagger-contact.json';
@@ -290,7 +292,7 @@ export class ApisService
 		}
 	}
 
-	swaggerLoaded(api: OpenAPI.Document, fileName: string = null): void
+	swaggerLoaded(api: any, fileName: string = null): void
 	{
 		console.log("swaggerLoaded");
 		this.current = api;
@@ -307,27 +309,28 @@ export class ApisService
 		this.isOas2 = this.specVersion.startsWith('2.0');
 		this.isOas3 = this.specVersion.startsWith('3.0');
 
-		if ('openapi' in api) {
-			ConfirmComponent.open(this.modalService, 
-				"OpenAPI 3.0 is not yet fully supported by Swadit. " +
-				"Visual editing is limited.", 
-				"Ok", null);
-		}
+		// if ('openapi' in api) {
+		// 	ConfirmComponent.open(this.modalService, 
+		// 		"OpenAPI 3.0 is not yet fully supported by Swadit. " +
+		// 		"Visual editing is limited.", 
+		// 		"Ok", null);
+		// }
 
-		const self = this;
 		const apiClone: any = _cloneDeep(this.current);
 		SwaggerParser.validate(apiClone, swaggerParserOptions)
-			.then(function(api) {
+			.then((api) => {
 				console.log("This API is a valid Swagger file.");
-				self.hasLoadingErrors = false;
-				self._eventApiChanged.next(self.currentFileName);
+				this.hasLoadingErrors = false;
+				this._eventApiChanged.next(this.currentFileName);
 			})
-			.catch(function(err) {
+			.catch((err) => {
 				console.log("Swagger validation error: ", err.message);
-				self.hasLoadingErrors = true;
-				self._eventApiChanged.next(self.currentFileName);
-				self.router.navigate(['/source']);
+				this.hasLoadingErrors = true;
+				this._eventApiChanged.next(this.currentFileName);
+				this.router.navigate(['/source']);
 			});
+
+		this._eventApiChanged.next(this.currentFileName);
 	}
 
 	swaggerLoadingError(err, fileName: string = null): void
@@ -1124,5 +1127,42 @@ export class ApisService
 	getDefCategories(): Array<string>
 	{
 		return this.schemas._definitionCategories;
+	}
+
+	convertOas2To3(): void
+	{
+		if (!this.isOas2) {
+			console.error("Cannot convert non-Swagger 2.0 to OpenAPI 3.0");
+			return;
+		}
+		convertOas2to3(this.current)
+			.then((result) => {
+				this.current = result.target;
+
+				if ('swagger' in this.current) {
+					this.specVersion = this.current['swagger'];
+				} else if ('openapi' in this.current) {
+					this.specVersion = this.current['openapi'];
+				} else {
+					this.specVersion = "";
+				}
+		
+				this.isOas2 = this.specVersion.startsWith('2.0');
+				this.isOas3 = this.specVersion.startsWith('3.0');
+		
+				if ('openapi' in this.current) {
+					ConfirmComponent.open(this.modalService, 
+						"OpenAPI 3.0 is not yet fully supported by Swadit. " +
+						"Conversion may be incomplete and visual editing is limited. " +
+						"Please review the resulting document carefully.", 
+						"Ok", null);
+				}
+
+				this._eventApiChanged.next(this.currentFileName);
+			})
+			.catch((err) => {
+				console.error("Error converting Swagger 2.0 file:", err);
+				// TODO: Show hint to user
+			});
 	}
 }

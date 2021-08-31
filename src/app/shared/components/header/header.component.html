@@ -38,6 +38,8 @@
 							<i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a>
 
 						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" style="cursor: pointer" (click)="apis.convertOas2To3()" *ngIf="apis.isOas2 && !apis.config.menu.hideItems['convertOas2to3']">
+							<i class="fa fa-fw fa-align-left"></i> {{ 'Convert to OAS 3' | translate }}</a>
 						<a class="dropdown-item" [routerLink]="['/source']" *ngIf="!apis.config.menu.hideItems['source']">
 							<i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a>
 
