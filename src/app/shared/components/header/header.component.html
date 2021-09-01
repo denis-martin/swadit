@@ -39,7 +39,7 @@
 
 						<div class="dropdown-divider"></div>
 						<a class="dropdown-item" style="cursor: pointer" (click)="apis.convertOas2To3()" *ngIf="apis.isOas2 && !apis.config.menu.hideItems['convertOas2to3']">
-							<i class="fa fa-fw fa-align-left"></i> {{ 'Convert to OAS 3' | translate }}</a>
+							<i class="fa fa-fw fa-align-left"></i> {{ 'Convert to OAS 3' | translate }}<span style="vertical-align: super; font-size: 75%; font-weight: bold; color: red" title="OpenAPI 3.0 support is currently limited and should be considered as in 'alpha' state">ALPHA</span></a>
 						<a class="dropdown-item" [routerLink]="['/source']" *ngIf="!apis.config.menu.hideItems['source']">
 							<i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a>
 
