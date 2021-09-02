@@ -14,7 +14,7 @@ function convertRefDeep(src: any)
 		if ('$ref' in src) {
 			src['$ref'] = convertRef(src['$ref']);
 		} else {
-			for (let k in src) {
+			for (const k in src) {
 				convertRefDeep(src[k]);
 			}
 		}
@@ -39,7 +39,7 @@ function convertParameterObject(src: any, api: any, path: string, method: string
 		'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength',
 		'pattern', 'maxItems', 'minItems', 'uniqueItems', 'enum', 'multipleOf'
 	]
-	let target = {};
+	const target = {};
 	if (src['in'] == 'query' || src['in'] == 'header' || src['in'] == 'path') {
 		target['parameter'] = {};
 		for (const field of copyFields) {
@@ -92,7 +92,9 @@ function convertParameterObject(src: any, api: any, path: string, method: string
 						target['requestBody']['content'][mt]['schema']['properties'][src['name']]['format'] = 'binary';
 					} else {
 						for (const field of copySchemaFields) {
-							target['requestBody']['content'][mt]['schema']['properties'][src['name']][field] = src[field];
+							if (field in src) {
+								target['requestBody']['content'][mt]['schema']['properties'][src['name']][field] = src[field];
+							}
 						}
 					}
 					if ('description' in src) {
@@ -112,8 +114,8 @@ function convertParameterObject(src: any, api: any, path: string, method: string
 
 function convertOperationObject(src: any, api: any, path: string, method: string): any
 {
-	let target = {};
-	for (let k in src) {
+	const target = {};
+	for (const k in src) {
 		if (k == 'summary' || k == 'description' || k == 'operationId' || k == 'deprecated') {
 			target[k] = src[k];
 
@@ -121,8 +123,8 @@ function convertOperationObject(src: any, api: any, path: string, method: string
 			target[k] = _cloneDeep(src[k]);
 
 		} else if (k == 'parameters') {
-			for (let param of src[k]) {
-				let paramObj = convertParameterObject(param, api, path, method);
+			for (const param of src[k]) {
+				const paramObj = convertParameterObject(param, api, path, method);
 				if ('parameter' in paramObj) {
 					if (!(k in target)) {
 						target[k] = [];
@@ -131,14 +133,14 @@ function convertOperationObject(src: any, api: any, path: string, method: string
 				} else if ('requestBody' in paramObj) {
 					if (target['requestBody']) {
 						let required = false;
-						for (let mt in target['requestBody']['content']) {
+						for (const mt in target['requestBody']['content']) {
 							if (mt in paramObj['requestBody']['content']) {
 								console.log(target['requestBody']['content'], paramObj['requestBody']['content']);
 								if (('schema' in target['requestBody']['content'][mt]) && ('schema' in paramObj['requestBody']['content'][mt])) {
 									// merge request body parameters
 									if (target['requestBody']['content'][mt]['schema']['type'] == paramObj['requestBody']['content'][mt]['schema']['type'] && target['requestBody']['content'][mt]['schema']['type'] == 'object') {
 										if ('properties' in target['requestBody']['content'][mt]['schema'] && 'properties' in paramObj['requestBody']['content'][mt]['schema']) {
-											for (let p in paramObj['requestBody']['content'][mt]['schema']['properties']) {
+											for (const p in paramObj['requestBody']['content'][mt]['schema']['properties']) {
 												target['requestBody']['content'][mt]['schema']['properties'][p] = paramObj['requestBody']['content'][mt]['schema']['properties'][p];
 												console.warn("Merging", path, method, target['requestBody'], p);
 											}
@@ -172,7 +174,7 @@ function convertOperationObject(src: any, api: any, path: string, method: string
 			}
 		} else if (k == 'responses') {
 			target[k] = {};
-			for (let resp in src[k]) {
+			for (const resp in src[k]) {
 				target[k][resp] = convertResponseObject(src[k][resp], api, path, method);
 			}
 		}
@@ -187,7 +189,7 @@ function convertOperationObject(src: any, api: any, path: string, method: string
 
 function convertSchemaObject(src: any): any
 {
-	let target = _cloneDeep(src);
+	const target = _cloneDeep(src);
 	for (const k in target) {
 		if (k == '$ref') {
 			target[k] = convertRef(target[k]);
@@ -215,7 +217,7 @@ function convertHeaderObject(src: any): any
 
 function convertResponseObject(src: any, api: any, path: string, method: string): any
 {
-	let target = {};
+	const target = {};
 	if ('$ref' in src) {
 		target['$ref'] = convertRef(src['$ref']);
 		return target;
@@ -259,7 +261,7 @@ function convertResponseObject(src: any, api: any, path: string, method: string)
 
 export async function convertOas2to3(src: any): Promise<any>
 {
-	let target = {};
+	const target = {};
 	// openapi
 	target['openapi'] = '3.0.3';
 	// info
@@ -267,15 +269,15 @@ export async function convertOas2to3(src: any): Promise<any>
 	// servers: NYI
 	// paths
 	target['paths'] = {};
-	for (let path in src['paths']) {
+	for (const path in src['paths']) {
 		target['paths'][path] = {}
-		for (let method in src['paths'][path]) {
+		for (const method in src['paths'][path]) {
 			if (method == '$ref') {
 				target['paths'][path][method] = convertRef(src['paths'][path][method]);
 			} else if (method == 'parameters') {
 				target['paths'][path]['parameters'] = [];
-				for (let param of target['paths'][path]['parameters']) {
-					let paramObj = convertParameterObject(param, src, path, null);
+				for (const param of target['paths'][path]['parameters']) {
+					const paramObj = convertParameterObject(param, src, path, null);
 					if ('parameter' in paramObj) {
 						target['paths'][path]['parameters'].push(paramObj['parameter']);
 					} else if ('requestBody' in paramObj) {
@@ -293,15 +295,15 @@ export async function convertOas2to3(src: any): Promise<any>
 		if (src['definitions']) {
 			// components.schemas
 			target['components']['schemas'] = {};
-			for (let definition in src['definitions']) {
+			for (const definition in src['definitions']) {
 				target['components']['schemas'][definition] = convertSchemaObject(src['definitions'][definition]);
 			}
 		}
 		if (src['parameters']) {
 			// components.parameters
 			target['components']['parameters'] = {};
-			for (let parameter in src['parameters']) {
-				let paramObj = convertParameterObject(src['parameters'][parameter], src, null, null);
+			for (const parameter in src['parameters']) {
+				const paramObj = convertParameterObject(src['parameters'][parameter], src, null, null);
 				if ('parameter' in paramObj) {
 					target['components']['parameters'][parameter] = paramObj['parameter'];
 				} else {
@@ -315,7 +317,7 @@ export async function convertOas2to3(src: any): Promise<any>
 		if (src['responses']) {
 			// components.responses
 			target['components']['responses'] = {};
-			for (let response in src['responses']) {
+			for (const response in src['responses']) {
 				target['components']['responses'][response] = convertResponseObject(src['responses'][response], src, null, null);
 			}
 		}
@@ -333,7 +335,7 @@ export async function convertOas2to3(src: any): Promise<any>
 		target['externalDocs'] = _cloneDeep(src['externalDocs']);
 	}
 	// x-tensions
-	for (let key in src) {
+	for (const key in src) {
 		if (key.startsWith('x-')) {
 			target[key] = _cloneDeep(src[key]);
 		}
