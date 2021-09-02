@@ -32,7 +32,7 @@
 							<i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a>
 						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFileModal()" *ngIf="!apis.config.menu.hideItems['open']">
 							<i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a>
-						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()" *ngIf="!apis.config.menu.hideItems['add']">
+						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()" *ngIf="apis.isOas2 && !apis.config.menu.hideItems['add']">
 							<i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a>
 						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.downloadFileModal()" *ngIf="!apis.config.menu.hideItems['download']">
 							<i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a>
