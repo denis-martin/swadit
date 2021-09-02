@@ -35,13 +35,13 @@
 		<div class="col-md-6">
 			<div class="checkbox">
 				<input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
-				<label for="sortItems" class="mb-0" style="margin-top: 0.4rem">Display sorted</label>
+				<label for="sortItems" class="ml-1 mb-0" style="margin-top: 0.4rem">Display sorted</label>
 			</div>
 		</div>
 	</div>
 	<div class="row" style="margin-top: 1em">
 		<div class="col-md-12">
-			<label>Select Paths ({{apis.getLength(apis.selectedPaths)}} selected):</label>
+			<label class="mr-1">Select Paths ({{apis.getLength(apis.selectedPaths)}} selected):</label>
 			<div class="btn-group">
 				<button type="button" class="btn btn-secondary btn-sm" (click)="apis.selectAllPaths()">All</button>
 				<button type="button" class="btn btn-secondary btn-sm" (click)="apis.deselectAllPaths()">None</button>
