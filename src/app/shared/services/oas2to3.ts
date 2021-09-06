@@ -1,4 +1,4 @@
-import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _remove } from "lodash-es";
+import { cloneDeep as _cloneDeep } from "lodash-es";
 
 function convertRef(ref: string): string
 {
@@ -17,6 +17,15 @@ function convertRefDeep(src: any)
 			for (const k in src) {
 				convertRefDeep(src[k]);
 			}
+		}
+	}
+}
+
+function copyExtensions(target: any, src: any): void
+{
+	for (const k in src) {
+		if (src[k].startsWith('x-')) {
+			target[k] = _cloneDeep(src[k]);
 		}
 	}
 }
@@ -256,6 +265,60 @@ function convertResponseObject(src: any, api: any, path: string, method: string)
 
 	// oas3 links: n/a
 	convertRefDeep(target);
+	return target;
+}
+
+function convertSecuritySchemeObject(src: any): any
+{
+	const target = {};
+	if ('$ref' in src) {
+		target['$ref'] = convertRef(src['$ref']);
+	} else {
+		if (src['type'] == 'basic') {
+			target['type'] = 'http';
+			target['scheme'] = 'basic';
+
+		} else if (src['type'] == 'apiKey') {
+			target['type'] = 'http';
+			target['name'] = src['name'];
+			target['in'] = src['in'];
+
+		} else if (src['type'] == 'oauth2') {
+			target['type'] = 'oauth2';
+			target['flows'] = {};
+			if (src['flow'] == 'implicit') {
+				target['flows']['implicit'] = {
+					'authorizationUrl': src['authorizationUrl'],
+					'scopes': _cloneDeep(src['scopes']),
+				};
+
+			} else if (src['flow'] == 'password') {
+				target['flows']['password'] = {
+					'tokenUrl': src['tokenUrl'],
+					'scopes': _cloneDeep(src['scopes']),
+				};
+
+			} else if (src['flow'] == 'application') {
+				target['flows']['clientCredentials'] = {
+					'tokenUrl': src['tokenUrl'],
+					'scopes': _cloneDeep(src['scopes']),
+				};
+
+			} else if (src['flow'] == 'accessCode') {
+				target['flows']['authorizationCode'] = {
+					'authorizationUrl': src['authorizationUrl'],
+					'tokenUrl': src['tokenUrl'],
+					'scopes': _cloneDeep(src['scopes']),
+				};
+
+			} else {
+				console.warn("invalid oauth2 flow type", src['flow']);
+			}
+		} else {
+			console.warn("invalid security scheme type", src['type']);
+		}
+	}
+	copyExtensions(target, src);
 	return target;
 }
 
