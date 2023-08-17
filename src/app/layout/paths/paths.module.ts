@@ -27,16 +27,15 @@ import { PathsRoutingModule } from './paths-routing.module';
 import { PathsComponent } from './paths.component';
 
 @NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		NgbModule,
-		EditorModalsModule,
-		PathsRoutingModule
-	],
-	declarations: [
-		PathsComponent
-	],
-	entryComponents: [ ]
+    imports: [
+        CommonModule,
+        FormsModule,
+        NgbModule,
+        EditorModalsModule,
+        PathsRoutingModule
+    ],
+    declarations: [
+        PathsComponent
+    ]
 })
 export class PathsModule { }
