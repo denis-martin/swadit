@@ -31,7 +31,7 @@
 		</span>
 	</div>
 </div>
-
+<!--
 <div ngxAceEditor
 	[(text)]="text"
 	[mode]="'yaml'"
@@ -43,6 +43,15 @@
 	(textChanged)="onChange($event)"
 	class="editor" [ngClass]="{ 'editor-with-footer': message }">
 </div>
+-->
+<ace
+	[(value)]="text"
+	[mode]="'yaml'"
+	[theme]="'eclipse'"
+	[config]="options"
+	(valueChange)="onChange($event)"
+	class="editor" [ngClass]="{ 'editor-with-footer': message }">
+</ace>
 
 <div class="editor-footer" *ngIf="message">
 	<div class="alert alert-danger">{{message}}</div>
