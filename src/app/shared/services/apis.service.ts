@@ -31,7 +31,9 @@ import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confi
 
 import { convertOas2to3 } from './oas2to3';
 
-import * as Oas20SchemaRoot from '../schemas/oas2.0/swagger-root.json';
+import * as JsonSchemaDraft04 from '../schemas/json-schema/draft-04.json';
+
+import * as Oas20Schema from '../schemas/oas2.0/swagger.json';
 import * as Oas20SchemaInfo from '../schemas/oas2.0/swagger-info.json';
 import * as Oas20SchemaContact from '../schemas/oas2.0/swagger-contact.json';
 import * as Oas20SchemaLicense from '../schemas/oas2.0/swagger-license.json';
@@ -91,10 +93,14 @@ class SwaditConfig
 @Injectable()
 export class ApisService 
 {
+	private readonly jsonSchemas = {
+		"http://json-schema.org/draft-04/schema#": JsonSchemaDraft04['default']
+	}
+
 	private readonly _schemas = 
 	{
 		"oas2.0": {
-			root: Oas20SchemaRoot['default'],
+			root: Oas20Schema['default'],
 			info: Oas20SchemaInfo['default'],
 			contact: Oas20SchemaContact['default'],
 			license: Oas20SchemaLicense['default'],
@@ -726,23 +732,28 @@ export class ApisService
 	// TODO
 	resolveRef(ref: string, rootSchema: any = null): any
 	{
-		const source = rootSchema ? rootSchema : this.current;
+		let source = rootSchema ? rootSchema : this.current;
+		let _ref = ref;
 
-		if (ref.startsWith("#/definitions/")) {
-			const refParts = ref.split('/');
-			return source['definitions'][refParts[2]];
+		// check whether we have a global ref on a JSON Schema
+		for (const k in this.jsonSchemas) {
+			if (ref.startsWith(k)) {
+				source = this.jsonSchemas[k];
+				_ref = "#" + ref.replace(k, "");
+				break;
+			}
 		}
-		if (ref.startsWith("#/parameters/")) {
-			const refParts = ref.split('/');
-			return source['parameters'][refParts[2]];
-		}
-		if (ref.startsWith("#/responses/")) {
-			const refParts = ref.split('/');
-			return source['responses'][refParts[2]];
-		}
-		if (ref.startsWith("#/components/")) {
-			const refParts = ref.split('/');
-			return source['components'][refParts[2]][refParts[3]];
+
+		try {
+			const refParts = _ref.split('/');
+			refParts.forEach(p => {
+				if (p != "#") {
+					source = source[p];
+				}
+			});
+			return source;
+		} catch (err) {
+			console.error("Exception resolving ref", err, ref, _ref, rootSchema, source);
 		}
 		return null;
 	}
