@@ -10,7 +10,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "target": "es2020", //"es2018", //"es2015",
+    "target": "ES2022",
     "typeRoots": [
       "./node_modules/@types"
     ],
@@ -18,7 +18,8 @@
       "es2017",
       "dom"
     ],
-    "paths": { },
-    "resolveJsonModule": true
+    "paths": {},
+    "resolveJsonModule": true,
+    "useDefineForClassFields": false
   }
 }
