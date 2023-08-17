@@ -48,7 +48,7 @@
     "prismjs": "^1.21.0",
     "rxjs": "^6.5.4",
     "rxjs-compat": "^6.0.0-rc.0",
-    "swagger-ui-dist": "^3.50.0",
+    "swagger-ui-dist": "^5.4.1",
     "tslib": "^2.0.0",
     "url": "^0.11.1",
     "util": "^0.12.5",
