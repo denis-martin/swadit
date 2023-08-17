@@ -26,7 +26,6 @@
     "@ng-bootstrap/ng-bootstrap": "^10.0.0",
     "@ngx-translate/core": "^10.0.2",
     "@ngx-translate/http-loader": "^3.0.1",
-    "@postfinance/ngx-ace-editor-wrapper": "^11.1.2",
     "@types/file-saver": "^2.0.2",
     "@types/js-yaml": "^4.0.1",
     "@types/lodash": "^4.14.170",
