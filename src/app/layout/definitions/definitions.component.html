@@ -22,7 +22,7 @@
 		<a class="nav-link" [ngClass]="{ 'active': dc==defCat }" 
 			href="javascript:void(0)" (click)="defCat=dc">
 			<span style="text-transform: capitalize">{{dc}}</span>
-			<span class="badge badge-pill badge-light ml-1" *ngIf="apis.getComponentsCount(dc) > 0">
+			<span class="badge rounded-pill badge-light ms-1" *ngIf="apis.getComponentsCount(dc) > 0">
 				{{ apis.getComponentsCount(dc) }}
 			</span>
 		</a>
@@ -33,12 +33,12 @@
 	<div class="row">
 		<div class="col-md-6">
 			<div class="input-group">
-				<span class="input-group-addon">
+				<span class="input-group-text">
 					<i class="fa fa-filter"></i>
 				</span>
 				<input type="text" [(ngModel)]="filterText" name="filterText" class="form-control"
 					placeholder="Filter by key name" title="Filter by key name">
-				<span class="input-group-addon clickable" *ngIf="filterText" (click)="filterText=''">
+				<span class="input-group-text clickable" *ngIf="filterText" (click)="filterText=''">
 					<i class="fa fa-times"></i>
 				</span>
 			</div>
@@ -46,11 +46,11 @@
 		<div class="col-md-5">
 			<div class="checkbox">
 				<input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
-				<label for="sortItems" class="ml-1 mb-0" style="margin-top: 0.4rem">Display sorted</label>
+				<label for="sortItems" class="ms-1 mb-0" style="margin-top: 0.4rem">Display sorted</label>
 			</div>
 		</div>
-		<div class="col-md-1 text-right">
-			<div class="edit-subsection mr-3" style="font-size: 120%" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly && apis.isOas2">
+		<div class="col-md-1 text-end">
+			<div class="edit-subsection me-3" style="font-size: 120%" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly && apis.isOas2">
 				<i class="fa fa-plus"></i>
 			</div>
 		</div>
