@@ -10,7 +10,7 @@
     "declaration": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
-    "target": "es5", //"es2018", //"es2015",
+    "target": "es2020", //"es2018", //"es2015",
     "typeRoots": [
       "./node_modules/@types"
     ],

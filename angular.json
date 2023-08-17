@@ -138,7 +138,6 @@
       }
     }
   },
-  "defaultProject": "sb-admin-angular4-bootstrap4",
   "cli": {
     "warnings": {}
   },
