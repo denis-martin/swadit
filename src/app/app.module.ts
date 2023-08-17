@@ -44,8 +44,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
         EditorModalsModule
     ],
     providers: [AuthGuard, ApisService],
-    bootstrap: [AppComponent],
-	entryComponents: [FileModalComponent]
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

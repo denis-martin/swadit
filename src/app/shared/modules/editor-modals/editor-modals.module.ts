@@ -14,35 +14,27 @@ import { ConfirmComponent } from './confirm/confirm.component';
 import { ModifyComponent } from './modify/modify.component';
 
 @NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		NgbModule,
-		SchemaEditorModule
-	],
-	declarations: [
-		DefinitionEditComponent,
-		ParameterEditComponent,
-		ResponseEditComponent,
-		PathEditComponent,
-		ConfirmComponent,
-		ModifyComponent
-	],
-	exports: [
-		DefinitionEditComponent,
-		ParameterEditComponent,
-		ResponseEditComponent,
-		PathEditComponent,
-		ConfirmComponent,
-		ModifyComponent
-	],
-	entryComponents: [
-		DefinitionEditComponent,
-		ParameterEditComponent,
-		ResponseEditComponent,
-		PathEditComponent,
-		ConfirmComponent,
-		ModifyComponent
-	]
+    imports: [
+        CommonModule,
+        FormsModule,
+        NgbModule,
+        SchemaEditorModule
+    ],
+    declarations: [
+        DefinitionEditComponent,
+        ParameterEditComponent,
+        ResponseEditComponent,
+        PathEditComponent,
+        ConfirmComponent,
+        ModifyComponent
+    ],
+    exports: [
+        DefinitionEditComponent,
+        ParameterEditComponent,
+        ResponseEditComponent,
+        PathEditComponent,
+        ConfirmComponent,
+        ModifyComponent
+    ]
 })
 export class EditorModalsModule { }

@@ -30,19 +30,18 @@ import { ApiInfoComponent } from './api-info.component';
 import { ApiInfoEditComponent } from './api-info-edit/api-info-edit.component';
 
 @NgModule({
-	imports: [
-		CommonModule,
-		FormsModule,
-		NgbModule,
-		MarkdownModule.forChild(),
-		SchemaViewModule,
-		SchemaEditorModule,
-		ApiInfoRoutingModule,
-	],
-	declarations: [
-		ApiInfoComponent, 
-		ApiInfoEditComponent
-	],
-	entryComponents: [ApiInfoEditComponent]
+    imports: [
+        CommonModule,
+        FormsModule,
+        NgbModule,
+        MarkdownModule.forChild(),
+        SchemaViewModule,
+        SchemaEditorModule,
+        ApiInfoRoutingModule,
+    ],
+    declarations: [
+        ApiInfoComponent,
+        ApiInfoEditComponent
+    ]
 })
 export class ApiInfoModule { }
