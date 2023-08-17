@@ -18,15 +18,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { AceEditorModule } from 'ngx-ace-editor-wrapper';
-
 import { SwadocRoutingModule } from './swadoc-routing.module';
 import { SwadocComponent } from './swadoc.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    AceEditorModule,
     SwadocRoutingModule
   ],
   declarations: [SwadocComponent]
