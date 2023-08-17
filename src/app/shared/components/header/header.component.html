@@ -1,6 +1,6 @@
 <div class="pos-f-t fixed-top header">
-	<nav class="navbar navbar-inverse bg-inverse navbar-toggleable-md">
-		<button class="navbar-toggler navbar-toggler-left" (click)="toggleSidebar()">
+	<nav class="navbar navbar-dark bg-dark navbar-expand-md ps-3 pe-3">
+		<button class="navbar-toggler navbar-toggler-start" (click)="toggleSidebar()">
 			<span class="navbar-toggler-icon"></span>
 		</button>
 		<span class="navbar-brand">
@@ -17,12 +17,12 @@
 			</span>
 		</span>
 		<div class="collapse navbar-collapse">
-			<ul class="navbar-nav ml-auto mt-2 mt-md-0">
+			<ul class="navbar-nav ms-auto mt-2 mt-md-0">
 				<li class="nav-item dropdown" ngbDropdown>
 					<a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
 						<i class="fa fa-fw fa-folder-open"></i>&nbsp;{{ apis.config.menu.title }} <b class="caret"></b>
 					</a>
-					<div class="dropdown-menu dropdown-menu-right">
+					<div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
 
 						<a class="dropdown-item" href="javascript:void(0)" *ngFor="let catItem of apis.config.catalog" (click)="apis.openFile(catItem.path)">
 							<i class="fa fa-fw fa-folder-open"></i> {{ catItem.title }}</a>
@@ -70,7 +70,7 @@
 					<a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
 						<i class="fa fa-fw fa-gear"></i>&nbsp;Settings <b class="caret"></b>
 					</a>
-					<div class="dropdown-menu dropdown-menu-right">
+					<div class="dropdown-menu dropdown-menu-end">
 						<a class="dropdown-item" href="javascript:void(0)"><i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}</a>
 						<a class="dropdown-item" [routerLink]="['/login']" (click)="onLoggedout()"><i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }} </a>
 					</div>
