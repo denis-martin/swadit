@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="addPath($event)" title="Add item" *ngIf="!apis.config.readOnly">
+<div class="edit-section" (click)="addPath($event)" title="Add item" *ngIf="!apis.config.readOnly && apis.isOas2">
 	<i class="fa fa-plus"></i>
 </div>
 <div class="filterBox">
@@ -35,22 +35,22 @@
 		<div class="col-md-6">
 			<div class="checkbox">
 				<input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
-				<label for="sortItems" class="mb-0" style="margin-top: 0.4rem">Display sorted</label>
+				<label for="sortItems" class="ml-1 mb-0" style="margin-top: 0.4rem">Display sorted</label>
 			</div>
 		</div>
 	</div>
 	<div class="row" style="margin-top: 1em">
 		<div class="col-md-12">
-			<label>Select Paths ({{apis.getLength(apis.selectedPaths)}} selected):</label>
+			<label class="mr-1">Select Paths ({{apis.getLength(apis.selectedPaths)}} selected):</label>
 			<div class="btn-group">
 				<button type="button" class="btn btn-secondary btn-sm" (click)="apis.selectAllPaths()">All</button>
 				<button type="button" class="btn btn-secondary btn-sm" (click)="apis.deselectAllPaths()">None</button>
 				<button type="button" class="btn btn-secondary btn-sm" (click)="apis.inverseSelectedPaths()">Invers</button>
 				<button type="button" class="btn btn-secondary btn-sm" disabled title="not yet implemented">By...</button>
 			</div>
-			<button type="button" class="btn btn-secondary btn-sm" (click)="apis.deleteSelectedPaths()" *ngIf="!apis.config.readOnly">Delete</button>
+			<button type="button" class="btn btn-secondary btn-sm" (click)="apis.deleteSelectedPaths()" *ngIf="!apis.config.readOnly && apis.isOas2">Delete</button>
 			<button type="button" class="btn btn-secondary btn-sm" (click)="modify($event)"
-				[disabled]="apis.getLength(apis.selectedPaths) == 0" *ngIf="!apis.config.readOnly">Modify...</button>
+				[disabled]="apis.getLength(apis.selectedPaths) == 0" *ngIf="!apis.config.readOnly && apis.isOas2">Modify...</button>
 		</div>
 	</div>
 </div>

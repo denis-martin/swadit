@@ -15,9 +15,20 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly">
-	<i class="fa fa-plus"></i>
-</div>
+<!-- Definition Categories -->
+<ul class="nav nav-tabs mb-3">
+	<li *ngFor="let dc of apis.getDefCategories()"
+		class="nav-item">
+		<a class="nav-link" [ngClass]="{ 'active': dc==defCat }" 
+			href="javascript:void(0)" (click)="defCat=dc">
+			<span style="text-transform: capitalize">{{dc}}</span>
+			<span class="badge badge-pill badge-light ml-1" *ngIf="apis.getComponentsCount(dc) > 0">
+				{{ apis.getComponentsCount(dc) }}
+			</span>
+		</a>
+	</li>
+</ul>
+
 <div class="filterBox">
 	<div class="row">
 		<div class="col-md-6">
@@ -32,33 +43,51 @@
 				</span>
 			</div>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-5">
 			<div class="checkbox">
 				<input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
-				<label for="sortItems" class="mb-0" style="margin-top: 0.4rem">Display sorted</label>
+				<label for="sortItems" class="ml-1 mb-0" style="margin-top: 0.4rem">Display sorted</label>
+			</div>
+		</div>
+		<div class="col-md-1 text-right">
+			<div class="edit-subsection mr-3" style="font-size: 120%" (click)="edit($event)" title="Add item" *ngIf="!apis.config.readOnly && apis.isOas2">
+				<i class="fa fa-plus"></i>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div *ngFor="let def of apis.filterList(keys(apis.current['definitions']), filterText, sortItems); let index = index" 
+<div *ngFor="let def of apis.filterList(keys(apis.getComponents(defCat)), filterText, sortItems); let index = index" 
 	class="card mb-2">
 	<div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
 		<div class="row">
 			<div class="col-md-10 preview">
 				{{def}}
-				<span *ngIf="apis.current['definitions'][def]['type']" class="headerType"> ({{apis.current['definitions'][def]['type']}}) </span>
-				<span *ngIf="apis.current['definitions'][def]['description']"> {{apis.current['definitions'][def]['description']}} </span>
+				<span *ngIf="apis.getComponents(defCat)[def]['in']" class="headerType"> in {{apis.getComponents(defCat)[def]['in']}}</span>
+				<span *ngIf="apis.getComponents(defCat)[def]['type']" class="headerType"> ({{apis.getComponents(defCat)[def]['type']}}) </span>
+				<span *ngIf="apis.getComponents(defCat)[def]['description']"> {{apis.getComponents(defCat)[def]['description']}} </span>
 			</div>
 			<div class="col-md-2">
-				<div class="edit-card" (click)="edit($event, def)" *ngIf="!apis.config.readOnly">
+				<div class="edit-card" (click)="edit($event, def)" *ngIf="!apis.config.readOnly && apis.isOas2">
 					<i class="fa fa-fw fa-pencil"></i>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="card-block" *ngIf="uncollapsedDef[def]">
-		<swadit-swagger-schema-view [obj]="apis.current['definitions'][def]" [generateExample]="true">
-		</swadit-swagger-schema-view>
+		<div [ngSwitch]="defCat">
+			<div *ngSwitchCase="'parameters'">
+				<swadit-parameter-view [obj]="apis.getComponents(defCat)[def]">
+				</swadit-parameter-view>
+			</div>
+			<div *ngSwitchCase="'responses'">
+				<swadit-response-view [obj]="apis.getComponents(defCat)[def]">
+				</swadit-response-view>
+			</div>
+			<div *ngSwitchDefault>
+				<swadit-swagger-schema-view [obj]="apis.getComponents(defCat)[def]" [generateExample]="true">
+				</swadit-swagger-schema-view>
+			</div>
+		</div>
 	</div>
 </div>

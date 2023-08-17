@@ -15,29 +15,69 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="schemaView">
+<div class="schemaView" *ngIf="obj">
 	<markdown *ngIf="obj['description']" 
 		[data]="obj['description']"></markdown>
-	<div *ngIf="obj['in']=='body'; else nonBodyParameter">
-		<swadit-schema-view
-			[schema]="apis.schemas.parameterBody" [obj]="obj" [skip]="['description']">
-		</swadit-schema-view>
-		<div *ngIf="obj['schema'] && obj['schema']['example']">
-			<p>Example:</p>
-			<markdown [data]="apis.toJson(obj['schema']['example']) | language: 'json'"></markdown>
+
+	<!-- OAS2 -->
+	<div *ngIf="apis.isOas2">
+		<div *ngIf="obj['in']=='body'; else nonBodyParameter">
+			<swadit-schema-view
+				[schema]="apis.schemas.parameterBody" [obj]="obj" [skip]="['description']">
+			</swadit-schema-view>
+			<div *ngIf="obj['schema'] && obj['schema']['example']">
+				<p>Example:</p>
+				<markdown [data]="apis.toJson(obj['schema']['example']) | language: 'json'"></markdown>
+			</div>
+			<div *ngIf="obj['schema']">
+				<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+					Example (generated)<span *ngIf="!showGeneratedExample">:</span><span *ngIf="showGeneratedExample">...</span>
+				</p>
+				<markdown *ngIf="!showGeneratedExample"
+					[data]="generateExample(obj['schema']) | language: 'json'">
+				</markdown>
+			</div>
 		</div>
+		<ng-template #nonBodyParameter>
+			<swadit-schema-view
+				[schema]="apis.schemas.parameterNonBody" [obj]="obj" [skip]="['description']">
+			</swadit-schema-view>
+		</ng-template>
+	</div>
+
+	<!-- OAS3 -->
+	<div *ngIf="apis.isOas3">
+		<swadit-schema-view
+			[schema]="apis.schemas.definitions['Parameter']" [obj]="obj" 
+			[skip]="['description', 'required', 'example', 'examples']">
+		</swadit-schema-view>
 		<div *ngIf="obj['schema']">
-			<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
-				Example (generated)<span *ngIf="!showGeneratedExample">:</span><span *ngIf="showGeneratedExample">...</span>
-			</p>
-			<markdown *ngIf="!showGeneratedExample"
-				[data]="generateExample(obj['schema']) | language: 'json'">
-			</markdown>
+			<div *ngIf="obj['example'] || obj['examples']; else schemaExample">
+				<div *ngIf="obj['example']">
+					<p>Example:</p>
+					<markdown [data]="apis.toJson(obj['example']) | language: 'json'"></markdown>
+				</div>
+				<!-- TODO: examples -->
+			</div>
+			<ng-template #schemaExample>
+				<div *ngIf="obj['schema']['example']">
+					<p>Example:</p>
+					<markdown [data]="apis.toJson(obj['schema']['example']) | language: 'json'"></markdown>
+				</div>
+			</ng-template>
+		</div>
+		<div *ngIf="obj['content']">
+			<div *ngFor="let contentType of apis.keys(obj['content'])">
+				<p>{{ contentType }}:</p>
+				<swadit-schema-view
+					[schema]="apis.schemas.definitions['Schema']" [obj]="obj['content'][contentType]['schema']">
+				</swadit-schema-view>
+				<div *ngIf="obj['content']['example']">
+					<p>Example:</p>
+					<markdown [data]="apis.toJson(obj['content']['example']) | language: 'json'"></markdown>
+				</div>
+				<!-- TODO: examples -->
+			</div>
 		</div>
 	</div>
-	<ng-template #nonBodyParameter>
-		<swadit-schema-view
-			[schema]="apis.schemas.parameterNonBody" [obj]="obj" [skip]="['description']">
-		</swadit-schema-view>
-	</ng-template>
 </div>

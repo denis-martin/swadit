@@ -30,7 +30,7 @@ import { SchemaPrintViewComponent } from './schema-print-view/schema-print-view.
 @NgModule({
   imports: [
     CommonModule,
-    MarkdownModule.forRoot(),
+    MarkdownModule.forChild(),
     SchemaViewModule,
 		SchemaEditorModule,
     PrintRoutingModule

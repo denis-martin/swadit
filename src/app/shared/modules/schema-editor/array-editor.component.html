@@ -15,9 +15,9 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div *ngIf="schema['items']['type']=='string'">
+<div *ngIf="itemsSchema['type']=='string'">
 	<div *ngFor="let item of obj; let index = index; trackBy:trackByIndex" class="input-group" style="margin-bottom:-1px">
-		<swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap input-wrap-item'" [schema]="schema['items']" [(obj)]="obj[index]">
+		<swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap input-wrap-item'" [schema]="itemsSchema" [(obj)]="obj[index]">
 		</swadit-primitive-editor>
 		<span class="input-group-addon" style="border-left: 0; width: 5.1rem;">
 			<span>
@@ -28,7 +28,7 @@
 		</span>
 	</div>
 	<div class="input-group">
-		<swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap'" [schema]="schema['items']" [(obj)]="itemToAdd"
+		<swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap'" [schema]="itemsSchema" [(obj)]="itemToAdd"
 			(keydown.enter)="addItem($event)">
 		</swadit-primitive-editor>
 		<span class="input-group-addon clickable" style="border-left: 0; width: 5.1rem;" (click)="addItem($event)">
@@ -38,9 +38,9 @@
 	<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
 </div>
 
-<div *ngIf="schema['items']['type']=='object'">
+<div *ngIf="itemsSchema['type']=='object'">
 	<div *ngFor="let item of obj; let index = index" style="margin-bottom: 0.6rem" class="input-group">
-		<swadit-object-editor [schema]="schema['items']" [(obj)]="obj[index]" class="form-control" style="background-color: #f7f7f9">
+		<swadit-object-editor [schema]="itemsSchema" [(obj)]="obj[index]" class="form-control" style="background-color: #f7f7f9">
 		</swadit-object-editor>
 		<div class="input-group-addon">
 			<span class="clickable" (click)="deleteItem($event, index)"><i class="fa fa-fw fa-trash"></i></span><br>
@@ -49,11 +49,11 @@
 		</div>
 	</div>
 	<div class="input-group">
-		<swadit-object-editor [schema]="schema['items']" [(obj)]="itemToAdd" class="form-control"
+		<swadit-object-editor [schema]="itemsSchema" [(obj)]="itemToAdd" class="form-control"
 			(keydown.enter)="addItem($event)">
 		</swadit-object-editor>
 		<div class="input-group-addon clickable" (click)="addItem($event)">
-			<i class="fa fa-plus"></i>
+			<i class="fa fa-fw fa-plus"></i>
 		</div>
 	</div>
 	<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>

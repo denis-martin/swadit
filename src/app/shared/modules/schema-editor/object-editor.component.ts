@@ -16,6 +16,7 @@
  */
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ApisService } from 'app/shared/services';
 
 @Component({
 	selector: 'swadit-object-editor',
@@ -61,7 +62,7 @@ export class ObjectEditorComponent implements OnInit
 	public noItemToAdd: boolean = false;
 	public collapsed = {};
 
-	constructor()
+	constructor(public apis: ApisService)
 	{
 		if (!this._obj) {
 			this._obj = {};
@@ -70,6 +71,8 @@ export class ObjectEditorComponent implements OnInit
 
 	ngOnInit(): void
 	{
+		this.schema = this.apis.resolveObj(this.schema);
+		
 		if (!this.card && this.schema["x-swadit-editor-card"]) {
 			this.card = true;
 		}
@@ -92,7 +95,13 @@ export class ObjectEditorComponent implements OnInit
 		if (!this.schema.properties) {
 			return [];
 		} else {
-			return Object.keys(this.schema.properties);
+			const properties: string[] = [];
+			for (const k in this.schema.properties) {
+				if (!this.schema.properties[k]['x-swadit-input-hidden']) {
+					properties.push(k);
+				}
+			}
+			return properties;
 		}
 	}
 

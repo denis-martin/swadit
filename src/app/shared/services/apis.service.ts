@@ -29,20 +29,26 @@ import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _rem
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
 import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
 
-import * as Swagger20SchemaRoot from '../schemas/2.0/swagger-root.json';
-import * as Swagger20SchemaInfo from '../schemas/2.0/swagger-info.json';
-import * as Swagger20SchemaContact from '../schemas/2.0/swagger-contact.json';
-import * as Swagger20SchemaLicense from '../schemas/2.0/swagger-license.json';
-import * as Swagger20SchemaExternalDocs from '../schemas/2.0/swagger-externalDocs.json';
-import * as Swagger20SchemaTags from '../schemas/2.0/swagger-tags.json';
-import * as Swagger20SchemaSecurityDefinitions from '../schemas/2.0/swagger-securityDefinitions.json';
-import * as Swagger20SchemaSecurity from '../schemas/2.0/swagger-security.json';
-import * as Swagger20SchemaSchema from '../schemas/2.0/swagger-schema.json';
-import * as Swagger20SchemaParameterBody from '../schemas/2.0/swagger-parameterBody.json';
-import * as Swagger20SchemaParameterNonBody from '../schemas/2.0/swagger-parameterNonBody.json';
-import * as Swagger20SchemaResponse from '../schemas/2.0/swagger-response.json';
-import * as Swagger20SchemaOperation from '../schemas/2.0/swagger-operation.json';
-import * as Swagger20SchemaHeader from '../schemas/2.0/swagger-header.json';
+import { convertOas2to3 } from './oas2to3';
+
+import * as JsonSchemaDraft04 from '../schemas/json-schema/draft-04.json';
+
+import * as Oas20Schema from '../schemas/oas2.0/swagger.json';
+import * as Oas20SchemaInfo from '../schemas/oas2.0/swagger-info.json';
+import * as Oas20SchemaContact from '../schemas/oas2.0/swagger-contact.json';
+import * as Oas20SchemaLicense from '../schemas/oas2.0/swagger-license.json';
+import * as Oas20SchemaExternalDocs from '../schemas/oas2.0/swagger-externalDocs.json';
+import * as Oas20SchemaTags from '../schemas/oas2.0/swagger-tags.json';
+import * as Oas20SchemaSecurityDefinitions from '../schemas/oas2.0/swagger-securityDefinitions.json';
+import * as Oas20SchemaSecurity from '../schemas/oas2.0/swagger-security.json';
+import * as Oas20SchemaSchema from '../schemas/oas2.0/swagger-schema.json';
+import * as Oas20SchemaParameterBody from '../schemas/oas2.0/swagger-parameterBody.json';
+import * as Oas20SchemaParameterNonBody from '../schemas/oas2.0/swagger-parameterNonBody.json';
+import * as Oas20SchemaResponse from '../schemas/oas2.0/swagger-response.json';
+import * as Oas20SchemaOperation from '../schemas/oas2.0/swagger-operation.json';
+import * as Oas20SchemaHeader from '../schemas/oas2.0/swagger-header.json';
+
+import * as Oas30Schema from '../schemas/oas3.0/schema.json';
 
 const swaggerParserOptions: SwaggerParser.Options = {
 	resolve: {
@@ -87,30 +93,64 @@ class SwaditConfig
 @Injectable()
 export class ApisService 
 {
+	private readonly jsonSchemas = {
+		"http://json-schema.org/draft-04/schema#": JsonSchemaDraft04['default']
+	}
+
 	private readonly _schemas = 
 	{
-		"2.0": {
-			root: Swagger20SchemaRoot['default'],
-			info: Swagger20SchemaInfo['default'],
-			contact: Swagger20SchemaContact['default'],
-			license: Swagger20SchemaLicense['default'],
-			externalDocs: Swagger20SchemaExternalDocs['default'],
-			tags: Swagger20SchemaTags['default'],
-			securityDefinitions: Swagger20SchemaSecurityDefinitions['default'],
-			security: Swagger20SchemaSecurity['default'],
-			schema: Swagger20SchemaSchema['default'],
-			parameterBody: Swagger20SchemaParameterBody['default'],
-			parameterNonBody: Swagger20SchemaParameterNonBody['default'],
-			response: Swagger20SchemaResponse['default'],
-			operation: Swagger20SchemaOperation['default'],
-			header: Swagger20SchemaHeader['default']
+		"oas2.0": {
+			root: Oas20Schema['default'],
+			info: Oas20SchemaInfo['default'],
+			contact: Oas20SchemaContact['default'],
+			license: Oas20SchemaLicense['default'],
+			externalDocs: Oas20SchemaExternalDocs['default'],
+			tags: Oas20SchemaTags['default'],
+			securityDefinitions: Oas20SchemaSecurityDefinitions['default'],
+			security: Oas20SchemaSecurity['default'],
+			schema: Oas20SchemaSchema['default'],
+			parameterBody: Oas20SchemaParameterBody['default'],
+			parameterNonBody: Oas20SchemaParameterNonBody['default'],
+			response: Oas20SchemaResponse['default'],
+			operation: Oas20SchemaOperation['default'],
+			header: Oas20SchemaHeader['default'],
+			_definitionCategories: [
+				'definitions', 
+				'parameters',
+				'responses'
+			]
+		},
+		"oas3.0": {
+			root: Oas30Schema['default'],
+			info: Oas30Schema['default']['definitions']['Info'],
+			contact: Oas30Schema['default']['definitions']['Contact'],
+			license: Oas30Schema['default']['definitions']['License'],
+			externalDocs: Oas30Schema['default']['definitions']['ExternalDocumentation'],
+			tags: Oas30Schema['default']['properties']['tags'],
+			definitions: Oas30Schema['default']['definitions'],
+			schema: Oas30Schema['default']['definitions']['Schema'],
+			_definitionCategories: [
+				'schemas', 
+				'responses',
+				'parameters',
+				//'examples',
+				//'requestBodies',
+				//'headers',
+				//'securitySchemes',
+				//'links',
+				//'callbacks'
+			]
 		}
 	};
 
 	get schemas(): any
 	{
-		if (this.current['swagger'] == "2.0") {
-			return this._schemas["2.0"];
+		if (this.isOas2) {
+			return this._schemas["oas2.0"];
+		} else if (this.isOas3) {
+			if (this.specVersion.startsWith('3.0')) {
+				return this._schemas["oas3.0"];
+			}
 		}
 		return null;
 	}
@@ -129,15 +169,9 @@ export class ApisService
 	public lastLoaded: string;
 	public hasLoadingErrors: boolean = false;
 
-	public get isOas3(): boolean
-	{
-		return 'openapi' in this.current && typeof this.current['openapi'] == 'string' && this.current['openapi'].startsWith('3.0');
-	}
-
-	public get isOas2(): boolean
-	{
-		return 'swagger' in this.current && typeof this.current['openapi'] == 'string' && this.current['swagger'].startsWith('2.0');
-	}
+	public specVersion = '2.0';
+	public isOas2 = true;
+	public isOas3 = false;
 
 	filesToAdd = [];
 	filesToAddIndex = 0;
@@ -264,33 +298,45 @@ export class ApisService
 		}
 	}
 
-	swaggerLoaded(api: OpenAPI.Document, fileName: string = null): void
+	swaggerLoaded(api: any, fileName: string = null): void
 	{
 		console.log("swaggerLoaded");
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
 
-		if (this.isOas3) {
-			ConfirmComponent.open(this.modalService, 
-				"OpenAPI 3.0 is not yet fully supported by Swadit. " +
-				"Visual editing is limited.", 
-				"Ok", null);
+		if ('swagger' in this.current) {
+			this.specVersion = this.current['swagger'];
+		} else if ('openapi' in this.current) {
+			this.specVersion = this.current['openapi'];
+		} else {
+			this.specVersion = "";
 		}
 
-		const self = this;
+		this.isOas2 = this.specVersion.startsWith('2.0');
+		this.isOas3 = this.specVersion.startsWith('3.0');
+
+		// if ('openapi' in api) {
+		// 	ConfirmComponent.open(this.modalService, 
+		// 		"OpenAPI 3.0 is not yet fully supported by Swadit. " +
+		// 		"Visual editing is limited.", 
+		// 		"Ok", null);
+		// }
+
 		const apiClone: any = _cloneDeep(this.current);
 		SwaggerParser.validate(apiClone, swaggerParserOptions)
-			.then(function(api) {
+			.then((api) => {
 				console.log("This API is a valid Swagger file.");
-				self.hasLoadingErrors = false;
-				self._eventApiChanged.next(self.currentFileName);
+				this.hasLoadingErrors = false;
+				this._eventApiChanged.next(this.currentFileName);
 			})
-			.catch(function(err) {
+			.catch((err) => {
 				console.log("Swagger validation error: ", err.message);
-				self.hasLoadingErrors = true;
-				self._eventApiChanged.next(self.currentFileName);
-				self.router.navigate(['/source']);
+				this.hasLoadingErrors = true;
+				this._eventApiChanged.next(this.currentFileName);
+				this.router.navigate(['/source']);
 			});
+
+		this._eventApiChanged.next(this.currentFileName);
 	}
 
 	swaggerLoadingError(err, fileName: string = null): void
@@ -472,22 +518,24 @@ export class ApisService
 				}
 			});
 		} else {
+			schema = this.resolveObj(schema, this.schemas.root);
 			if (schema['type'] == 'object') {
 				if (schema['properties']) {
 					this.keys(schema['properties']).forEach(p => {
 						if (api[p] != null) {
 							this.cleanUp(schema['properties'][p], api[p]);
-							if (schema['properties'][p]['type'] == 'array') {
+							const propertySchema = this.resolveObj(schema['properties'][p], this.schemas.root);
+							if (propertySchema['type'] == 'array') {
 								if (api[p].length == 0 && !this.propertyIsRequired(schema, p)) {
 									delete api[p];
 								}
 							}
-							if (schema['properties'][p]['type'] == 'object') {
+							if (propertySchema['type'] == 'object') {
 								if (this.keys(api[p]).length == 0 && !this.propertyIsRequired(schema, p)) {
 									delete api[p];
 								}
 							}
-							if (schema['properties'][p]['type'] == 'string') {
+							if (propertySchema['type'] == 'string') {
 								if (api[p] == "" && !this.propertyIsRequired(schema, p)) {
 									delete api[p];
 								}
@@ -682,28 +730,39 @@ export class ApisService
 	}
 
 	// TODO
-	resolveRef(ref: string): any
+	resolveRef(ref: string, rootSchema: any = null): any
 	{
-		if (ref.startsWith("#/definitions/")) {
-			const refParts = ref.split('/');
-			return this.current['definitions'][refParts[2]];
+		let source = rootSchema ? rootSchema : this.current;
+		let _ref = ref;
+
+		// check whether we have a global ref on a JSON Schema
+		for (const k in this.jsonSchemas) {
+			if (ref.startsWith(k)) {
+				source = this.jsonSchemas[k];
+				_ref = "#" + ref.replace(k, "");
+				break;
+			}
 		}
-		if (ref.startsWith("#/parameters/")) {
-			const refParts = ref.split('/');
-			return this.current['parameters'][refParts[2]];
-		}
-		if (ref.startsWith("#/responses/")) {
-			const refParts = ref.split('/');
-			return this.current['responses'][refParts[2]];
+
+		try {
+			const refParts = _ref.split('/');
+			refParts.forEach(p => {
+				if (p != "#") {
+					source = source[p];
+				}
+			});
+			return source;
+		} catch (err) {
+			console.error("Exception resolving ref", err, ref, _ref, rootSchema, source);
 		}
 		return null;
 	}
 
-	resolveObj(obj: any): any
+	resolveObj(obj: any, rootSchema: any = null): any
 	{
 		if (obj) {
 			if (obj['$ref']) {
-				obj = this.resolveRef(obj['$ref']);
+				obj = this.resolveRef(obj['$ref'], rootSchema);
 			} 
 			if (Array.isArray(obj['allOf'])) {
 				const mergedObj = {};
@@ -748,11 +807,6 @@ export class ApisService
 			}
 		});
 		return obj;
-	}
-
-	settingsModal(): void
-	{
-		alert('Not yet implemented');
 	}
 
 	keys(obj: Object): string[]
@@ -1035,5 +1089,91 @@ export class ApisService
 			return api['produces'];
 		}
 		return null;
+	}
+
+	getComponents(type: string): any
+	{
+		if (this.isOas2) {
+			if (type in this.current || type == 'schemas') {
+				if (type == 'definitions' ||
+					type == 'responses' ||
+					type == 'parameters')
+				{
+					return this.current[type];
+				} 
+				else if (type == 'schemas') 
+				{
+					return this.current['definitions'];
+				}
+			}
+		} else if (this.isOas3) {
+			if ('components' in this.current && type in this.current['components']) {
+				if (type == 'schemas' ||
+					type == 'responses' ||
+					type == 'parameters' ||
+					type == 'examples' ||
+					type == 'requestBodies' ||
+					type == 'headers' ||
+					type == 'securitySchemes' ||
+					type == 'links' ||
+					type == 'callbacks')
+				{
+					return this.current['components'][type];
+				}
+			}
+		}
+		return null;
+	}
+
+	getComponentsCount(type: string): number
+	{
+		const components = this.keys(this.getComponents(type));
+		if (components && components.length > 0) {
+			return components.length;
+		} else {
+			return 0;
+		}
+	}
+
+	getDefCategories(): Array<string>
+	{
+		return this.schemas._definitionCategories;
+	}
+
+	convertOas2To3(): void
+	{
+		if (!this.isOas2) {
+			console.error("Cannot convert non-Swagger 2.0 to OpenAPI 3.0");
+			return;
+		}
+		convertOas2to3(this.current)
+			.then((result) => {
+				this.current = result.target;
+
+				if ('swagger' in this.current) {
+					this.specVersion = this.current['swagger'];
+				} else if ('openapi' in this.current) {
+					this.specVersion = this.current['openapi'];
+				} else {
+					this.specVersion = "";
+				}
+		
+				this.isOas2 = this.specVersion.startsWith('2.0');
+				this.isOas3 = this.specVersion.startsWith('3.0');
+		
+				if ('openapi' in this.current) {
+					ConfirmComponent.open(this.modalService, 
+						"OpenAPI 3.0 is not yet fully supported by Swadit. " +
+						"Conversion may be incomplete and visual editing is limited. " +
+						"Please review the resulting document carefully.", 
+						"Ok", null);
+				}
+
+				this._eventApiChanged.next(this.currentFileName);
+			})
+			.catch((err) => {
+				console.error("Error converting Swagger 2.0 file:", err);
+				// TODO: Show hint to user
+			});
 	}
 }

@@ -15,7 +15,7 @@
 	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="editPath($event, path, method)" *ngIf="!apis.config.readOnly">
+<div class="edit-section" (click)="editPath($event, path, method)" *ngIf="!apis.config.readOnly && apis.isOas2">
 	<i class="fa fa-pencil"></i>
 </div>
 
@@ -32,7 +32,7 @@
 				<span *ngIf="apis.current['paths'][path][m]['deprecated']" class="badge badge-warning">deprecated</span>
 			</a>
 		</li>
-		<li class="nav-item" *ngIf="!apis.config.readOnly">
+		<li class="nav-item" *ngIf="!apis.config.readOnly && apis.isOas2">
 			<a class="nav-link" [ngClass]="{ 'active': !method }" 
 				href="javascript:void(0)" (click)="editPath($event, path)">
 				<i class="fa fa-plus"></i>
@@ -59,7 +59,7 @@
 		<!-- parameters -->
 		<h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
 			Parameters
-			<span class="edit-subsection" (click)="editParameter($event)" title="Add parameter" *ngIf="!apis.config.readOnly">
+			<span class="edit-subsection" (click)="editParameter($event)" title="Add parameter" *ngIf="!apis.config.readOnly && apis.isOas2">
 				<i class="fa fa-plus"></i>
 			</span>
 		</h2>
@@ -78,7 +78,7 @@
 							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
-							<div class="edit-card" (click)="editParameter($event, param, true)" *ngIf="!apis.config.readOnly">
+							<div class="edit-card" (click)="editParameter($event, param, true)" *ngIf="!apis.config.readOnly && apis.isOas2">
 								<i class="fa fa-fw fa-pencil"></i>
 							</div>
 						</div>
@@ -105,7 +105,7 @@
 							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
-							<div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly">
+							<div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
 								<i class="fa fa-fw fa-pencil"></i>
 							</div>
 						</div>
@@ -117,12 +117,62 @@
 					</swadit-parameter-view>
 				</div>
 			</div>
+			<div *ngIf="apis.isOas3 && apis.current['paths'][path][method]['requestBody']"
+				swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['requestBody'])}" #local="swLet"
+				class="card mb-1">
+				<div class="card-header clickable" 
+					(click)="uncollapsedParameter['x-swadit-requestBody'] = !uncollapsedParameter['x-swadit-requestBody']">
+					<div class="row">
+						<div class="col-md-11 preview">
+							Request Body<span *ngIf="local.values.obj['required']" style="color: red">*</span>
+							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
+						</div>
+						<div class="col-md-1">
+							<!--
+							<div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
+								<i class="fa fa-fw fa-pencil"></i>
+							</div>
+							-->
+						</div>
+					</div>
+				</div>
+				<div class="card-block" *ngIf="uncollapsedParameter['x-swadit-requestBody']">
+					<div *ngFor="let contentType of apis.keys(local.values.obj['content'])">
+						<p>{{ contentType }}: <span *ngIf="local.values.obj['content'][contentType]['schema']['$ref']" class="headerType">{{ local.values.obj['content'][contentType]['schema']['$ref'] }}</span></p>
+						<swadit-swagger-schema-view [obj]="apis.resolveObj(local.values.obj['content'][contentType]['schema'])">
+						</swadit-swagger-schema-view>
+			
+						<!-- TODO -->
+						<div *ngIf="local.values.obj['example']">
+							<p>Example:</p>
+							<p><markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown></p>
+						</div>
+						<div *ngIf="local.values.obj['examples']">
+							<p>Examples:</p>
+							<div *ngFor="let k of apis.keys(local.values.obj['examples'])">
+								<p><label>{{k}}:</label><br>
+									<markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown>
+								</p>
+							</div>
+						</div>
+			
+						<div *ngIf="local.values.obj['content'][contentType]['schema']">
+							<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+								Example (generated)<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
+							</p>
+							<markdown *ngIf="showGeneratedExample"
+								[data]="generateExample(local.values.obj['content'][contentType]['schema']) | language: 'json'">
+							</markdown>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<!-- responses -->
 		<h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">
 			Responses
-			<span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response" *ngIf="!apis.config.readOnly">
+			<span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response" *ngIf="!apis.config.readOnly && apis.isOas2">
 				<i class="fa fa-plus"></i>
 			</span>
 		</h2>
@@ -139,7 +189,7 @@
 							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
 						</div>
 						<div class="col-md-1">
-							<div class="edit-card" (click)="editResponse($event, path, method, resp)" *ngIf="!apis.config.readOnly">
+							<div class="edit-card" (click)="editResponse($event, path, method, resp)" *ngIf="!apis.config.readOnly && apis.isOas2">
 								<i class="fa fa-fw fa-pencil"></i>
 							</div>
 						</div>

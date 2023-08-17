@@ -34,7 +34,7 @@ import { DefinitionsComponent } from './definitions.component';
 		CommonModule,
 		FormsModule,
 		NgbModule,
-		MarkdownModule.forRoot(),
+		MarkdownModule.forChild(),
 		SchemaViewModule,
 		EditorModalsModule,
 		DefinitionsRoutingModule

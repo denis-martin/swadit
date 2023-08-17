@@ -23,6 +23,7 @@
 	-->
 	<div class="modal-body" id="modal-body">
 		<ul ngbNav #nav="ngbNav" class="nav-tabs">
+			<!-- .info -->
 			<li ngbNavItem>
 				<a ngbNavLink>Info</a>
 				<ng-template ngbNavContent>
@@ -31,6 +32,7 @@
 					</div>
 				</ng-template>
 			</li>
+			<!-- .info.contact -->
 			<li ngbNavItem>
 				<a ngbNavLink>Contact</a>
 				<ng-template ngbNavContent>
@@ -41,9 +43,11 @@
 							</div>
 						</div>
 						<div class="row" style="margin-top: 1rem!important">
+							<!-- .info.license -->
 							<div class="col col-sm-6">
 								<swadit-object-editor [schema]="apis.schemas.license" [(obj)]="api['info']['license']" [card]="true"></swadit-object-editor>
 							</div>
+							<!-- .externalDocs -->
 							<div class="col col-sm-6">
 								<swadit-object-editor [schema]="apis.schemas.externalDocs" [(obj)]="api['externalDocs']" [card]="true"></swadit-object-editor>
 							</div>
@@ -51,7 +55,12 @@
 					</div>
 				</ng-template>
 			</li>
-			<li ngbNavItem>
+			<!-- .schemes [OAS2]-->
+			<!-- .host [OAS2] -->
+			<!-- .basePath [OAS2] -->
+			<!-- .consumes [OAS2] -->
+			<!-- .produces [OAS2] -->
+			<li ngbNavItem *ngIf="apis.isOas2">
 				<a ngbNavLink>General</a>
 				<ng-template ngbNavContent>
 					<div class="tab-content">
@@ -59,6 +68,7 @@
 					</div>
 				</ng-template>
 			</li>
+			<!-- .tags -->
 			<li ngbNavItem>
 				<a ngbNavLink>Tags</a>
 				<ng-template ngbNavContent>
@@ -67,7 +77,7 @@
 					</div>
 				</ng-template>
 			</li>
-			<li ngbNavItem>
+			<li ngbNavItem *ngIf="apis.isOas2">
 				<a ngbNavLink>Security</a>
 				<ng-template ngbNavContent>
 					<div class="tab-content">

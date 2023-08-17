@@ -18,15 +18,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { AceEditorModule } from 'ngx-ace-editor-wrapper';
-
 import { SwaggerUiRoutingModule } from './swaggerui-routing.module';
 import { SwaggerUiComponent } from './swaggerui.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    AceEditorModule,
     SwaggerUiRoutingModule
   ],
   declarations: [SwaggerUiComponent]

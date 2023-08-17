@@ -32,12 +32,14 @@
 							<i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a>
 						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFileModal()" *ngIf="!apis.config.menu.hideItems['open']">
 							<i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a>
-						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()" *ngIf="!apis.config.menu.hideItems['add']">
+						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()" *ngIf="apis.isOas2 && !apis.config.menu.hideItems['add']">
 							<i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a>
 						<a class="dropdown-item" href="javascript:void(0)" (click)="apis.downloadFileModal()" *ngIf="!apis.config.menu.hideItems['download']">
 							<i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a>
 
 						<div class="dropdown-divider"></div>
+						<a class="dropdown-item" style="cursor: pointer" (click)="apis.convertOas2To3()" *ngIf="apis.isOas2 && !apis.config.menu.hideItems['convertOas2to3']">
+							<i class="fa fa-fw fa-align-left"></i> {{ 'Convert to OAS 3' | translate }}<span style="vertical-align: super; font-size: 75%; font-weight: bold; color: red" title="OpenAPI 3.0 support is currently limited and should be considered as in 'alpha' state">ALPHA</span></a>
 						<a class="dropdown-item" [routerLink]="['/source']" *ngIf="!apis.config.menu.hideItems['source']">
 							<i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a>
 
@@ -46,7 +48,7 @@
 						<a class="dropdown-item" [routerLink]="['/print']">
 							<i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a>
 						-->
-						<a class="dropdown-item" [routerLink]="['/swadoc']" title="Print preview (e.g. for PDF export)" *ngIf="!apis.config.menu.hideItems['printPreview']">
+						<a class="dropdown-item" [routerLink]="['/swadoc']" title="Print preview (e.g. for PDF export)" *ngIf="!apis.config.menu.hideItems['printPreview'] && apis.isOas2">
 							<i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a>
 						<a class="dropdown-item" [routerLink]="['/swaggerui']" title="Preview in Swagger UI" *ngIf="!apis.config.menu.hideItems['swaggerUi']">
 							<i class="fa fa-fw fa-eye"></i> {{ 'Swagger UI' | translate }}</a>

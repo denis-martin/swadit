@@ -16,6 +16,7 @@
  */
 
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ApisService } from 'app/shared/services';
 
 @Component({
 	selector: 'swadit-array-editor',
@@ -45,11 +46,17 @@ export class ArrayEditorComponent implements OnInit
 	public itemToAdd: any;
 	public noItemToAdd: boolean = false;
 
+	public itemsSchema: any = {};
+
+	constructor(public apis: ApisService) {}
+
 	ngOnInit(): void {
 		if (!this._obj) {
 			this._obj = [];
 		}
-		if (this.schema['items']['type'] == 'object') {
+		this.schema = this.apis.resolveObj(this.schema, this.apis.schemas.root);
+		this.itemsSchema = this.apis.resolveObj(this.schema['items'], this.apis.schemas.root);
+		if (this.itemsSchema['type'] == 'object') {
 			this.itemToAdd = {};
 		} else {
 			this.itemToAdd = null;
@@ -66,7 +73,7 @@ export class ArrayEditorComponent implements OnInit
 		}
 		this.noItemToAdd = false;
 		this.obj.push(this.itemToAdd);
-		if (this.schema['items']['type'] == 'object') {
+		if (this.itemsSchema['type'] == 'object') {
 			this.itemToAdd = {};
 		} else {
 			this.itemToAdd = null;

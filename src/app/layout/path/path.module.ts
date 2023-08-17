@@ -34,7 +34,7 @@ import { PathComponent } from './path.component';
 		CommonModule,
 		FormsModule,
 		NgbModule,
-		MarkdownModule.forRoot(),
+		MarkdownModule.forChild(),
 		SchemaViewModule,
 		EditorModalsModule,
 		PathRoutingModule

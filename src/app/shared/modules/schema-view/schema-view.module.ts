@@ -32,7 +32,7 @@ import { ExtensionsViewComponent } from './custom/extensions-view.component';
 	imports: [
 		CommonModule,
 		NgbModule,
-		MarkdownModule.forRoot()
+		MarkdownModule.forChild()
 	],
 	declarations: [
 		SchemaViewComponent,
