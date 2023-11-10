@@ -767,7 +767,7 @@ export class ApisService
 			if (Array.isArray(obj['allOf'])) {
 				const mergedObj = {};
 				obj['allOf'].forEach(o => {
-					o = this.resolveObj(o);
+					o = this.resolveObj(o, rootSchema);
 					if (o) {
 						for (const key of Object.keys(o)) {
 							if (!mergedObj[key]) {
