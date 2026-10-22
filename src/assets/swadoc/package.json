@@ -3,7 +3,7 @@
   "main": "index.html",
   "version": "0.13.1",
   "dependencies": {
-    "swagger-parser": "^4.1.0"
+    "swagger-parser": "^10.0.3"
   },
   "devDependencies": {},
   "author": "denis",
