@@ -1,62 +1,77 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div *ngFor="let item of obj; let index = index; trackBy:trackByIndex">
-	<div *ngFor="let p of keys(item); let indexp = index; trackBy:trackByIndex" class="form-group">
-		<div class="input-group input-group-overlapping-border">
-			<span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
-				<i *ngIf="!collapsed[p]" class="fa fa-caret-down"></i>
-				<i *ngIf="collapsed[p]"  class="fa fa-caret-right"></i>
-			</span>
-			<select *ngIf="isSecurityDefinition(p); else noSecDef"
-				id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
-				class="form-control {{schema['x-swadit-input-class'] || ''}}"
-				title="{{schema['description']}}">
-				<option *ngFor="let o of keys(securityDefinitions)">{{o}}</option>
-			</select>
-			<ng-template #noSecDef class="form-control">
-				<input type="text" 
-					id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
-					class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
-					placeholder="{{schema['description']}}" 
-					title="{{schema['description']}}">
-			</ng-template>
-			<span class="input-group-addon clickable" (click)="deleteItem($event, index)">
-				<i class="fa fa-trash"></i>
-			</span>
-		</div>
-		<div [ngbCollapse]="collapsed[p]">
-			<swadit-array-editor
-				[schema]="scopes(p)" [obj]="item[p]" class="form-control" style="background-color: #f7f7f9">
-			</swadit-array-editor>
-		</div>
-	</div>
-</div>
+@for (item of obj; track trackByIndex(index, item); let index = $index) {
+  <div>
+    @for (p of keys(item); track trackByIndex(indexp, p); let indexp = $index) {
+      <div class="form-group">
+        <div class="input-group input-group-overlapping-border">
+          <span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
+            @if (!collapsed[p]) {
+              <i class="fa fa-caret-down"></i>
+            }
+            @if (collapsed[p]) {
+              <i  class="fa fa-caret-right"></i>
+            }
+          </span>
+          @if (isSecurityDefinition(p)) {
+            <select
+              id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
+              class="form-control {{schema['x-swadit-input-class'] || ''}}"
+              title="{{schema['description']}}">
+              @for (o of keys(securityDefinitions); track o) {
+                <option>{{o}}</option>
+              }
+            </select>
+          } @else {
+            <input type="text"
+              id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
+              class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
+              placeholder="{{schema['description']}}"
+              title="{{schema['description']}}">
+          }
+          <span class="input-group-addon clickable" (click)="deleteItem($event, index)">
+            <i class="fa fa-trash"></i>
+          </span>
+        </div>
+        <div [ngbCollapse]="collapsed[p]">
+          <swadit-array-editor
+            [schema]="scopes(p)" [obj]="item[p]" class="form-control" style="background-color: #f7f7f9">
+          </swadit-array-editor>
+        </div>
+      </div>
+    }
+  </div>
+}
 <div class="form-group">
-	<div class="input-group">
-		<select 
-			id="{{id}}" [(ngModel)]="propertyToAdd"
-			class="form-control {{schema['x-swadit-input-class'] || ''}}"
-			title="{{schema['description']}}">
-			<option *ngFor="let o of keys(securityDefinitions)">{{o}}</option>
-		</select>
-		<span class="input-group-addon clickable" (click)="addProperty($event)">
-			<i class="fa fa-plus"></i>
-		</span>
-	</div>
-	<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
+  <div class="input-group">
+    <select
+      id="{{id}}" [(ngModel)]="propertyToAdd"
+      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      title="{{schema['description']}}">
+      @for (o of keys(securityDefinitions); track o) {
+        <option>{{o}}</option>
+      }
+    </select>
+    <span class="input-group-addon clickable" (click)="addProperty($event)">
+      <i class="fa fa-plus"></i>
+    </span>
+  </div>
+  @if (noItemToAdd) {
+    <ngb-alert [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
+  }
 </div>

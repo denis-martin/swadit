@@ -1,14 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { ApisService } from '../../shared/services';
 
-import { SwaggerUIBundle } from 'swagger-ui-dist';
-import { SwaggerUIStandalonePreset } from 'swagger-ui-dist';
+// provided as globals by the swagger-ui-dist scripts in angular.json
+declare const SwaggerUIBundle: any;
+declare const SwaggerUIStandalonePreset: any;
 
 @Component({
-	selector: 'app-swaggerui',
-	templateUrl: './swaggerui.component.html',
-	styleUrls: ['./swaggerui.component.scss']
+    selector: 'app-swaggerui',
+    templateUrl: './swaggerui.component.html',
+    styleUrls: ['./swaggerui.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SwaggerUiComponent implements OnInit 
 {

@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModal, NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
-	selector: 'app-modify',
-	templateUrl: './modify.component.html',
-	styleUrls: ['./modify.component.scss']
+    selector: 'app-modify',
+    templateUrl: './modify.component.html',
+    styleUrls: ['./modify.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ModifyComponent implements OnInit
 {

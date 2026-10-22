@@ -1,47 +1,51 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <form (ngSubmit)="ok()" #editForm="ngForm">
-	<!--
-	<div class="modal-header">
-		<h3 class="modal-title" id="modal-title">Definition</h3>
-	</div>
-	-->
-	<div class="modal-body" id="modal-body">
-		<div class="form-group">
-			<label for="definitionKey">Name of schema definition</label>
-			<input type="text" id="definitionKey" name="definitionKey" [(ngModel)]="key" required
-				class="form-control" placeholder="Enter name for definition" title="Name of definition">
-		</div>
-		<div class="form-group">
-			<label for="definitionSchema">Schema definition</label>
-			<swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'definitionSchema'">
-			</swadit-swagger-schema-editor>
-		</div>
-	</div>
-	<div class="modal-footer">
-		<button *ngIf="key_orig" class="btn btn-danger mr-auto" type="button" (click)="deleteDefinition()" title="Delete definition">
-			Delete</button>
-		<span *ngIf="errorStr" style="color: red">
-			{{errorStr}}
-		</span>
-		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
-			Apply</button>
-		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
-			Cancel</button>
-	</div>
+  <!--
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Definition</h3>
+  </div>
+  -->
+  <div class="modal-body" id="modal-body">
+    <div class="form-group">
+      <label for="definitionKey">Name of schema definition</label>
+      <input type="text" id="definitionKey" name="definitionKey" [(ngModel)]="key" required
+        class="form-control" placeholder="Enter name for definition" title="Name of definition">
+    </div>
+    <div class="form-group">
+      <label for="definitionSchema">Schema definition</label>
+      <swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'definitionSchema'">
+      </swadit-swagger-schema-editor>
+    </div>
+  </div>
+  <div class="modal-footer">
+    @if (key_orig) {
+      <button class="btn btn-danger mr-auto" type="button" (click)="deleteDefinition()" title="Delete definition">
+      Delete</button>
+    }
+    @if (errorStr) {
+      <span style="color: red">
+        {{errorStr}}
+      </span>
+    }
+    <button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
+    Apply</button>
+    <button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+    Cancel</button>
+  </div>
 </form>

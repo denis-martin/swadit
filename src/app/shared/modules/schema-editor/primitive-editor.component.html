@@ -1,59 +1,72 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <div class="{{wrapClass}}">
-	<!-- simple input string -->
-	<input *ngIf="schema['type']=='string' && !schema['enum'] && !schema['x-swadit-input-multiline']" 
-		type="text" id="{{id}}" [(ngModel)]="obj" 
-		class="form-control {{schema['x-swadit-input-class'] || ''}}" 
-		placeholder="{{schema['description']}}" 
-		title="{{schema['description']}}">
+  <!-- simple input string -->
+  @if (schema['type']=='string' && !schema['enum'] && !schema['x-swadit-input-multiline']) {
+    <input
+      type="text" id="{{id}}" [(ngModel)]="obj"
+      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      placeholder="{{schema['description']}}"
+      title="{{schema['description']}}">
+  }
 
-	<!-- textarea input string -->
-	<textarea *ngIf="schema['type']=='string' && !schema['enum'] && schema['x-swadit-input-multiline']" 
-		id="{{id}}" [(ngModel)]="obj"
-		class="form-control {{schema['x-swadit-input-class'] || ''}}"
-		placeholder="{{schema['description']}}" 
-		title="{{schema['description']}}" 
-		rows="{{schema['x-swadit-input-multiline']}}">
-	</textarea>
+  <!-- textarea input string -->
+  @if (schema['type']=='string' && !schema['enum'] && schema['x-swadit-input-multiline']) {
+    <textarea
+      id="{{id}}" [(ngModel)]="obj"
+      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      placeholder="{{schema['description']}}"
+      title="{{schema['description']}}"
+      rows="{{schema['x-swadit-input-multiline']}}">
+    </textarea>
+  }
 
-	<!-- enum input string -->
-	<select *ngIf="schema['type']=='string' && schema['enum'] && isInEnum(obj); else notInEnum"
-		id="{{id}}" [(ngModel)]="obj" 
-		class="form-control {{schema['x-swadit-input-class'] || ''}}"
-		title="{{schema['description']}}">
-		<option *ngFor="let o of schema['enum']">{{o}}</option>
-	</select>
-	<ng-template #notInEnum>
-		<input *ngIf="schema['type']=='string' && schema['enum']"
-			type="text" id="{{id}}" [(ngModel)]="obj" 
-			class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
-			placeholder="{{schema['description']}}" 
-			title="{{schema['description']}}">
-	</ng-template>
+  <!-- enum input string -->
+  @if (schema['type']=='string' && schema['enum'] && isInEnum(obj)) {
+    <select
+      id="{{id}}" [(ngModel)]="obj"
+      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      title="{{schema['description']}}">
+      @for (o of schema['enum']; track o) {
+        <option>{{o}}</option>
+      }
+    </select>
+  } @else {
+    @if (schema['type']=='string' && schema['enum']) {
+      <input
+        type="text" id="{{id}}" [(ngModel)]="obj"
+        class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
+        placeholder="{{schema['description']}}"
+        title="{{schema['description']}}">
+    }
+  }
 
-	<!-- boolean input -->
-	<select *ngIf="schema['type']=='boolean'"
-		id="{{id}}" [(ngModel)]="obj" 
-		class="form-control {{schema['x-swadit-input-class'] || ''}}"
-		title="{{schema['description']}}">
-		<option [ngValue]="undefined" *ngIf="schema['default'] == undefined">(not set)</option>
-		<option [ngValue]="true">yes</option>
-		<option [ngValue]="false">no</option>
-	</select>
+  <!-- boolean input -->
+  @if (schema['type']=='boolean') {
+    <select
+      id="{{id}}" [(ngModel)]="obj"
+      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      title="{{schema['description']}}">
+      @if (schema['default'] == undefined) {
+        <option [ngValue]="undefined">(not set)</option>
+      }
+      <option [ngValue]="true">yes</option>
+      <option [ngValue]="false">no</option>
+    </select>
+  }
 </div>

@@ -1,15 +1,23 @@
 <form (ngSubmit)="ok()" #editForm="ngForm">
-	<div class="modal-header" id="modal-header">
-		<b *ngIf="cancelText">Confirmation</b>
-		<b *ngIf="!cancelText">Information</b>
-	</div>
-	<div class="modal-body" id="modal-body">
-		<p>{{text}}</p>
-	</div>
-	<div class="modal-footer">
-		<button *ngIf="okText" class="btn btn-primary" type="submit" title="{{okText}}">
-			{{okText}}</button>
-		<button *ngIf="cancelText" class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="{{cancelText}}">
-			{{cancelText}}</button>
-	</div>
+  <div class="modal-header" id="modal-header">
+    @if (cancelText) {
+      <b>Confirmation</b>
+    }
+    @if (!cancelText) {
+      <b>Information</b>
+    }
+  </div>
+  <div class="modal-body" id="modal-body">
+    <p>{{text}}</p>
+  </div>
+  <div class="modal-footer">
+    @if (okText) {
+      <button class="btn btn-primary" type="submit" title="{{okText}}">
+      {{okText}}</button>
+    }
+    @if (cancelText) {
+      <button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="{{cancelText}}">
+      {{cancelText}}</button>
+    }
+  </div>
 </form>

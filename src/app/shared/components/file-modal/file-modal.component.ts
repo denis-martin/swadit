@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import * as FileSaver from 'file-saver';
 
 @Component({
-	selector: 'app-file-modal',
-	templateUrl: './file-modal.component.html',
-	styleUrls: ['./file-modal.component.scss']
+    selector: 'app-file-modal',
+    templateUrl: './file-modal.component.html',
+    styleUrls: ['./file-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class FileModalComponent implements OnInit 
 {

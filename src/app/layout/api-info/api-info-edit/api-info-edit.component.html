@@ -1,100 +1,104 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <form (ngSubmit)="ok()" #editForm="ngForm">
-	<!--
-	<div class="modal-header">
-		<h3 class="modal-title" id="modal-title">{{api.info.title}}</h3>
-	</div>
-	-->
-	<div class="modal-body" id="modal-body">
-		<ul ngbNav #nav="ngbNav" class="nav-tabs">
-			<!-- .info -->
-			<li ngbNavItem>
-				<a ngbNavLink>Info</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<swadit-object-editor [schema]="apis.schemas.info" [(obj)]="api['info']" [title]="false"></swadit-object-editor>
-					</div>
-				</ng-template>
-			</li>
-			<!-- .info.contact -->
-			<li ngbNavItem>
-				<a ngbNavLink>Contact</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<div class="row">
-							<div class="col col-sm-12">
-								<swadit-object-editor [schema]="apis.schemas.contact" [(obj)]="api['info']['contact']" [card]="true"></swadit-object-editor>
-							</div>
-						</div>
-						<div class="row" style="margin-top: 1rem!important">
-							<!-- .info.license -->
-							<div class="col col-sm-6">
-								<swadit-object-editor [schema]="apis.schemas.license" [(obj)]="api['info']['license']" [card]="true"></swadit-object-editor>
-							</div>
-							<!-- .externalDocs -->
-							<div class="col col-sm-6">
-								<swadit-object-editor [schema]="apis.schemas.externalDocs" [(obj)]="api['externalDocs']" [card]="true"></swadit-object-editor>
-							</div>
-						</div>
-					</div>
-				</ng-template>
-			</li>
-			<!-- .schemes [OAS2]-->
-			<!-- .host [OAS2] -->
-			<!-- .basePath [OAS2] -->
-			<!-- .consumes [OAS2] -->
-			<!-- .produces [OAS2] -->
-			<li ngbNavItem *ngIf="apis.isOas2">
-				<a ngbNavLink>General</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<swadit-object-editor [schema]="apis.schemas.root" [(obj)]="api"></swadit-object-editor>
-					</div>
-				</ng-template>
-			</li>
-			<!-- .tags -->
-			<li ngbNavItem>
-				<a ngbNavLink>Tags</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<swadit-array-editor [schema]="apis.schemas.tags" [(obj)]="api['tags']"></swadit-array-editor>
-					</div>
-				</ng-template>
-			</li>
-			<li ngbNavItem *ngIf="apis.isOas2">
-				<a ngbNavLink>Security</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<p>Security Definitions:</p>
-						<swadit-object-editor [schema]="apis.schemas.securityDefinitions" [(obj)]="api['securityDefinitions']"></swadit-object-editor>
-						<p>Default Security Requirements:</p>
-						<swadit-security-editor [schema]="apis.schemas.security" [(obj)]="api['security']"
-							[securityDefinitions]="api['securityDefinitions']">
-						</swadit-security-editor>
-					</div>
-				</ng-template>
-			</li>
-		</ul>
-		<div [ngbNavOutlet]="nav" class="mt-2"></div>
-	</div>
-	<div class="modal-footer">
-		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">Apply</button>
-		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" [disabled]="!editForm.form.valid">Cancel</button>
-	</div>
+  <!--
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-title">{{api.info.title}}</h3>
+  </div>
+  -->
+  <div class="modal-body" id="modal-body">
+    <ul ngbNav #nav="ngbNav" class="nav-tabs">
+      <!-- .info -->
+      <li ngbNavItem>
+        <a ngbNavLink>Info</a>
+        <ng-template ngbNavContent>
+          <div class="tab-content">
+            <swadit-object-editor [schema]="apis.schemas.info" [(obj)]="api['info']" [title]="false"></swadit-object-editor>
+          </div>
+        </ng-template>
+      </li>
+      <!-- .info.contact -->
+      <li ngbNavItem>
+        <a ngbNavLink>Contact</a>
+        <ng-template ngbNavContent>
+          <div class="tab-content">
+            <div class="row">
+              <div class="col col-sm-12">
+                <swadit-object-editor [schema]="apis.schemas.contact" [(obj)]="api['info']['contact']" [card]="true"></swadit-object-editor>
+              </div>
+            </div>
+            <div class="row" style="margin-top: 1rem!important">
+              <!-- .info.license -->
+              <div class="col col-sm-6">
+                <swadit-object-editor [schema]="apis.schemas.license" [(obj)]="api['info']['license']" [card]="true"></swadit-object-editor>
+              </div>
+              <!-- .externalDocs -->
+              <div class="col col-sm-6">
+                <swadit-object-editor [schema]="apis.schemas.externalDocs" [(obj)]="api['externalDocs']" [card]="true"></swadit-object-editor>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </li>
+      <!-- .schemes [OAS2]-->
+      <!-- .host [OAS2] -->
+      <!-- .basePath [OAS2] -->
+      <!-- .consumes [OAS2] -->
+      <!-- .produces [OAS2] -->
+      @if (apis.isOas2) {
+        <li ngbNavItem>
+          <a ngbNavLink>General</a>
+          <ng-template ngbNavContent>
+            <div class="tab-content">
+              <swadit-object-editor [schema]="apis.schemas.root" [(obj)]="api"></swadit-object-editor>
+            </div>
+          </ng-template>
+        </li>
+      }
+      <!-- .tags -->
+      <li ngbNavItem>
+        <a ngbNavLink>Tags</a>
+        <ng-template ngbNavContent>
+          <div class="tab-content">
+            <swadit-array-editor [schema]="apis.schemas.tags" [(obj)]="api['tags']"></swadit-array-editor>
+          </div>
+        </ng-template>
+      </li>
+      @if (apis.isOas2) {
+        <li ngbNavItem>
+          <a ngbNavLink>Security</a>
+          <ng-template ngbNavContent>
+            <div class="tab-content">
+              <p>Security Definitions:</p>
+              <swadit-object-editor [schema]="apis.schemas.securityDefinitions" [(obj)]="api['securityDefinitions']"></swadit-object-editor>
+              <p>Default Security Requirements:</p>
+              <swadit-security-editor [schema]="apis.schemas.security" [(obj)]="api['security']"
+                [securityDefinitions]="api['securityDefinitions']">
+              </swadit-security-editor>
+            </div>
+          </ng-template>
+        </li>
+      }
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid">Apply</button>
+    <button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" [disabled]="!editForm.form.valid">Cancel</button>
+  </div>
 </form>

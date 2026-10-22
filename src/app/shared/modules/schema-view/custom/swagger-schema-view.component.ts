@@ -15,14 +15,16 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { ApisService } from '../../../services';
 
 @Component({
-	selector: 'swadit-swagger-schema-view',
-	templateUrl: './swagger-schema-view.component.html',
-	styleUrls: ['./../schema-view.component.scss']
+    selector: 'swadit-swagger-schema-view',
+    templateUrl: './swagger-schema-view.component.html',
+    styleUrls: ['./../schema-view.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SwaggerSchemaViewComponent implements OnInit 
 {
@@ -60,12 +62,11 @@ export class SwaggerSchemaViewComponent implements OnInit
 
 	getTypePreview(obj: any): string
 	{
-		let tp: string = "";
 		if (Array.isArray(obj["allOf"]) && obj["allOf"].length > 0) {
 			obj = obj["allOf"][0];
 		}
 		
-		tp = obj['type'] || obj['$ref'];
+		let tp: string = obj['type'] || obj['$ref'];
 		if (obj['type'] == 'array' && obj['items']) {
 			tp = tp + " (" + (obj['items']['type'] || obj['items']['$ref']) + ")";
 		}

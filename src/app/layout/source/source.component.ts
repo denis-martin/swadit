@@ -15,14 +15,16 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { ApisService } from '../../shared/services';
 
 @Component({
-	selector: 'app-source',
-	templateUrl: './source.component.html',
-	styleUrls: ['./source.component.scss']
+    selector: 'app-source',
+    templateUrl: './source.component.html',
+    styleUrls: ['./source.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SourceComponent implements OnInit 
 {

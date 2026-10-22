@@ -22,7 +22,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 import { Subject } from 'rxjs';
 
 import { OpenAPI } from 'openapi-types';
-import * as SwaggerParser from '@apidevtools/swagger-parser';
+import SwaggerParser from '@apidevtools/swagger-parser';
 import * as YAML from 'js-yaml';
 import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _remove } from "lodash-es";
 

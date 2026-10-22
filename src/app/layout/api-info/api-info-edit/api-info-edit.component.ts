@@ -15,7 +15,7 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { cloneDeep as _cloneDeep } from "lodash-es";
@@ -23,9 +23,11 @@ import { cloneDeep as _cloneDeep } from "lodash-es";
 import { ApisService } from '../../../shared/services';
 
 @Component({
-	selector: 'app-api-info-edit',
-	templateUrl: './api-info-edit.component.html',
-	styleUrls: ['./api-info-edit.component.scss']
+    selector: 'app-api-info-edit',
+    templateUrl: './api-info-edit.component.html',
+    styleUrls: ['./api-info-edit.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ApiInfoEditComponent implements OnInit 
 {

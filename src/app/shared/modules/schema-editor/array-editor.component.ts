@@ -15,13 +15,15 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ApisService } from 'app/shared/services';
 
 @Component({
-	selector: 'swadit-array-editor',
-	templateUrl: './array-editor.component.html',
-	styleUrls: ['./schema-editor.component.scss']
+    selector: 'swadit-array-editor',
+    templateUrl: './array-editor.component.html',
+    styleUrls: ['./schema-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ArrayEditorComponent implements OnInit
 {
@@ -30,13 +32,13 @@ export class ArrayEditorComponent implements OnInit
 
 	private _obj: any;
 	@Input() 
-	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+	 
 	get obj() { 
 		return this._obj; 
 	}
 
 	@Output() objChange = new EventEmitter<any>();
-	// eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
+	 
 	set obj(val) 
 	{
 		this._obj = val;

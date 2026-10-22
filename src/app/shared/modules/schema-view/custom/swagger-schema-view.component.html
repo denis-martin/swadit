@@ -1,113 +1,172 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<table *ngIf="obj">
-	<tbody>
-		<tr *ngIf="obj['allOf']">
-			<td class="label-text">all of</td>
-			<td style="padding: 0">
-				<div *ngFor="let allOfObj of obj['allOf']">
-					<swadit-swagger-schema-view [obj]="apis.resolveObj(allOfObj)">
-					</swadit-swagger-schema-view>
-				</div>
-			</td>
-		</tr>
-		<tr *ngIf="obj['type'] && ((obj['type'] != 'object' && obj['type'] != 'array') || (obj['type'] == 'object' && !obj['properties']) || (obj['type'] == 'array' && !obj['items']))">
-			<td class="label-text">type</td>
-			<td>{{obj['type']}}</td>
-		</tr>
-		<tr *ngIf="obj['properties']">
-			<td class="label-text" *ngIf="obj['type'] && obj['type'] != 'object'">properties</td>
-			<td class="label-text" *ngIf="obj['type'] == 'object' || !obj['type']">object</td>
-			<td>
-				<div *ngFor="let p of keys(obj['properties'])">
-					<div class="clickable" (click)="uncollapsed[p] = !uncollapsed[p]">
-						<span class="property">{{p}}<span *ngIf="propertyIsRequired(p)" style="color: red">*</span></span>
-						<span class="propertyType">: 
-							{{getTypePreview(obj['properties'][p])}}
-						</span>
-						<span class="propertyDescription" *ngIf="obj['properties'][p]['description']">
-							{{obj['properties'][p]['description'].length > 40 ? obj['properties'][p]['description'].substr(0,39) + '...' : obj['properties'][p]['description']}}
-						</span>
-					</div>
-					<div *ngIf="uncollapsed[p] && obj['properties'][p]['$ref']; else nonRef">
-						<swadit-swagger-schema-view [obj]="apis.resolveRef(obj['properties'][p]['$ref'])">
-						</swadit-swagger-schema-view>
-					</div>
-					<ng-template #nonRef>
-						<swadit-swagger-schema-view *ngIf="uncollapsed[p]" [obj]="obj['properties'][p]">
-						</swadit-swagger-schema-view>
-					</ng-template>
-					
-				</div>
-			</td>
-		</tr>
-		<tr *ngIf="obj['items']">
-			<td class="label-text" *ngIf="obj['type'] != 'array'">items</td>
-			<td class="label-text" *ngIf="obj['type'] == 'array'">array of</td>
-			<td style="padding: 0">
-				<div *ngIf="obj['items']['$ref']; else nonRef">
-					<swadit-swagger-schema-view [obj]="apis.resolveRef(obj['items']['$ref'])">
-					</swadit-swagger-schema-view>
-				</div>
-				<ng-template #nonRef>
-					<swadit-swagger-schema-view [obj]="obj['items']">
-					</swadit-swagger-schema-view>
-				</ng-template>
-			</td>
-		</tr>
-		<tr *ngIf="obj['format']">
-			<td class="label-text">format</td>
-			<td>{{obj['format']}}</td>
-		</tr>
-		<tr *ngIf="obj['enum']">
-			<td class="label-text">enum</td>
-			<td><span *ngFor="let ev of obj['enum']; let index = index"><span *ngIf="index>0"> | </span>{{ev}}</span></td>
-		</tr>
-		<tr *ngIf="obj['description']">
-			<td class="label-text">description</td>
-			<td class="description"><markdown [data]="obj['description']"></markdown></td>
-		</tr>
-		<tr *ngIf="obj['default']">
-			<td class="label-text">default</td>
-			<td>
-				<span *ngIf="!isComplex(obj['default'])">{{obj['default']}}</span>
-				<pre *ngIf="isComplex(obj['default'])"><code highlight [innerHTML]="toJson(obj['default'])"></code></pre>
-			</td>
-		</tr>
-		<tr *ngIf="obj['example']">
-			<td class="label-text">example</td>
-			<td>
-				<span *ngIf="!isComplex(obj['example'])">{{obj['example']}}</span>
-				<markdown *ngIf="isComplex(obj['example'])"
-					[data]="apis.toJson(obj['example']) | language: 'json'">
-				</markdown>
-			</td>
-		</tr>
-		<tr *ngIf="generateExample && (obj['type'] == 'object' || obj['type'] == 'array' || obj['allOf'])">
-			<td class="label-text">example</td>
-			<td>
-				<span class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
-					Generated example<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
-				</span>
-				<markdown *ngIf="showGeneratedExample"
-					[data]="apis.toJson(apis.generateExample(obj, {}, false, true)) | language: 'json'">
-				</markdown>
-			</td>
-		</tr>
-	</tbody>
+@if (obj) {
+  <table>
+    <tbody>
+      @if (obj['allOf']) {
+        <tr>
+          <td class="label-text">all of</td>
+          <td style="padding: 0">
+            @for (allOfObj of obj['allOf']; track allOfObj) {
+              <div>
+                <swadit-swagger-schema-view [obj]="apis.resolveObj(allOfObj)">
+                </swadit-swagger-schema-view>
+              </div>
+            }
+          </td>
+        </tr>
+      }
+      @if (obj['type'] && ((obj['type'] != 'object' && obj['type'] != 'array') || (obj['type'] == 'object' && !obj['properties']) || (obj['type'] == 'array' && !obj['items']))) {
+        <tr>
+          <td class="label-text">type</td>
+          <td>{{obj['type']}}</td>
+        </tr>
+      }
+      @if (obj['properties']) {
+        <tr>
+          @if (obj['type'] && obj['type'] != 'object') {
+            <td class="label-text">properties</td>
+          }
+          @if (obj['type'] == 'object' || !obj['type']) {
+            <td class="label-text">object</td>
+          }
+          <td>
+            @for (p of keys(obj['properties']); track p) {
+              <div>
+                <div class="clickable" (click)="uncollapsed[p] = !uncollapsed[p]">
+                  <span class="property">{{p}}@if (propertyIsRequired(p)) {
+                    <span style="color: red">*</span>
+                  }</span>
+                  <span class="propertyType">:
+                    {{getTypePreview(obj['properties'][p])}}
+                  </span>
+                  @if (obj['properties'][p]['description']) {
+                    <span class="propertyDescription">
+                      {{obj['properties'][p]['description'].length > 40 ? obj['properties'][p]['description'].substr(0,39) + '...' : obj['properties'][p]['description']}}
+                    </span>
+                  }
+                </div>
+                @if (uncollapsed[p] && obj['properties'][p]['$ref']) {
+                  <div>
+                    <swadit-swagger-schema-view [obj]="apis.resolveRef(obj['properties'][p]['$ref'])">
+                    </swadit-swagger-schema-view>
+                  </div>
+                } @else {
+                  @if (uncollapsed[p]) {
+                    <swadit-swagger-schema-view [obj]="obj['properties'][p]">
+                    </swadit-swagger-schema-view>
+                  }
+                }
+              </div>
+            }
+          </td>
+        </tr>
+      }
+      @if (obj['items']) {
+        <tr>
+          @if (obj['type'] != 'array') {
+            <td class="label-text">items</td>
+          }
+          @if (obj['type'] == 'array') {
+            <td class="label-text">array of</td>
+          }
+          <td style="padding: 0">
+            @if (obj['items']['$ref']) {
+              <div>
+                <swadit-swagger-schema-view [obj]="apis.resolveRef(obj['items']['$ref'])">
+                </swadit-swagger-schema-view>
+              </div>
+            } @else {
+              <swadit-swagger-schema-view [obj]="obj['items']">
+              </swadit-swagger-schema-view>
+            }
+          </td>
+        </tr>
+      }
+      @if (obj['format']) {
+        <tr>
+          <td class="label-text">format</td>
+          <td>{{obj['format']}}</td>
+        </tr>
+      }
+      @if (obj['enum']) {
+        <tr>
+          <td class="label-text">enum</td>
+          <td>@for (ev of obj['enum']; track ev; let index = $index) {
+            <span>@if (index>0) {
+              <span> | </span>
+            }{{ev}}</span>
+          }</td>
+        </tr>
+      }
+      @if (obj['description']) {
+        <tr>
+          <td class="label-text">description</td>
+          <td class="description"><markdown [data]="obj['description']"></markdown></td>
+        </tr>
+      }
+      @if (obj['default']) {
+        <tr>
+          <td class="label-text">default</td>
+          <td>
+            @if (!isComplex(obj['default'])) {
+              <span>{{obj['default']}}</span>
+            }
+            @if (isComplex(obj['default'])) {
+              <pre><code highlight [innerHTML]="toJson(obj['default'])"></code></pre>
+            }
+          </td>
+        </tr>
+      }
+      @if (obj['example']) {
+        <tr>
+          <td class="label-text">example</td>
+          <td>
+            @if (!isComplex(obj['example'])) {
+              <span>{{obj['example']}}</span>
+            }
+            @if (isComplex(obj['example'])) {
+              <markdown
+                [data]="apis.toJson(obj['example']) | language: 'json'">
+              </markdown>
+            }
+          </td>
+        </tr>
+      }
+      @if (generateExample && (obj['type'] == 'object' || obj['type'] == 'array' || obj['allOf'])) {
+        <tr>
+          <td class="label-text">example</td>
+          <td>
+            <span class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+              Generated example@if (showGeneratedExample) {
+              <span>:</span>
+              }@if (!showGeneratedExample) {
+              <span>...</span>
+            }
+          </span>
+          @if (showGeneratedExample) {
+            <markdown
+              [data]="apis.toJson(apis.generateExample(obj, {}, false, true)) | language: 'json'">
+            </markdown>
+          }
+        </td>
+      </tr>
+    }
+  </tbody>
 </table>
+}

@@ -17,7 +17,7 @@ Swadit is completely run within your browser:
 More information can be found [here](https://froschbach.io/apps/swadit/).
 
 ## Prepare
-Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) to install all dependencies:
+Althought Swadit is only run within a browser, you'll need [Node](https://nodejs.org) (22.22+ or 24.15+) to install all dependencies:
 ```
 npm install
 ```
@@ -40,9 +40,9 @@ The deployable files can then be found in the 'dist' folder.
 ## Run
 Swadit can either be run from a web server (after the build, simply throw all files in the dist folder on a web space) or locally with [NW.js](https://nwjs.io/).
 
-During development, you may run a live server with @angular/cli:
+During development, you may run a live server on http://localhost:4201 with @angular/cli:
 ```
-ng serve
+npm start
 ```
 
 ## History

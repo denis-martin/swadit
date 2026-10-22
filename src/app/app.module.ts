@@ -1,10 +1,9 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClientModule, HttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AuthGuard } from './shared';
@@ -17,10 +16,6 @@ import { ApisService } from './shared';
 import { FileModalComponent } from './shared/components/file-modal/file-modal.component';
 import { EditorModalsModule } from './shared/modules/editor-modals/editor-modals.module';
 
-// AoT requires an exported function for factories
-export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
-    return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
-}
 @NgModule({
     declarations: [
         AppComponent,
@@ -28,22 +23,21 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ],
     imports: [
         BrowserModule,
-        BrowserAnimationsModule,
         FormsModule,
-        HttpClientModule,
         AppRoutingModule,
-        TranslateModule.forRoot({
-            loader: {
-                provide: TranslateLoader,
-                useFactory: createTranslateLoader,
-                deps: [HttpClient]
-            }
-        }),
         NgbModule,
         MarkdownModule.forRoot(),
         EditorModalsModule
     ],
-    providers: [AuthGuard, ApisService],
+    providers: [
+        AuthGuard,
+        ApisService,
+        provideHttpClient(withXhr(), withInterceptorsFromDi()),
+        provideTranslateService({
+            loader: provideTranslateHttpLoader({ prefix: 'assets/i18n/', suffix: '.json' }),
+            fallbackLang: 'en'
+        })
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {

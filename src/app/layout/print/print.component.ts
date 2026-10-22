@@ -15,14 +15,16 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { ApisService } from '../../shared/services';
 
 @Component({
-	selector: 'app-print',
-	templateUrl: './print.component.html',
-	styleUrls: ['../../../assets/swadoc/style.css', './print.component.scss']
+    selector: 'app-print',
+    templateUrl: './print.component.html',
+    styleUrls: ['../../../assets/swadoc/style.css', './print.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PrintComponent implements OnInit
 {

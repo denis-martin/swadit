@@ -15,7 +15,7 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Directive } from '@angular/core';
+import { Component, OnInit, Directive, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -27,9 +27,11 @@ import { ResponseEditComponent } from '../../shared/modules/editor-modals/respon
 import { ParameterEditComponent } from '../../shared/modules/editor-modals/parameter-edit/parameter-edit.component';
 
 @Component({
-	selector: 'app-path',
-	templateUrl: './path.component.html',
-	styleUrls: ['./path.component.scss']
+    selector: 'app-path',
+    templateUrl: './path.component.html',
+    styleUrls: ['./path.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PathComponent implements OnInit {
 	private routeSubscription: any;

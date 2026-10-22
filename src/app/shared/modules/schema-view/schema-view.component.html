@@ -1,51 +1,67 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<table *ngIf="schema['type'] && schema['type'] == 'object'; else jsonView">
-	<tbody>
-		<tr *ngFor="let key of getKeys()">
-			<td class="label-text">{{key}}</td>
-			<td *ngIf="schema['properties'] && schema['properties'][key]"
-				[ngClass]="{ 'no-padding': (isComplex(obj[key]) && !obj[key]['$ref']) }">
-				<markdown *ngIf="schema['properties'][key]['x-swadit-markdown']; else nonMarkdown"
-					[data]="obj[key]"></markdown>
-				<ng-template #nonMarkdown>
-					<div *ngIf="schema['properties'][key]['x-swadit-swagger-schema']; else schemaView">
-						<span *ngIf="obj[key]['$ref']" class="headerType">{{obj[key]['$ref']}}</span>
-						<swadit-swagger-schema-view [obj]="apis.resolveObj(obj[key])">
-						</swadit-swagger-schema-view>
-					</div>
-					<ng-template #schemaView>
-						<span *ngIf="!isComplex(obj[key]); else recursiveView">{{obj[key]}}</span>
-						<ng-template #recursiveView>
-							<swadit-schema-view [schema]="schema['properties'][key]" [obj]="obj[key]">
-							</swadit-schema-view>
-						</ng-template>
-					</ng-template>
-				</ng-template>
-			</td>
-			<td *ngIf="!schema['properties'] || !schema['properties'][key]"
-				[ngClass]="{ 'no-padding': isComplex(obj[key]) }">
-				<span *ngIf="!isComplex(obj[key])">{{obj[key]}}</span>
-				<pre *ngIf="isComplex(obj[key])"><code highlight [innerHTML]="obj[key] | json"></code></pre>
-			</td>
-		</tr>
-	</tbody>
-</table>
-<ng-template #jsonView>
-	<markdown [data]="apis.toYaml(obj) | language : 'yaml'"></markdown>
-</ng-template>
+@if (schema['type'] && schema['type'] == 'object') {
+  <table>
+    <tbody>
+      @for (key of getKeys(); track key) {
+        <tr>
+          <td class="label-text">{{key}}</td>
+          @if (schema['properties'] && schema['properties'][key]) {
+            <td
+              [ngClass]="{ 'no-padding': (isComplex(obj[key]) && !obj[key]['$ref']) }">
+              @if (schema['properties'][key]['x-swadit-markdown']) {
+                <markdown
+                [data]="obj[key]"></markdown>
+              } @else {
+                @if (schema['properties'][key]['x-swadit-swagger-schema']) {
+                  <div>
+                    @if (obj[key]['$ref']) {
+                      <span class="headerType">{{obj[key]['$ref']}}</span>
+                    }
+                    <swadit-swagger-schema-view [obj]="apis.resolveObj(obj[key])">
+                    </swadit-swagger-schema-view>
+                  </div>
+                } @else {
+                  @if (!isComplex(obj[key])) {
+                    <span>{{obj[key]}}</span>
+                  } @else {
+                    <swadit-schema-view [schema]="schema['properties'][key]" [obj]="obj[key]">
+                    </swadit-schema-view>
+                  }
+                }
+              }
+            </td>
+          }
+          @if (!schema['properties'] || !schema['properties'][key]) {
+            <td
+              [ngClass]="{ 'no-padding': isComplex(obj[key]) }">
+              @if (!isComplex(obj[key])) {
+                <span>{{obj[key]}}</span>
+              }
+              @if (isComplex(obj[key])) {
+                <pre><code highlight [innerHTML]="obj[key] | json"></code></pre>
+              }
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+} @else {
+  <markdown [data]="apis.toYaml(obj) | language : 'yaml'"></markdown>
+}

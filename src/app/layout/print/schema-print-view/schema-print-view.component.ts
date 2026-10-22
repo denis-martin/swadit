@@ -15,16 +15,18 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
 
 import { ApisService } from '../../../shared/services';
 
 const maxLevel = 20;
 
 @Component({
-	selector: 'schema-print-view',
-	templateUrl: './schema-print-view.component.html',
-	styleUrls: ['./schema-print-view.component.scss']
+    selector: 'schema-print-view',
+    templateUrl: './schema-print-view.component.html',
+    styleUrls: ['./schema-print-view.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SchemaPrintViewComponent implements OnInit 
 {

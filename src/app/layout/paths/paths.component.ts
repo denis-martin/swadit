@@ -15,7 +15,7 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
 
@@ -24,9 +24,11 @@ import { ModifyComponent } from '../../shared/modules/editor-modals/modify/modif
 import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
 
 @Component({
-	selector: 'app-paths',
-	templateUrl: './paths.component.html',
-	styleUrls: ['./paths.component.scss']
+    selector: 'app-paths',
+    templateUrl: './paths.component.html',
+    styleUrls: ['./paths.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PathsComponent implements OnInit 
 {

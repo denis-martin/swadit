@@ -1,31 +1,49 @@
 <form (ngSubmit)="ok()">
-	<div class="modal-header">
-		<h3 class="modal-title" id="modal-title">{{modalTitle}}</h3>
-	</div>
-	<div class="modal-body" id="modal-body">
-		<p *ngIf="dialogType=='fileOpen'"><input type="file" (change)="onFileChange($event)" class="form-control"></p>
-		<p *ngIf="dialogType=='fileAdd'"><input type="file" (change)="onFileChange($event)" multiple class="form-control"></p>
-		<p *ngIf="dialogType=='fileAdd'" class="form-check">
-			<input type="checkbox" [(ngModel)]="addSource" name="addSource" id="addSource">
-			<label for="addSource">Add source file name to path descriptions</label>
-		</p>
-		<p *ngIf="dialogType=='fileDownload'">
-			<label for="fileName">File name to download</label>
-			<input type="text" [(ngModel)]="fileName" class="form-control" name="fileName">
-		</p>
-		<p *ngIf="modalHint!=''">{{modalHint}}</p>
-		<div class="alert alert-danger" *ngIf="validationErrors===true">
-			There are validation errors. 
-			<a [routerLink]="['/source']" (click)="activeModal.dismiss('cancel')">Please review them</a> before saving the file.
-		</div>
-	</div>
-	<div class="modal-footer">
-		<button class="btn btn-primary" type="submit" 
-			[disabled]="validationErrors || (dialogType=='fileDownload' && !fileName) || ((dialogType=='fileOpen' || dialogType=='fileAdd') && (!files || files.length==0))">
-			<span *ngIf="dialogType=='fileOpen'">Open</span>
-			<span *ngIf="dialogType=='fileAdd'">Add</span>
-			<span *ngIf="dialogType=='fileDownload'">Download</span>
-		</button>
-		<button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" type="button">Cancel</button>
-	</div>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-title">{{modalTitle}}</h3>
+  </div>
+  <div class="modal-body" id="modal-body">
+    @if (dialogType=='fileOpen') {
+      <p><input type="file" (change)="onFileChange($event)" class="form-control"></p>
+    }
+    @if (dialogType=='fileAdd') {
+      <p><input type="file" (change)="onFileChange($event)" multiple class="form-control"></p>
+    }
+    @if (dialogType=='fileAdd') {
+      <p class="form-check">
+        <input type="checkbox" [(ngModel)]="addSource" name="addSource" id="addSource">
+        <label for="addSource">Add source file name to path descriptions</label>
+      </p>
+    }
+    @if (dialogType=='fileDownload') {
+      <p>
+        <label for="fileName">File name to download</label>
+        <input type="text" [(ngModel)]="fileName" class="form-control" name="fileName">
+      </p>
+    }
+    @if (modalHint!='') {
+      <p>{{modalHint}}</p>
+    }
+    @if (validationErrors===true) {
+      <div class="alert alert-danger">
+        There are validation errors.
+        <a [routerLink]="['/source']" (click)="activeModal.dismiss('cancel')">Please review them</a> before saving the file.
+      </div>
+    }
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" type="submit"
+      [disabled]="validationErrors || (dialogType=='fileDownload' && !fileName) || ((dialogType=='fileOpen' || dialogType=='fileAdd') && (!files || files.length==0))">
+      @if (dialogType=='fileOpen') {
+        <span>Open</span>
+      }
+      @if (dialogType=='fileAdd') {
+        <span>Add</span>
+      }
+      @if (dialogType=='fileDownload') {
+        <span>Download</span>
+      }
+    </button>
+    <button class="btn btn-warning" (click)="activeModal.dismiss('cancel')" type="button">Cancel</button>
+  </div>
 </form>

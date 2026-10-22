@@ -15,14 +15,16 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import * as YAML from 'js-yaml';
 
 @Component({
-	selector: 'swadit-extensions-view',
-	templateUrl: './extensions-view.component.html',
-	styleUrls: ['./../schema-view.component.scss']
+    selector: 'swadit-extensions-view',
+    templateUrl: './extensions-view.component.html',
+    styleUrls: ['./../schema-view.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ExtensionsViewComponent implements OnInit {
 	@Input() obj: any;

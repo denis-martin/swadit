@@ -18,7 +18,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { AceModule } from 'ngx-ace-wrapper';
+import { AceEditorModule } from '../../shared/modules/ace-editor/ace-editor.module';
 
 import { SourceRoutingModule } from './source-routing.module';
 import { SourceComponent } from './source.component';
@@ -26,7 +26,7 @@ import { SourceComponent } from './source.component';
 @NgModule({
   imports: [
     CommonModule,
-    AceModule,
+    AceEditorModule,
     SourceRoutingModule
   ],
   declarations: [SourceComponent]

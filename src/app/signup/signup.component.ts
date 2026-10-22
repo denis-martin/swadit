@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { routerTransition } from '../router.animations';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: 'app-signup',
     templateUrl: './signup.component.html',
     styleUrls: ['./signup.component.scss'],
-    animations: [routerTransition()]
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SignupComponent implements OnInit {
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     constructor() { }
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-empty-function
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     ngOnInit() { }
 }

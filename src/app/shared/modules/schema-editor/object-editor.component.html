@@ -1,107 +1,145 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <div [ngClass]="{'card': card}">
-	<div *ngIf="title && (header || schema['description'])" [ngClass]="{'card-header': card, 'header': !card}">{{header || schema['description']}}</div>
-	<div [ngClass]="{'card-block': card}">
-		<div *ngIf="getGrid()">
-			<div *ngFor="let row of getGrid()" class="row">
-				<div *ngFor="let p of row" class="form-group col-md-{{getGridCols()[p] ? getGridCols()[p] : 12}}">
-					<label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
-						{{deCamelize(p)}}<span *ngIf="propertyIsRequired(schema, p)" style="color: red">*</span><span *ngIf="collapsed[p]">...</span>
-						<span *ngIf="obj[p] != undefined && obj[p] != null && schema['properties'][p]['type'] == object && !propertyIsRequired(schema, p)"
-							(click)="deleteProperty($event, p)">
-							<i class="fa fa-trash"></i>
-						</span>
-					</label>
-					<div [ngbCollapse]="collapsed[p]">
-						<swadit-schema-editor 
-							*ngIf="(obj[p] != undefined && obj[p] != null) || schema['properties'][p]['type'] != object; else addSchema"
-							[schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p">
-						</swadit-schema-editor>
-						<ng-template #addSchema>
-							<button class="btn" (click)="obj[p] = { type: 'object' }">add</button>
-						</ng-template>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div *ngIf="!getGrid()">
-			<div *ngFor="let p of schemaProperties()" class="form-group">
-				<label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
-					{{deCamelize(p)}}<span *ngIf="propertyIsRequired(schema, p)" style="color: red">*</span><span *ngIf="collapsed[p]">...</span>
-				</label>
-				<div [ngbCollapse]="collapsed[p]">
-					<swadit-schema-editor [schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p"></swadit-schema-editor>
-				</div>
-			</div>
-			<div *ngIf="schema.additionalProperties">
-				<div *ngIf="schema.additionalProperties['type']=='object'">
-					<div *ngFor="let p of objectProperties(); let index = index; trackBy:trackByIndex" class="form-group">
-						<div class="input-group input-group-overlapping-border" style="margin-bottom: -1px">
-							<span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
-								<i *ngIf="!collapsed[p]" class="fa fa-caret-down"></i>
-								<i *ngIf="collapsed[p]"  class="fa fa-caret-right"></i>
-							</span>
-							<input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
-								class="form-control" 
-								placeholder="{{schema.additionalProperties['description']}}" 
-								title="{{schema.additionalProperties['description']}}">
-							<span class="input-group-addon clickable" (click)="deleteProperty($event, p)">
-								<i class="fa fa-trash"></i>
-							</span>
-						</div>
-						<div [ngbCollapse]="collapsed[p]">
-							<swadit-schema-editor [schema]="schema.additionalProperties" [(obj)]="obj[p]" [id]="p" class="form-control" style="background-color: #f7f7f9">
-							</swadit-schema-editor>
-						</div>
-					</div>
-				</div>
-				<div *ngIf="schema.additionalProperties['type']!='object'">
-					<div *ngFor="let p of objectProperties(); let index = index; trackBy:trackByIndex" class="row form-group">
-						<div class="col-md-5">
-							<div class="input-group">
-								<span class="input-group-addon">
-									<span class="clickable" (click)="deleteProperty($event, p)"><i class="fa fa-trash"></i></span>
-								</span>
-								<input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
-									class="form-control" 
-									placeholder="{{schema.additionalProperties['description']}}" 
-									title="{{schema.additionalProperties['description']}}">
-							</div>
-						</div>
-						<swadit-primitive-editor [schema]="schema.additionalProperties" [(obj)]="obj[p]" [id]="p" class="col-md-7">
-						</swadit-primitive-editor>
-					</div>
-				</div>
-				<div class="form-group">
-					<div class="input-group">
-						<input type="text" [(ngModel)]="propertyToAdd"
-							class="form-control" 
-							placeholder="{{schema.additionalProperties['description']}}" 
-							title="{{schema.additionalProperties['description']}}"
-							(keydown.enter)="addProperty($event)">
-						<span class="input-group-addon clickable" (click)="addProperty($event)">
-							<i class="fa fa-plus"></i>
-						</span>
-					</div>
-					<ngb-alert *ngIf="noItemToAdd" [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
-				</div>
-			</div>
-		</div>
-	</div>
+  @if (title && (header || schema['description'])) {
+    <div [ngClass]="{'card-header': card, 'header': !card}">{{header || schema['description']}}</div>
+  }
+  <div [ngClass]="{'card-block': card}">
+    @if (getGrid()) {
+      <div>
+        @for (row of getGrid(); track row) {
+          <div class="row">
+            @for (p of row; track p) {
+              <div class="form-group col-md-{{getGridCols()[p] ? getGridCols()[p] : 12}}">
+                <label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
+                  {{deCamelize(p)}}@if (propertyIsRequired(schema, p)) {
+                  <span style="color: red">*</span>
+                  }@if (collapsed[p]) {
+                  <span>...</span>
+                }
+                @if (obj[p] != undefined && obj[p] != null && schema['properties'][p]['type'] == object && !propertyIsRequired(schema, p)) {
+                  <span
+                    (click)="deleteProperty($event, p)">
+                    <i class="fa fa-trash"></i>
+                  </span>
+                }
+              </label>
+              <div [ngbCollapse]="collapsed[p]">
+                @if ((obj[p] != undefined && obj[p] != null) || schema['properties'][p]['type'] != object) {
+                  <swadit-schema-editor
+                    [schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p">
+                  </swadit-schema-editor>
+                } @else {
+                  <button class="btn" (click)="obj[p] = { type: 'object' }">add</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+  @if (!getGrid()) {
+    <div>
+      @for (p of schemaProperties(); track p) {
+        <div class="form-group">
+          <label for="{{p}}" (click)="collapsed[p] = !collapsed[p]">
+            {{deCamelize(p)}}@if (propertyIsRequired(schema, p)) {
+            <span style="color: red">*</span>
+            }@if (collapsed[p]) {
+            <span>...</span>
+          }
+        </label>
+        <div [ngbCollapse]="collapsed[p]">
+          <swadit-schema-editor [schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p"></swadit-schema-editor>
+        </div>
+      </div>
+    }
+    @if (schema.additionalProperties) {
+      <div>
+        @if (schema.additionalProperties['type']=='object') {
+          <div>
+            @for (p of objectProperties(); track trackByIndex(index, p); let index = $index) {
+              <div class="form-group">
+                <div class="input-group input-group-overlapping-border" style="margin-bottom: -1px">
+                  <span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
+                    @if (!collapsed[p]) {
+                      <i class="fa fa-caret-down"></i>
+                    }
+                    @if (collapsed[p]) {
+                      <i  class="fa fa-caret-right"></i>
+                    }
+                  </span>
+                  <input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
+                    class="form-control"
+                    placeholder="{{schema.additionalProperties['description']}}"
+                    title="{{schema.additionalProperties['description']}}">
+                  <span class="input-group-addon clickable" (click)="deleteProperty($event, p)">
+                    <i class="fa fa-trash"></i>
+                  </span>
+                </div>
+                <div [ngbCollapse]="collapsed[p]">
+                  <swadit-schema-editor [schema]="schema.additionalProperties" [(obj)]="obj[p]" [id]="p" class="form-control" style="background-color: #f7f7f9">
+                  </swadit-schema-editor>
+                </div>
+              </div>
+            }
+          </div>
+        }
+        @if (schema.additionalProperties['type']!='object') {
+          <div>
+            @for (p of objectProperties(); track trackByIndex(index, p); let index = $index) {
+              <div class="row form-group">
+                <div class="col-md-5">
+                  <div class="input-group">
+                    <span class="input-group-addon">
+                      <span class="clickable" (click)="deleteProperty($event, p)"><i class="fa fa-trash"></i></span>
+                    </span>
+                    <input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
+                      class="form-control"
+                      placeholder="{{schema.additionalProperties['description']}}"
+                      title="{{schema.additionalProperties['description']}}">
+                  </div>
+                </div>
+                <swadit-primitive-editor [schema]="schema.additionalProperties" [(obj)]="obj[p]" [id]="p" class="col-md-7">
+                </swadit-primitive-editor>
+              </div>
+            }
+          </div>
+        }
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" [(ngModel)]="propertyToAdd"
+              class="form-control"
+              placeholder="{{schema.additionalProperties['description']}}"
+              title="{{schema.additionalProperties['description']}}"
+              (keydown.enter)="addProperty($event)">
+            <span class="input-group-addon clickable" (click)="addProperty($event)">
+              <i class="fa fa-plus"></i>
+            </span>
+          </div>
+          @if (noItemToAdd) {
+            <ngb-alert [type]="'danger'" (close)="noItemToAdd=false">Please enter a valid value to add.</ngb-alert>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
+</div>
 </div>
