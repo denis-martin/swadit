@@ -141,7 +141,8 @@
     }
   },
   "cli": {
-    "warnings": {}
+    "warnings": {},
+    "analytics": false
   },
   "schematics": {
     "@schematics/angular:component": {

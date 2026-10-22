@@ -30,7 +30,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           </span>
           @if (isSecurityDefinition(p)) {
             <select
-              id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
+              id="{{id}}" [ngModel]="p" [ngModelOptions]="{standalone: true}" (ngModelChange)="changeProperty($event, index, p)"
               class="form-control {{schema['x-swadit-input-class'] || ''}}"
               title="{{schema['description']}}">
               @for (o of keys(securityDefinitions); track o) {
@@ -39,7 +39,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
             </select>
           } @else {
             <input type="text"
-              id="{{id}}" [ngModel]="p" (ngModelChange)="changeProperty($event, index, p)"
+              id="{{id}}" [ngModel]="p" [ngModelOptions]="{standalone: true}" (ngModelChange)="changeProperty($event, index, p)"
               class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
               placeholder="{{schema['description']}}"
               title="{{schema['description']}}">
@@ -60,7 +60,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 <div class="form-group">
   <div class="input-group">
     <select
-      id="{{id}}" [(ngModel)]="propertyToAdd"
+      id="{{id}}" [(ngModel)]="propertyToAdd" [ngModelOptions]="{standalone: true}"
       class="form-control {{schema['x-swadit-input-class'] || ''}}"
       title="{{schema['description']}}">
       @for (o of keys(securityDefinitions); track o) {

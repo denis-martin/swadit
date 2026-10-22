@@ -57,7 +57,7 @@ export class ArrayEditorComponent implements OnInit
 			this._obj = [];
 		}
 		this.schema = this.apis.resolveObj(this.schema, this.apis.schemas.root);
-		this.itemsSchema = this.apis.resolveObj(this.schema['items'], this.apis.schemas.root);
+		this.itemsSchema = this.apis.resolveObj(this.schema['items'], this.apis.schemas.root) || {};
 		if (this.itemsSchema['type'] == 'object') {
 			this.itemToAdd = {};
 		} else {

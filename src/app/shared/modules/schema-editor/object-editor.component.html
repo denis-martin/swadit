@@ -85,7 +85,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                       <i  class="fa fa-caret-right"></i>
                     }
                   </span>
-                  <input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
+                  <input type="text" [ngModel]="p" [ngModelOptions]="{standalone: true}" (ngModelChange)="changeProperty($event, p)"
                     class="form-control"
                     placeholder="{{schema.additionalProperties['description']}}"
                     title="{{schema.additionalProperties['description']}}">
@@ -110,7 +110,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                     <span class="input-group-addon">
                       <span class="clickable" (click)="deleteProperty($event, p)"><i class="fa fa-trash"></i></span>
                     </span>
-                    <input type="text" [ngModel]="p" (ngModelChange)="changeProperty($event, p)"
+                    <input type="text" [ngModel]="p" [ngModelOptions]="{standalone: true}" (ngModelChange)="changeProperty($event, p)"
                       class="form-control"
                       placeholder="{{schema.additionalProperties['description']}}"
                       title="{{schema.additionalProperties['description']}}">
@@ -124,7 +124,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         }
         <div class="form-group">
           <div class="input-group">
-            <input type="text" [(ngModel)]="propertyToAdd"
+            <input type="text" [(ngModel)]="propertyToAdd" [ngModelOptions]="{standalone: true}"
               class="form-control"
               placeholder="{{schema.additionalProperties['description']}}"
               title="{{schema.additionalProperties['description']}}"

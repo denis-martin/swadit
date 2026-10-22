@@ -19,7 +19,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   <!-- simple input string -->
   @if (schema['type']=='string' && !schema['enum'] && !schema['x-swadit-input-multiline']) {
     <input
-      type="text" id="{{id}}" [(ngModel)]="obj"
+      type="text" id="{{id}}" [(ngModel)]="obj" [ngModelOptions]="{standalone: true}"
       class="form-control {{schema['x-swadit-input-class'] || ''}}"
       placeholder="{{schema['description']}}"
       title="{{schema['description']}}">
@@ -28,7 +28,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   <!-- textarea input string -->
   @if (schema['type']=='string' && !schema['enum'] && schema['x-swadit-input-multiline']) {
     <textarea
-      id="{{id}}" [(ngModel)]="obj"
+      id="{{id}}" [(ngModel)]="obj" [ngModelOptions]="{standalone: true}"
       class="form-control {{schema['x-swadit-input-class'] || ''}}"
       placeholder="{{schema['description']}}"
       title="{{schema['description']}}"
@@ -39,7 +39,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   <!-- enum input string -->
   @if (schema['type']=='string' && schema['enum'] && isInEnum(obj)) {
     <select
-      id="{{id}}" [(ngModel)]="obj"
+      id="{{id}}" [(ngModel)]="obj" [ngModelOptions]="{standalone: true}"
       class="form-control {{schema['x-swadit-input-class'] || ''}}"
       title="{{schema['description']}}">
       @for (o of schema['enum']; track o) {
@@ -49,7 +49,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   } @else {
     @if (schema['type']=='string' && schema['enum']) {
       <input
-        type="text" id="{{id}}" [(ngModel)]="obj"
+        type="text" id="{{id}}" [(ngModel)]="obj" [ngModelOptions]="{standalone: true}"
         class="form-control {{schema['x-swadit-input-class'] || ''}}" style="color: red"
         placeholder="{{schema['description']}}"
         title="{{schema['description']}}">
@@ -59,7 +59,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   <!-- boolean input -->
   @if (schema['type']=='boolean') {
     <select
-      id="{{id}}" [(ngModel)]="obj"
+      id="{{id}}" [(ngModel)]="obj" [ngModelOptions]="{standalone: true}"
       class="form-control {{schema['x-swadit-input-class'] || ''}}"
       title="{{schema['description']}}">
       @if (schema['default'] == undefined) {
