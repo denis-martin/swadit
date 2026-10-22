@@ -15,12 +15,14 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
-	selector: 'swadit-primitive-editor',
-	templateUrl: './primitive-editor.component.html',
-	styleUrls: ['./schema-editor.component.scss']
+    selector: 'swadit-primitive-editor',
+    templateUrl: './primitive-editor.component.html',
+    styleUrls: ['./schema-editor.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PrimitiveEditorComponent implements OnInit 
 {
@@ -30,13 +32,13 @@ export class PrimitiveEditorComponent implements OnInit
 	
 	private _obj: any;
 	@Input() 
-	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+	 
 	get obj() { 
 		return this._obj; 
 	}
 
 	@Output() objChange = new EventEmitter<any>();
-	// eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
+	 
 	set obj(val) 
 	{
 		this._obj = val;

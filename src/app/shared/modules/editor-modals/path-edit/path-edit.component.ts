@@ -15,7 +15,7 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { cloneDeep as _cloneDeep } from "lodash-es";
@@ -23,9 +23,11 @@ import { cloneDeep as _cloneDeep } from "lodash-es";
 import { ApisService } from '../../../services';
 
 @Component({
-	selector: 'app-path-edit',
-	templateUrl: './path-edit.component.html',
-	styleUrls: ['../editor-modals.scss']
+    selector: 'app-path-edit',
+    templateUrl: './path-edit.component.html',
+    styleUrls: ['../editor-modals.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class PathEditComponent implements OnInit 
 {

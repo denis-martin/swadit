@@ -1,3 +1,5 @@
+@use "sass:color";
+
 $topnav-background-color: #222;
 .sidebar{
     border-radius: 0;
@@ -33,11 +35,11 @@ $topnav-background-color: #222;
             }
         }
         a:hover {
-            background: darken($topnav-background-color, 5%);
+            background: color.adjust($topnav-background-color, $lightness: -5%, $space: hsl);
             color: #fff;
         }
         a.router-link-active {
-            background: darken($topnav-background-color, 5%);
+            background: color.adjust($topnav-background-color, $lightness: -5%, $space: hsl);
             color: #fff;
         }
     }
@@ -69,7 +71,7 @@ $topnav-background-color: #222;
             }
         }
         .panel-title:hover {
-            background: darken($topnav-background-color, 5%);
+            background: color.adjust($topnav-background-color, $lightness: -5%, $space: hsl);
         }
         .panel-collapse {
             border-radius :0;
@@ -87,7 +89,7 @@ $topnav-background-color: #222;
                     }
                 }
                 .list-group-item:hover {
-                    background : darken($topnav-background-color, 5%);
+                    background : color.adjust($topnav-background-color, $lightness: -5%, $space: hsl);
                 }
             }
         }

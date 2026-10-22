@@ -15,7 +15,7 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModalOptions, NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { cloneDeep as _cloneDeep } from "lodash-es";
@@ -23,9 +23,11 @@ import { cloneDeep as _cloneDeep } from "lodash-es";
 import { ApisService } from '../../../shared/services';
 
 @Component({
-	selector: 'app-api-info-edit',
-	templateUrl: './api-info-edit.component.html',
-	styleUrls: ['./api-info-edit.component.scss']
+    selector: 'app-api-info-edit',
+    templateUrl: './api-info-edit.component.html',
+    styleUrls: ['./api-info-edit.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ApiInfoEditComponent implements OnInit 
 {
@@ -106,23 +108,25 @@ export class ApiInfoEditComponent implements OnInit
 
 		// In OAS2, we have incomplete schemas, therefore we need to clean up some more
 		if (this.apis.isOas2) {
-			if (Object.keys(this.apis.current['info']['contact']).length == 0) {
-				delete this.apis.current['info']['contact'];
+			const cur = this.apis.current;
+			const isEmpty = (v: any) => v == null || Object.keys(v).length == 0;
+			if (isEmpty(cur['info']['contact'])) {
+				delete cur['info']['contact'];
 			}
-			if (Object.keys(this.apis.current['info']['license']).length == 0) {
-				delete this.apis.current['info']['license'];
+			if (isEmpty(cur['info']['license'])) {
+				delete cur['info']['license'];
 			}
-			if (Object.keys(this.apis.current['externalDocs']).length == 0) {
-				delete this.apis.current['externalDocs'];
+			if (isEmpty(cur['externalDocs'])) {
+				delete cur['externalDocs'];
 			}
-			if (this.apis.current['tags'].length == 0) {
-				delete this.apis.current['tags'];
+			if (isEmpty(cur['tags'])) {
+				delete cur['tags'];
 			}
-			if (Object.keys(this.apis.current['securityDefinitions']).length == 0) {
-				delete this.apis.current['securityDefinitions'];
+			if (isEmpty(cur['securityDefinitions'])) {
+				delete cur['securityDefinitions'];
 			}
-			if (this.apis.current['security'].length == 0) {
-				delete this.apis.current['security'];
+			if (isEmpty(cur['security'])) {
+				delete cur['security'];
 			}
 		}
 

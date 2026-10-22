@@ -1,290 +1,410 @@
 <!--
-	Copyright 2018 Denis Martin.  This file is part of swadit.
+Copyright 2018 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <a class="no-print edit-section" href="#" (click)="print()">
-	<i class="fa fa-print"></i> 
+  <i class="fa fa-print"></i>
 </a>
 
-<div *ngIf="!api">
-	Validating API against Swagger specification...
-</div>
+@if (!api) {
+  <div>
+    Validating API against Swagger specification...
+  </div>
+}
 
-<div *ngIf="err">
-	Swagger validation error. See File / Source for details.
-</div>
+@if (err) {
+  <div>
+    Swagger validation error. See File / Source for details.
+  </div>
+}
 
-<div id="contentToPrint" *ngIf="!err && api">
-
-<!-- from api-info begin -->
-<div *ngIf="api['info']" class="api-info">
-	<h1>{{api['info']['title']}}
-		<span *ngIf="api['info']['version']" style="font-size: 70%"> v{{api['info']['version']}}</span>
-	</h1>
-	<div *ngIf="api['info']['contact']" class="api-info-element">
-		{{api['info']['contact']['name']}} 
-		<span *ngIf="api['info']['contact']['email']">
-			(<a href="mailto:{{api['info']['contact']['email']}}">{{api['info']['contact']['email']}}</a>)
-		</span>
-		<span *ngIf="api['info']['contact']['url']">{{api['info']['contact']['url']}}</span>
-	</div>
-	<markdown *ngIf="api['info'].description" class="api-info-element markdown">
-		{{api['info']['description']}}
-	</markdown>
-	<div *ngIf="api.externalDocs" class="api-info-element">
-		<a href="{{api.externalDocs['url']}}" target="_blanc">
-			<span *ngIf="api.externalDocs.description; else 'More'">{{api.externalDocs.description}}</span>
-		</a>
-	</div>
-	<div *ngIf="api['info']['termsOfService'] || api['info']['license']" class="api-info-element">
-		<p *ngIf="api['info']['termsOfService']">
-			Terms of service: {{api['info']['termsOfService']}}
-		</p>
-		<p *ngIf="api['info']['license']">
-			License: {{api['info']['license']['name']}}
-			<span *ngIf="api['info']['license']['url']">
-				(<a href="{{api['info']['license']['url']}}">{{api['info']['license']['url']}}</a>)
-			</span>
-		</p>
-	</div>
-</div>
-
-<div *ngIf="api['tags']" class="api-info api-info-element">
-	<h2>Tags</h2>
-	<table class="tag-table">
-		<tbody>
-			<tr *ngFor="let tag of api['tags']">
-				<td style="font-weight: bold">{{tag['name']}}</td>
-				<td>
-					<div markdown>{{tag.description}}</div>
-					<div *ngIf="tag.externalDocs">
-						<a href="{{tag.externalDocs['url']}}" target="_blanc">
-							<span *ngIf="tag.externalDocs.description; else more">{{tag.externalDocs.description}}</span>
-							<ng-template #more>More</ng-template>
-						</a>
-					</div>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-
-<div *ngIf="api['schemes'] || api['host'] || api['basePath'] || api['consumes'] || api['produces']"
-	class="api-info api-info-element">
-	<h2>General Information</h2>
-	<table>
-		<tbody>
-			<tr *ngIf="api['schemes']">
-				<td class="label-text">schemes</td>
-				<td>
-					<span *ngFor="let item of api['schemes']">{{item}}&nbsp;</span>
-				</td>
-			</tr>
-			<tr *ngIf="api['host']">
-				<td class="label-text">host</td>
-				<td>{{api['host']}}</td>
-			</tr>
-			<tr *ngIf="api['basePath']" >
-				<td class="label-text">basePath</td>
-				<td>{{api['basePath']}}</td>
-			</tr>
-			<tr *ngIf="api['consumes']">
-				<td class="label-text">consumes</td>
-				<td>
-					<ul class="list-unstyled">
-						<li *ngFor="let item of api['consumes']">{{item}}</li>
-					</ul>
-				</td>
-			</tr>
-			<tr *ngIf="api['produces']">
-				<td class="label-text">produces</td>
-				<td>
-					<ul class="list-unstyled">
-						<li *ngFor="let item of api['produces']">{{item}}</li>
-					</ul>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-</div>
-
-<div *ngIf="api['securityDefinitions'] || api['security']" class="api-info api-info-element">
-	<h2>Security</h2>
-	<div *ngFor="let def of keys(api['securityDefinitions'])">
-		<p>Security definition: <b>{{def}}</b></p>
-		<table>
-			<tbody>
-				<tr>
-					<td class="label-text">type</td>
-					<td>{{api['securityDefinitions'][def]['type']}}</td>
-				</tr>
-				<tr *ngIf="api['securityDefinitions'][def]['description']">
-					<td class="label-text">description</td>
-					<td><markdown>{{api['securityDefinitions'][def]['description']}}</markdown></td>
-				</tr>
-				<tr *ngIf="api['securityDefinitions'][def]['name']">
-					<td class="label-text">name</td>
-					<td>{{api['securityDefinitions'][def]['name']}}</td>
-				</tr>
-				<tr *ngIf="api['securityDefinitions'][def]['in']">
-					<td class="label-text">in</td>
-					<td>{{api['securityDefinitions'][def]['in']}}</td>
-				</tr>
-				<tr *ngIf="api['securityDefinitions'][def]['flow']">
-					<td class="label-text">flow</td>
-					<td>{{api['securityDefinitions'][def]['flow']}}</td>
-				</tr>
-				<tr *ngIf="api['securityDefinitions'][def]['authorizationUrl']">
-					<td class="label-text">auth URL</td>
-					<td>{{api['securityDefinitions'][def]['authorizationUrl']}}</td>
-				</tr>
-				<tr *ngIf="api['securityDefinitions'][def]['tokenUrl']">
-					<td class="label-text">token URL</td>
-					<td>{{api['securityDefinitions'][def]['tokenUrl']}}</td>
-				</tr>
-				<tr *ngIf="api['securityDefinitions'][def]['scopes']">
-					<td class="label-text">scopes</td>
-					<td>
-						<table>
-							<tbody>
-								<tr *ngFor="let scope of keys(api['securityDefinitions'][def]['scopes'])">
-									<td style="font-weight: bold">{{scope}}</td>
-									<td>{{api['securityDefinitions'][def]['scopes'][scope]}}</td>
-								</tr>
-							</tbody>
-						</table>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div *ngIf="api['security']">
-		<h3>Default Security Requirements</h3>
-		<div *ngFor="let req of api['security']">
-			<p style="font-weight: bold">{{keys(req)[0]}}</p>
-			<ul *ngIf="req[keys(req)[0]].length>0">
-				<li *ngFor="let scope of req[keys(req)[0]]">{{scope}}</li>
-			</ul>
-		</div>
-	</div>
-</div>
-
-<div *ngIf="apis.hasExtensions(api) || apis.hasExtensions(api['info'])" class="api-info api-info-element">
-	<h2>Extensions</h2>
-	<div *ngIf="apis.hasExtensions(api)" class="api-info-element">
-		At document root:
-		<swadit-extensions-view [obj]="api"></swadit-extensions-view>
-	</div>
-	<div *ngIf="apis.hasExtensions(api['info'])" class="api-info-element">
-		At document info:
-		<swadit-extensions-view [obj]="api['info']"></swadit-extensions-view>
-	</div>
-</div>
-<!-- from api-info end -->
-
-<!-- path list -->
-<h2 class="pathlistheading"><a name="pathlist">Paths</a></h2>
-<p>This API supports {{apis.keys(api['paths']).length}} paths:</p>
-<table class="pathlist">
-	<tbody>
-		<tr *ngFor="let path of apis.filterList(apis.keys(api['paths']), null, true); let index = index">
-			<td><a href="#{{getPathAnchor(path)}}">{{path}}</a></td>
-        </tr>
-	</tbody>
-</table>
-
-<!-- paths -->
-<div *ngFor="let path of apis.filterList(apis.keys(api['paths']), null, true); let index = index">
-	<h3 class="pathheading">
-		<a name="{{getPathAnchor(path)}}">{{path}}</a>
-		<a href="#pathlist" style="float: right; font-size: 80%; text-decoration: none; color: inherit">&#9776;&nbsp;</a>
-	</h3>
-	<p>
-		This path supports the following methods:
-		<span *ngFor="let method of apis.getMethods(path, api)">
-			<span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">{{method.key}}</span>
-		</span>
-	</p>
-	<div *ngFor="let method of apis.getMethods(path, api)">
-		<h4 class="methodheading" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
-			<span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
-				{{method.key}}
-			</span>
-			{{path}}
-		</h4>
-		
-		<markdown>{{method.obj.summary}}</markdown>
-		
-		<h5 *ngIf="method.obj.description">Description</h5>
-		<!-- <markdown>{{method.obj.description}}</markdown> -->
-
-		<div *ngIf="apis.getParameters(api, path, method.key, false).length > 0">
-			<h5>Parameters</h5>
-			<table>
-				<thead>
-					<th>Name</th>
-					<th>Type</th>
-					<th>Description</th>
-				</thead>
-				<tbody>
-					<tr *ngFor="let param of apis.getParameters(path, method.key, false)">
-						<td>
-							{{param.name}}<br>
-							<span class="paramproperties">in {{param['in']}}<span ng-if="param['required']">, required</span></span>
-						</td>
-						<td class="type">{{param['type']}}</td>
-						<td>
-							<markdown>{{param['description']}}</markdown>
-							<p *ngIf="param['default']">Default: <span *ngIf="param['type']=='string'">"</span>{{param['default']}}<span *ngIf="param['type']=='string'">"</span></p>
-							<p *ngIf="param['example']">Example: <span *ngIf="param['type']=='string'">"</span>{{param['example']}}<span *ngIf="param['type']=='string'">"</span></p>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-		<div *ngIf="apis.getBodyParameter(api, path, method.key) as body">
-			<h5>Request Body <span *ngFor="let consume of apis.getConsumes(api, path, method.key)">({{consume}}) </span></h5>
-			<markdown>{{body['description']}}</markdown>
-			<div *ngIf="body['schema'] as bodySchema">
-				<p>Schema: {{bodySchema['type']}} 
-					<span *ngIf="bodySchema['type']=='array'">
-						of {{bodySchema['items']['type']}}
-					</span>
-				</p>
-				<markdown>{{bodySchema['description']}}</markdown>
-				<schema-print-view [schema]="bodySchema" [type]="'Request'"></schema-print-view>
-			</div>
-		</div>
-
-		<h5>Responses</h5>
-		<div class="responsebox" *ngFor="let resp of apis.keys(method.obj['responses'])">
-			<h6 class="responseheading">{{resp}}: {{method.obj['responses'][resp]['description']}}</h6>
-			<div *ngIf="method.obj['responses'][resp]['schema'] as respSchema">
-				<p>Schema: {{respSchema['type']}} 
-					<span *ngIf="respSchema['type']=='array' && respSchema['items']">
-						of {{respSchema['items']['type']}}
-					</span>
-				</p>
-				<markdown>{{respSchema['description']}}</markdown>
-				<schema-print-view [schema]="respSchema" [type]="'Response'"></schema-print-view>
-			</div>
-		</div>
-	</div>
-</div>
-
-</div><!-- #contentToPrint -->
+@if (!err && api) {
+  <div id="contentToPrint">
+    <!-- from api-info begin -->
+    @if (api['info']) {
+      <div class="api-info">
+        <h1>{{api['info']['title']}}
+          @if (api['info']['version']) {
+            <span style="font-size: 70%"> v{{api['info']['version']}}</span>
+          }
+        </h1>
+        @if (api['info']['contact']) {
+          <div class="api-info-element">
+            {{api['info']['contact']['name']}}
+            @if (api['info']['contact']['email']) {
+              <span>
+                (<a href="mailto:{{api['info']['contact']['email']}}">{{api['info']['contact']['email']}}</a>)
+              </span>
+            }
+            @if (api['info']['contact']['url']) {
+              <span>{{api['info']['contact']['url']}}</span>
+            }
+          </div>
+        }
+        @if (api['info'].description) {
+          <markdown class="api-info-element markdown">
+            {{api['info']['description']}}
+          </markdown>
+        }
+        @if (api.externalDocs) {
+          <div class="api-info-element">
+            <a href="{{api.externalDocs['url']}}" target="_blanc">
+              @if (api.externalDocs.description) {
+                <span>{{api.externalDocs.description}}</span>
+              } @else {
+                <ng-template [ngTemplateOutlet]="'More'"></ng-template>
+              }
+            </a>
+          </div>
+        }
+        @if (api['info']['termsOfService'] || api['info']['license']) {
+          <div class="api-info-element">
+            @if (api['info']['termsOfService']) {
+              <p>
+                Terms of service: {{api['info']['termsOfService']}}
+              </p>
+            }
+            @if (api['info']['license']) {
+              <p>
+                License: {{api['info']['license']['name']}}
+                @if (api['info']['license']['url']) {
+                  <span>
+                    (<a href="{{api['info']['license']['url']}}">{{api['info']['license']['url']}}</a>)
+                  </span>
+                }
+              </p>
+            }
+          </div>
+        }
+      </div>
+    }
+    @if (api['tags']) {
+      <div class="api-info api-info-element">
+        <h2>Tags</h2>
+        <table class="tag-table">
+          <tbody>
+            @for (tag of api['tags']; track tag) {
+              <tr>
+                <td style="font-weight: bold">{{tag['name']}}</td>
+                <td>
+                  <div markdown>{{tag.description}}</div>
+                  @if (tag.externalDocs) {
+                    <div>
+                      <a href="{{tag.externalDocs['url']}}" target="_blanc">
+                        @if (tag.externalDocs.description) {
+                          <span>{{tag.externalDocs.description}}</span>
+                        } @else {
+                          More
+                        }
+                      </a>
+                    </div>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @if (api['schemes'] || api['host'] || api['basePath'] || api['consumes'] || api['produces']) {
+      <div
+        class="api-info api-info-element">
+        <h2>General Information</h2>
+        <table>
+          <tbody>
+            @if (api['schemes']) {
+              <tr>
+                <td class="label-text">schemes</td>
+                <td>
+                  @for (item of api['schemes']; track item) {
+                    <span>{{item}}&nbsp;</span>
+                  }
+                </td>
+              </tr>
+            }
+            @if (api['host']) {
+              <tr>
+                <td class="label-text">host</td>
+                <td>{{api['host']}}</td>
+              </tr>
+            }
+            @if (api['basePath']) {
+              <tr >
+                <td class="label-text">basePath</td>
+                <td>{{api['basePath']}}</td>
+              </tr>
+            }
+            @if (api['consumes']) {
+              <tr>
+                <td class="label-text">consumes</td>
+                <td>
+                  <ul class="list-unstyled">
+                    @for (item of api['consumes']; track item) {
+                      <li>{{item}}</li>
+                    }
+                  </ul>
+                </td>
+              </tr>
+            }
+            @if (api['produces']) {
+              <tr>
+                <td class="label-text">produces</td>
+                <td>
+                  <ul class="list-unstyled">
+                    @for (item of api['produces']; track item) {
+                      <li>{{item}}</li>
+                    }
+                  </ul>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+    @if (api['securityDefinitions'] || api['security']) {
+      <div class="api-info api-info-element">
+        <h2>Security</h2>
+        @for (def of keys(api['securityDefinitions']); track def) {
+          <div>
+            <p>Security definition: <b>{{def}}</b></p>
+            <table>
+              <tbody>
+                <tr>
+                  <td class="label-text">type</td>
+                  <td>{{api['securityDefinitions'][def]['type']}}</td>
+                </tr>
+                @if (api['securityDefinitions'][def]['description']) {
+                  <tr>
+                    <td class="label-text">description</td>
+                    <td><markdown>{{api['securityDefinitions'][def]['description']}}</markdown></td>
+                  </tr>
+                }
+                @if (api['securityDefinitions'][def]['name']) {
+                  <tr>
+                    <td class="label-text">name</td>
+                    <td>{{api['securityDefinitions'][def]['name']}}</td>
+                  </tr>
+                }
+                @if (api['securityDefinitions'][def]['in']) {
+                  <tr>
+                    <td class="label-text">in</td>
+                    <td>{{api['securityDefinitions'][def]['in']}}</td>
+                  </tr>
+                }
+                @if (api['securityDefinitions'][def]['flow']) {
+                  <tr>
+                    <td class="label-text">flow</td>
+                    <td>{{api['securityDefinitions'][def]['flow']}}</td>
+                  </tr>
+                }
+                @if (api['securityDefinitions'][def]['authorizationUrl']) {
+                  <tr>
+                    <td class="label-text">auth URL</td>
+                    <td>{{api['securityDefinitions'][def]['authorizationUrl']}}</td>
+                  </tr>
+                }
+                @if (api['securityDefinitions'][def]['tokenUrl']) {
+                  <tr>
+                    <td class="label-text">token URL</td>
+                    <td>{{api['securityDefinitions'][def]['tokenUrl']}}</td>
+                  </tr>
+                }
+                @if (api['securityDefinitions'][def]['scopes']) {
+                  <tr>
+                    <td class="label-text">scopes</td>
+                    <td>
+                      <table>
+                        <tbody>
+                          @for (scope of keys(api['securityDefinitions'][def]['scopes']); track scope) {
+                            <tr>
+                              <td style="font-weight: bold">{{scope}}</td>
+                              <td>{{api['securityDefinitions'][def]['scopes'][scope]}}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+        @if (api['security']) {
+          <div>
+            <h3>Default Security Requirements</h3>
+            @for (req of api['security']; track req) {
+              <div>
+                <p style="font-weight: bold">{{keys(req)[0]}}</p>
+                @if (req[keys(req)[0]].length>0) {
+                  <ul>
+                    @for (scope of req[keys(req)[0]]; track scope) {
+                      <li>{{scope}}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+    @if (apis.hasExtensions(api) || apis.hasExtensions(api['info'])) {
+      <div class="api-info api-info-element">
+        <h2>Extensions</h2>
+        @if (apis.hasExtensions(api)) {
+          <div class="api-info-element">
+            At document root:
+            <swadit-extensions-view [obj]="api"></swadit-extensions-view>
+          </div>
+        }
+        @if (apis.hasExtensions(api['info'])) {
+          <div class="api-info-element">
+            At document info:
+            <swadit-extensions-view [obj]="api['info']"></swadit-extensions-view>
+          </div>
+        }
+      </div>
+    }
+    <!-- from api-info end -->
+    <!-- path list -->
+    <h2 class="pathlistheading"><a name="pathlist">Paths</a></h2>
+    <p>This API supports {{apis.keys(api['paths']).length}} paths:</p>
+    <table class="pathlist">
+      <tbody>
+        @for (path of apis.filterList(apis.keys(api['paths']), null, true); track path; let index = $index) {
+          <tr>
+            <td><a href="#{{getPathAnchor(path)}}">{{path}}</a></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <!-- paths -->
+    @for (path of apis.filterList(apis.keys(api['paths']), null, true); track path; let index = $index) {
+      <div>
+        <h3 class="pathheading">
+          <a name="{{getPathAnchor(path)}}">{{path}}</a>
+          <a href="#pathlist" style="float: right; font-size: 80%; text-decoration: none; color: inherit">&#9776;&nbsp;</a>
+        </h3>
+        <p>
+          This path supports the following methods:
+          @for (method of apis.getMethods(path, api); track method) {
+            <span>
+              <span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">{{method.key}}</span>
+            </span>
+          }
+        </p>
+        @for (method of apis.getMethods(path, api); track method) {
+          <div>
+            <h4 class="methodheading" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
+              <span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
+                {{method.key}}
+              </span>
+              {{path}}
+            </h4>
+            <markdown>{{method.obj.summary}}</markdown>
+            @if (method.obj.description) {
+              <h5>Description</h5>
+            }
+            <!-- <markdown>{{method.obj.description}}</markdown> -->
+            @if (apis.getParameters(api, path, method.key, false).length > 0) {
+              <div>
+                <h5>Parameters</h5>
+                <table>
+                  <thead>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                  </thead>
+                  <tbody>
+                    @for (param of apis.getParameters(path, method.key, false); track param) {
+                      <tr>
+                        <td>
+                          {{param.name}}<br>
+                          <span class="paramproperties">in {{param['in']}}<span ng-if="param['required']">, required</span></span>
+                        </td>
+                        <td class="type">{{param['type']}}</td>
+                        <td>
+                          <markdown>{{param['description']}}</markdown>
+                          @if (param['default']) {
+                            <p>Default: @if (param['type']=='string') {
+                              <span>"</span>
+                              }{{param['default']}}@if (param['type']=='string') {
+                              <span>"</span>
+                            }</p>
+                          }
+                          @if (param['example']) {
+                            <p>Example: @if (param['type']=='string') {
+                              <span>"</span>
+                              }{{param['example']}}@if (param['type']=='string') {
+                              <span>"</span>
+                            }</p>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+            @if (apis.getBodyParameter(api, path, method.key); as body) {
+              <div>
+                <h5>Request Body @for (consume of apis.getConsumes(api, path, method.key); track consume) {
+                  <span>({{consume}}) </span>
+                }</h5>
+                <markdown>{{body['description']}}</markdown>
+                @if (body['schema']; as bodySchema) {
+                  <div>
+                    <p>Schema: {{bodySchema['type']}}
+                      @if (bodySchema['type']=='array') {
+                        <span>
+                          of {{bodySchema['items']['type']}}
+                        </span>
+                      }
+                    </p>
+                    <markdown>{{bodySchema['description']}}</markdown>
+                    <schema-print-view [schema]="bodySchema" [type]="'Request'"></schema-print-view>
+                  </div>
+                }
+              </div>
+            }
+            <h5>Responses</h5>
+            @for (resp of apis.keys(method.obj['responses']); track resp) {
+              <div class="responsebox">
+                <h6 class="responseheading">{{resp}}: {{method.obj['responses'][resp]['description']}}</h6>
+                @if (method.obj['responses'][resp]['schema']; as respSchema) {
+                  <div>
+                    <p>Schema: {{respSchema['type']}}
+                      @if (respSchema['type']=='array' && respSchema['items']) {
+                        <span>
+                          of {{respSchema['items']['type']}}
+                        </span>
+                      }
+                    </p>
+                    <markdown>{{respSchema['description']}}</markdown>
+                    <schema-print-view [schema]="respSchema" [type]="'Response'"></schema-print-view>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+  }<!-- #contentToPrint -->
 

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SwaggerUiComponent } from './swaggerui.component';
 
@@ -6,12 +6,12 @@ describe('SwaggerUiComponent', () => {
   let component: SwaggerUiComponent;
   let fixture: ComponentFixture<SwaggerUiComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ SwaggerUiComponent ]
     })
     .compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SwaggerUiComponent);

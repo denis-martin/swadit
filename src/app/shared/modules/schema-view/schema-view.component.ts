@@ -15,24 +15,27 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit, Directive } from '@angular/core';
+import { Component, Input, OnInit, Directive, ChangeDetectionStrategy } from '@angular/core';
 
 import { remove as _remove } from "lodash-es";
 
 import { ApisService } from '../../services';
 
 @Directive({
-	selector: '[swLet]',
-	exportAs: 'swLet'
+    selector: '[swLet]',
+    exportAs: 'swLet',
+    standalone: false
 })
 export class LetDirective {
 	@Input() values: any = {};
 }
 
 @Component({
-	selector: 'swadit-schema-view',
-	templateUrl: './schema-view.component.html',
-	styleUrls: ['./schema-view.component.scss']
+    selector: 'swadit-schema-view',
+    templateUrl: './schema-view.component.html',
+    styleUrls: ['./schema-view.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SchemaViewComponent implements OnInit 
 {

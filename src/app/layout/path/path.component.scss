@@ -1,3 +1,5 @@
+@use "sass:color";
+
 /*	
  * Copyright 2017 Denis Martin.  This file is part of swadit.
  * 
@@ -29,7 +31,7 @@
 }
 
 .path-selected:hover {
-	background-color: darken(#FFDEA3, 20%);
+	background-color: color.adjust(#FFDEA3, $lightness: -20%, $space: hsl);
 }
 
 .path-active {

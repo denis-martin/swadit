@@ -15,7 +15,7 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModal, ModalDismissReasons, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from '../../shared/services';
@@ -25,9 +25,11 @@ import { ParameterEditComponent } from '../../shared/modules/editor-modals/param
 import { ResponseEditComponent } from '../../shared/modules/editor-modals/response-edit/response-edit.component';
 
 @Component({
-	selector: 'app-definitions',
-	templateUrl: './definitions.component.html',
-	styleUrls: ['./definitions.component.scss']
+    selector: 'app-definitions',
+    templateUrl: './definitions.component.html',
+    styleUrls: ['./definitions.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class DefinitionsComponent implements OnInit 
 {

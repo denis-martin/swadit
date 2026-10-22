@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ObjectEditorComponent } from './object-editor.component';
 
@@ -6,12 +6,12 @@ describe('ObjectEditorComponent', () => {
   let component: ObjectEditorComponent;
   let fixture: ComponentFixture<ObjectEditorComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ ObjectEditorComponent ]
     })
     .compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ObjectEditorComponent);

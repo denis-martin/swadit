@@ -1,7 +1,7 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslatePipe, provideTranslateService } from '@ngx-translate/core';
 
 import { HeaderComponent, SidebarComponent } from '../shared';
 import { LayoutComponent } from './layout.component';
@@ -10,13 +10,14 @@ describe('LayoutComponent', () => {
   let component: LayoutComponent;
   let fixture: ComponentFixture<LayoutComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
     imports: [
       RouterTestingModule,
       NgbDropdownModule,
-      TranslateModule.forRoot(),
+      TranslatePipe,
     ],
+      providers: [provideTranslateService()],
       declarations: [
         LayoutComponent,
         HeaderComponent,
@@ -24,7 +25,7 @@ describe('LayoutComponent', () => {
       ]
     })
     .compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LayoutComponent);

@@ -15,7 +15,7 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from '../../shared/services';
@@ -23,9 +23,11 @@ import { ApisService } from '../../shared/services';
 import { ApiInfoEditComponent } from './api-info-edit/api-info-edit.component';
 
 @Component({
-	selector: 'app-api-info',
-	templateUrl: './api-info.component.html',
-	styleUrls: ['./api-info.component.scss']
+    selector: 'app-api-info',
+    templateUrl: './api-info.component.html',
+    styleUrls: ['./api-info.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 
 export class ApiInfoComponent implements OnInit 

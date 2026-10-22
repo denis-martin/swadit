@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SwaggerSchemaViewComponent } from './swagger-schema-view.component';
 
@@ -6,12 +6,12 @@ describe('SwaggerSchemaViewComponent', () => {
   let component: SwaggerSchemaViewComponent;
   let fixture: ComponentFixture<SwaggerSchemaViewComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       declarations: [ SwaggerSchemaViewComponent ]
     })
     .compileComponents();
-  }));
+  });
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SwaggerSchemaViewComponent);

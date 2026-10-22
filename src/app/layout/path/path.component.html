@@ -1,277 +1,407 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div class="edit-section" (click)="editPath($event, path, method)" *ngIf="!apis.config.readOnly && apis.isOas2">
-	<i class="fa fa-pencil"></i>
+@if (!apis.config.readOnly && apis.isOas2) {
+  <div class="edit-section" (click)="editPath($event, path, method)">
+    <i class="fa fa-pencil"></i>
+  </div>
+}
+
+@if (apis.current && apis.current['paths']) {
+  <div class="api-info">
+    <h1 style="margin-bottom: 0.7em">{{path}}</h1>
+    <!-- methods -->
+    <ul class="nav nav-tabs">
+      @for (m of getMethods(); track m) {
+        <li
+          class="nav-item">
+          <a class="nav-link" [ngClass]="{ 'active': m==method }"
+            href="javascript:void(0)" (click)="method=m">
+            <span style="text-transform: uppercase">{{m}}</span>
+            @if (apis.current['paths'][path][m]['deprecated']) {
+              <span class="badge badge-warning">deprecated</span>
+            }
+          </a>
+        </li>
+      }
+      @if (!apis.config.readOnly && apis.isOas2) {
+        <li class="nav-item">
+          <a class="nav-link" [ngClass]="{ 'active': !method }"
+            href="javascript:void(0)" (click)="editPath($event, path)">
+            <i class="fa fa-plus"></i>
+          </a>
+        </li>
+      }
+    </ul>
+    <!-- (selected) operation -->
+    @if (method && apis.current['paths'][path][method]) {
+      <div class="api-info-element">
+        @if (apis.current['paths'][path][method]['summary']) {
+          <div class="api-info-element">
+            {{apis.current['paths'][path][method]['summary']}}
+          </div>
+        }
+        @if (apis.current['paths'][path][method]['description']) {
+          <markdown class="api-info-element markdown"
+            [data]="apis.current['paths'][path][method]['description']">
+          </markdown>
+        }
+        @if (apis.current['paths'][path][method]['tags']) {
+          <div class="api-info-element">
+            Tags:
+            @for (tag of apis.current['paths'][path][method]['tags']; track tag) {
+              <span class="tag-badge">
+                {{tag}}
+              </span>
+            }
+          </div>
+        }
+        <!-- parameters -->
+        <h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
+          Parameters
+          @if (!apis.config.readOnly && apis.isOas2) {
+            <span class="edit-subsection" (click)="editParameter($event)" title="Add parameter">
+              <i class="fa fa-plus"></i>
+            </span>
+          }
+        </h2>
+        @if (!collapsedParameters) {
+          <div>
+            <!-- parameters for all methods -->
+            @for (param of this.apis.current['paths'][path]['parameters']; track param) {
+              <div
+                swLet [values]="{obj: apis.resolveObj(param)}" #local="swLet"
+                class="card mb-1">
+                <div class="card-header clickable"
+                  (click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
+                  <div class="row">
+                    <div class="col-md-11 preview">
+                      {{local.values.obj['name']}}@if (local.values.obj['required']) {
+                      <span style="color: red">*</span>
+                    }
+                    @if (local.values.obj['in']) {
+                      <span class="headerType"> in {{local.values.obj['in']}}</span>
+                    }
+                    @if (local.values.obj['type']) {
+                      <span class="headerType"> ({{local.values.obj['type']}})</span>
+                    }
+                    @if (local.values.obj['description']) {
+                      <span> {{local.values.obj['description']}}</span>
+                    }
+                  </div>
+                  <div class="col-md-1">
+                    @if (!apis.config.readOnly && apis.isOas2) {
+                      <div class="edit-card" (click)="editParameter($event, param, true)">
+                        <i class="fa fa-fw fa-pencil"></i>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+              @if (uncollapsedParameter[local.values.obj['name']]) {
+                <div class="card-block">
+                  <p class="headerType">This parameter applies to all operations on this path.</p>
+                  @if (param['$ref']) {
+                    <p class="headerType">Defined in {{param['$ref']}}:</p>
+                  }
+                  <swadit-parameter-view [obj]="local.values.obj">
+                  </swadit-parameter-view>
+                </div>
+              }
+            </div>
+          }
+          <!-- parameters for this method -->
+          @for (param of this.apis.current['paths'][path][method]['parameters']; track param) {
+            <div
+              swLet [values]="{obj: apis.resolveObj(param)}" #local="swLet"
+              class="card mb-1">
+              <div class="card-header clickable"
+                (click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
+                <div class="row">
+                  <div class="col-md-11 preview">
+                    {{local.values.obj['name']}}@if (local.values.obj['required']) {
+                    <span style="color: red">*</span>
+                  }
+                  @if (local.values.obj['in']) {
+                    <span class="headerType"> in {{local.values.obj['in']}}</span>
+                  }
+                  @if (local.values.obj['type']) {
+                    <span class="headerType"> ({{local.values.obj['type']}})</span>
+                  }
+                  @if (local.values.obj['description']) {
+                    <span> {{local.values.obj['description']}}</span>
+                  }
+                </div>
+                <div class="col-md-1">
+                  @if (!apis.config.readOnly && apis.isOas2) {
+                    <div class="edit-card" (click)="editParameter($event, param)">
+                      <i class="fa fa-fw fa-pencil"></i>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+            @if (uncollapsedParameter[local.values.obj['name']]) {
+              <div class="card-block">
+                @if (param['$ref']) {
+                  <p class="headerType">Defined in {{param['$ref']}}:</p>
+                }
+                <swadit-parameter-view [obj]="local.values.obj">
+                </swadit-parameter-view>
+              </div>
+            }
+          </div>
+        }
+        @if (apis.isOas3 && apis.current['paths'][path][method]['requestBody']) {
+          <div
+            swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['requestBody'])}" #local="swLet"
+            class="card mb-1">
+            <div class="card-header clickable"
+              (click)="uncollapsedParameter['x-swadit-requestBody'] = !uncollapsedParameter['x-swadit-requestBody']">
+              <div class="row">
+                <div class="col-md-11 preview">
+                  Request Body@if (local.values.obj['required']) {
+                  <span style="color: red">*</span>
+                }
+                @if (local.values.obj['description']) {
+                  <span> {{local.values.obj['description']}}</span>
+                }
+              </div>
+              <div class="col-md-1">
+                <!--
+                <div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
+                  <i class="fa fa-fw fa-pencil"></i>
+                </div>
+                -->
+              </div>
+            </div>
+          </div>
+          @if (uncollapsedParameter['x-swadit-requestBody']) {
+            <div class="card-block">
+              @for (contentType of apis.keys(local.values.obj['content']); track contentType) {
+                <div>
+                  <p>{{ contentType }}: @if (local.values.obj['content'][contentType]['schema']['$ref']) {
+                    <span class="headerType">{{ local.values.obj['content'][contentType]['schema']['$ref'] }}</span>
+                  }</p>
+                  <swadit-swagger-schema-view [obj]="apis.resolveObj(local.values.obj['content'][contentType]['schema'])">
+                  </swadit-swagger-schema-view>
+                  <!-- TODO -->
+                  @if (local.values.obj['example']) {
+                    <div>
+                      <p>Example:</p>
+                      <p><markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown></p>
+                    </div>
+                  }
+                  @if (local.values.obj['examples']) {
+                    <div>
+                      <p>Examples:</p>
+                      @for (k of apis.keys(local.values.obj['examples']); track k) {
+                        <div>
+                          <p><label>{{k}}:</label><br>
+                          <markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown>
+                        </p>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (local.values.obj['content'][contentType]['schema']) {
+                  <div>
+                    <p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+                      Example (generated)@if (showGeneratedExample) {
+                      <span>:</span>
+                      }@if (!showGeneratedExample) {
+                      <span>...</span>
+                    }
+                  </p>
+                  @if (showGeneratedExample) {
+                    <markdown
+                      [data]="generateExample(local.values.obj['content'][contentType]['schema']) | language: 'json'">
+                    </markdown>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
 </div>
-
-<div class="api-info" *ngIf="apis.current && apis.current['paths']">
-	<h1 style="margin-bottom: 0.7em">{{path}}</h1>
-
-	<!-- methods -->
-	<ul class="nav nav-tabs">
-		<li *ngFor="let m of getMethods()"
-			class="nav-item">
-			<a class="nav-link" [ngClass]="{ 'active': m==method }" 
-				href="javascript:void(0)" (click)="method=m">
-				<span style="text-transform: uppercase">{{m}}</span>
-				<span *ngIf="apis.current['paths'][path][m]['deprecated']" class="badge badge-warning">deprecated</span>
-			</a>
-		</li>
-		<li class="nav-item" *ngIf="!apis.config.readOnly && apis.isOas2">
-			<a class="nav-link" [ngClass]="{ 'active': !method }" 
-				href="javascript:void(0)" (click)="editPath($event, path)">
-				<i class="fa fa-plus"></i>
-			</a>
-		</li>
-	</ul>
-
-	<!-- (selected) operation -->
-	<div class="api-info-element" *ngIf="method && apis.current['paths'][path][method]">
-		<div class="api-info-element" *ngIf="apis.current['paths'][path][method]['summary']">
-			{{apis.current['paths'][path][method]['summary']}}
-		</div>
-		<markdown *ngIf="apis.current['paths'][path][method]['description']" class="api-info-element markdown" 
-			[data]="apis.current['paths'][path][method]['description']">
-		</markdown>
-
-		<div *ngIf="apis.current['paths'][path][method]['tags']" class="api-info-element">
-			Tags:
-			<span *ngFor="let tag of apis.current['paths'][path][method]['tags']" class="tag-badge">
-				{{tag}}
-			</span>
-		</div>
-
-		<!-- parameters -->
-		<h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
-			Parameters
-			<span class="edit-subsection" (click)="editParameter($event)" title="Add parameter" *ngIf="!apis.config.readOnly && apis.isOas2">
-				<i class="fa fa-plus"></i>
-			</span>
-		</h2>
-		<div *ngIf="!collapsedParameters">
-			<!-- parameters for all methods -->
-			<div *ngFor="let param of this.apis.current['paths'][path]['parameters']"
-				swLet [values]="{obj: apis.resolveObj(param)}" #local="swLet"
-				class="card mb-1">
-				<div class="card-header clickable" 
-					(click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
-					<div class="row">
-						<div class="col-md-11 preview">
-							{{local.values.obj['name']}}<span *ngIf="local.values.obj['required']" style="color: red">*</span>
-							<span *ngIf="local.values.obj['in']" class="headerType"> in {{local.values.obj['in']}}</span>
-							<span *ngIf="local.values.obj['type']" class="headerType"> ({{local.values.obj['type']}})</span>
-							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
-						</div>
-						<div class="col-md-1">
-							<div class="edit-card" (click)="editParameter($event, param, true)" *ngIf="!apis.config.readOnly && apis.isOas2">
-								<i class="fa fa-fw fa-pencil"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="card-block" *ngIf="uncollapsedParameter[local.values.obj['name']]">
-					<p class="headerType">This parameter applies to all operations on this path.</p>
-					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
-					<swadit-parameter-view [obj]="local.values.obj">
-					</swadit-parameter-view>
-				</div>
-			</div>
-			<!-- parameters for this method -->
-			<div *ngFor="let param of this.apis.current['paths'][path][method]['parameters']"
-				swLet [values]="{obj: apis.resolveObj(param)}" #local="swLet"
-				class="card mb-1">
-				<div class="card-header clickable" 
-					(click)="uncollapsedParameter[local.values.obj['name']] = !uncollapsedParameter[local.values.obj['name']]">
-					<div class="row">
-						<div class="col-md-11 preview">
-							{{local.values.obj['name']}}<span *ngIf="local.values.obj['required']" style="color: red">*</span>
-							<span *ngIf="local.values.obj['in']" class="headerType"> in {{local.values.obj['in']}}</span>
-							<span *ngIf="local.values.obj['type']" class="headerType"> ({{local.values.obj['type']}})</span>
-							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
-						</div>
-						<div class="col-md-1">
-							<div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
-								<i class="fa fa-fw fa-pencil"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="card-block" *ngIf="uncollapsedParameter[local.values.obj['name']]">
-					<p *ngIf="param['$ref']" class="headerType">Defined in {{param['$ref']}}:</p>
-					<swadit-parameter-view [obj]="local.values.obj">
-					</swadit-parameter-view>
-				</div>
-			</div>
-			<div *ngIf="apis.isOas3 && apis.current['paths'][path][method]['requestBody']"
-				swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['requestBody'])}" #local="swLet"
-				class="card mb-1">
-				<div class="card-header clickable" 
-					(click)="uncollapsedParameter['x-swadit-requestBody'] = !uncollapsedParameter['x-swadit-requestBody']">
-					<div class="row">
-						<div class="col-md-11 preview">
-							Request Body<span *ngIf="local.values.obj['required']" style="color: red">*</span>
-							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
-						</div>
-						<div class="col-md-1">
-							<!--
-							<div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
-								<i class="fa fa-fw fa-pencil"></i>
-							</div>
-							-->
-						</div>
-					</div>
-				</div>
-				<div class="card-block" *ngIf="uncollapsedParameter['x-swadit-requestBody']">
-					<div *ngFor="let contentType of apis.keys(local.values.obj['content'])">
-						<p>{{ contentType }}: <span *ngIf="local.values.obj['content'][contentType]['schema']['$ref']" class="headerType">{{ local.values.obj['content'][contentType]['schema']['$ref'] }}</span></p>
-						<swadit-swagger-schema-view [obj]="apis.resolveObj(local.values.obj['content'][contentType]['schema'])">
-						</swadit-swagger-schema-view>
-			
-						<!-- TODO -->
-						<div *ngIf="local.values.obj['example']">
-							<p>Example:</p>
-							<p><markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown></p>
-						</div>
-						<div *ngIf="local.values.obj['examples']">
-							<p>Examples:</p>
-							<div *ngFor="let k of apis.keys(local.values.obj['examples'])">
-								<p><label>{{k}}:</label><br>
-									<markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown>
-								</p>
-							</div>
-						</div>
-			
-						<div *ngIf="local.values.obj['content'][contentType]['schema']">
-							<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
-								Example (generated)<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
-							</p>
-							<markdown *ngIf="showGeneratedExample"
-								[data]="generateExample(local.values.obj['content'][contentType]['schema']) | language: 'json'">
-							</markdown>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<!-- responses -->
-		<h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">
-			Responses
-			<span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response" *ngIf="!apis.config.readOnly && apis.isOas2">
-				<i class="fa fa-plus"></i>
-			</span>
-		</h2>
-		<div *ngIf="!collapsedResponses && apis.current['paths'][path][method]['responses']">
-			<div *ngFor="let resp of apis.keys(apis.current['paths'][path][method]['responses'])" 
-				swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['responses'][resp])}" #local="swLet"
-				class="card mb-1">
-				<div class="card-header clickable" (click)="uncollapsedResponse[resp] = !uncollapsedResponse[resp]">
-					<div class="row">
-						<div class="col-md-11 preview">
-							{{resp}}
-							<span *ngIf="local.values.obj['schema'] && local.values.obj['schema']['type']" class="headerType"> ({{local.values.obj['schema']['type']}})</span>
-							<span *ngIf="local.values.obj['schema'] && local.values.obj['$ref']" class="headerType"> ({{local.values.obj['$ref']}})</span>
-							<span *ngIf="local.values.obj['description']"> {{local.values.obj['description']}}</span>
-						</div>
-						<div class="col-md-1">
-							<div class="edit-card" (click)="editResponse($event, path, method, resp)" *ngIf="!apis.config.readOnly && apis.isOas2">
-								<i class="fa fa-fw fa-pencil"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="card-block" *ngIf="uncollapsedResponse[resp]">
-					<p *ngIf="apis.current['paths'][path][method]['responses'][resp]['$ref']" class="headerType">
-						Defined in {{apis.current['paths'][path][method]['responses'][resp]['$ref']}}:
-					</p>
-					<swadit-response-view [obj]="local.values.obj">
-					</swadit-response-view>
-				</div>
-			</div>
-		</div>
-
-		<div *ngIf="apis.current['paths'][path][method]['schemes'] || apis.current['paths'][path][method]['operationId'] || apis.current['paths'][path][method]['consumes'] || apis.current['paths'][path][method]['produces']"
-			class="api-info-element">
-			<h2 class="clickable" (click)="collapsedInfo = !collapsedInfo">General Information</h2>
-			<table *ngIf="!collapsedInfo">
-				<tbody>
-					<tr *ngIf="apis.current['paths'][path][method]['schemes']">
-						<td class="label-text">schemes</td>
-						<td>
-							<span *ngFor="let item of apis.current['paths'][path][method]['schemes']">{{item}}&nbsp;</span>
-						</td>
-					</tr>
-					<tr *ngIf="apis.current['paths'][path][method]['operationId']">
-						<td class="label-text">operationId</td>
-						<td>{{apis.current['paths'][path][method]['operationId']}}</td>
-					</tr>
-					<tr *ngIf="apis.current['paths'][path][method]['consumes']">
-						<td class="label-text">consumes</td>
-						<td>
-							<ul class="list-unstyled">
-								<li *ngFor="let item of apis.current['paths'][path][method]['consumes']">{{item}}</li>
-							</ul>
-						</td>
-					</tr>
-					<tr *ngIf="apis.current['paths'][path][method]['produces']">
-						<td class="label-text">produces</td>
-						<td>
-							<ul class="list-unstyled">
-								<li *ngFor="let item of apis.current['paths'][path][method]['produces']">{{item}}</li>
-							</ul>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-		<div *ngIf="apis.current['paths'][path][method]['security']" class="api-info-element">
-			<h2 class="clickable" (click)="collapsedSecurity = !collapsedSecurity">Security</h2>
-			<div *ngIf="!collapsedSecurity">
-				<div *ngFor="let req of apis.current['paths'][path][method]['security']">
-					<p style="font-weight: bold">{{apis.keys(req)[0]}}</p>
-					<ul *ngIf="req[apis.keys(req)[0]].length>0">
-						<li *ngFor="let scope of req[apis.keys(req)[0]]">{{scope}}</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-
-		<div *ngIf="apis.current['paths'][path][method]['externalDocs']" class="api-info-element">
-			<h2 class="clickable" (click)="collapsedExternalDocs = !collapsedExternalDocs">Documentation</h2>
-			<p *ngIf="!collapsedExternalDocs">
-				<a href="{{apis.current['paths'][path][method]['externalDocs']['url']}}" target="_blanc">
-					<span *ngIf="apis.current['paths'][path][method]['externalDocs']['description']; else 'More'">
-						{{apis.current['paths'][path][method]['externalDocs']['description']}}
-					</span>
-				</a>
-			</p>
-		</div>
-
-		<div *ngIf="apis.hasExtensions(apis.current['paths'][path][method])" class="api-info-element">
-			<h2 class="clickable" (click)="collapsedExtensions = !collapsedExtensions">Extensions</h2>
-			<swadit-extensions-view *ngIf="!collapsedExtensions"
-				[obj]="apis.current['paths'][path][method]">
-			</swadit-extensions-view>
-		</div>
-	</div>
-
-	<div class="api-info-element" *ngIf="!method">
-		<a href="javascript:void(0)" (click)="editPath($event, path)">Add a method...</a>
-	</div>
+}
+<!-- responses -->
+<h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">
+  Responses
+  @if (!apis.config.readOnly && apis.isOas2) {
+    <span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response">
+      <i class="fa fa-plus"></i>
+    </span>
+  }
+</h2>
+@if (!collapsedResponses && apis.current['paths'][path][method]['responses']) {
+  <div>
+    @for (resp of apis.keys(apis.current['paths'][path][method]['responses']); track resp) {
+      <div
+        swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['responses'][resp])}" #local="swLet"
+        class="card mb-1">
+        <div class="card-header clickable" (click)="uncollapsedResponse[resp] = !uncollapsedResponse[resp]">
+          <div class="row">
+            <div class="col-md-11 preview">
+              {{resp}}
+              @if (local.values.obj['schema'] && local.values.obj['schema']['type']) {
+                <span class="headerType"> ({{local.values.obj['schema']['type']}})</span>
+              }
+              @if (local.values.obj['schema'] && local.values.obj['$ref']) {
+                <span class="headerType"> ({{local.values.obj['$ref']}})</span>
+              }
+              @if (local.values.obj['description']) {
+                <span> {{local.values.obj['description']}}</span>
+              }
+            </div>
+            <div class="col-md-1">
+              @if (!apis.config.readOnly && apis.isOas2) {
+                <div class="edit-card" (click)="editResponse($event, path, method, resp)">
+                  <i class="fa fa-fw fa-pencil"></i>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+        @if (uncollapsedResponse[resp]) {
+          <div class="card-block">
+            @if (apis.current['paths'][path][method]['responses'][resp]['$ref']) {
+              <p class="headerType">
+                Defined in {{apis.current['paths'][path][method]['responses'][resp]['$ref']}}:
+              </p>
+            }
+            <swadit-response-view [obj]="local.values.obj">
+            </swadit-response-view>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+@if (apis.current['paths'][path][method]['schemes'] || apis.current['paths'][path][method]['operationId'] || apis.current['paths'][path][method]['consumes'] || apis.current['paths'][path][method]['produces']) {
+  <div
+    class="api-info-element">
+    <h2 class="clickable" (click)="collapsedInfo = !collapsedInfo">General Information</h2>
+    @if (!collapsedInfo) {
+      <table>
+        <tbody>
+          @if (apis.current['paths'][path][method]['schemes']) {
+            <tr>
+              <td class="label-text">schemes</td>
+              <td>
+                @for (item of apis.current['paths'][path][method]['schemes']; track item) {
+                  <span>{{item}}&nbsp;</span>
+                }
+              </td>
+            </tr>
+          }
+          @if (apis.current['paths'][path][method]['operationId']) {
+            <tr>
+              <td class="label-text">operationId</td>
+              <td>{{apis.current['paths'][path][method]['operationId']}}</td>
+            </tr>
+          }
+          @if (apis.current['paths'][path][method]['consumes']) {
+            <tr>
+              <td class="label-text">consumes</td>
+              <td>
+                <ul class="list-unstyled">
+                  @for (item of apis.current['paths'][path][method]['consumes']; track item) {
+                    <li>{{item}}</li>
+                  }
+                </ul>
+              </td>
+            </tr>
+          }
+          @if (apis.current['paths'][path][method]['produces']) {
+            <tr>
+              <td class="label-text">produces</td>
+              <td>
+                <ul class="list-unstyled">
+                  @for (item of apis.current['paths'][path][method]['produces']; track item) {
+                    <li>{{item}}</li>
+                  }
+                </ul>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+}
+@if (apis.current['paths'][path][method]['security']) {
+  <div class="api-info-element">
+    <h2 class="clickable" (click)="collapsedSecurity = !collapsedSecurity">Security</h2>
+    @if (!collapsedSecurity) {
+      <div>
+        @for (req of apis.current['paths'][path][method]['security']; track req) {
+          <div>
+            <p style="font-weight: bold">{{apis.keys(req)[0]}}</p>
+            @if (req[apis.keys(req)[0]].length>0) {
+              <ul>
+                @for (scope of req[apis.keys(req)[0]]; track scope) {
+                  <li>{{scope}}</li>
+                }
+              </ul>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+}
+@if (apis.current['paths'][path][method]['externalDocs']) {
+  <div class="api-info-element">
+    <h2 class="clickable" (click)="collapsedExternalDocs = !collapsedExternalDocs">Documentation</h2>
+    @if (!collapsedExternalDocs) {
+      <p>
+        <a href="{{apis.current['paths'][path][method]['externalDocs']['url']}}" target="_blanc">
+          @if (apis.current['paths'][path][method]['externalDocs']['description']) {
+            <span>
+              {{apis.current['paths'][path][method]['externalDocs']['description']}}
+            </span>
+          } @else {
+            <ng-template [ngTemplateOutlet]="'More'"></ng-template>
+          }
+        </a>
+      </p>
+    }
+  </div>
+}
+@if (apis.hasExtensions(apis.current['paths'][path][method])) {
+  <div class="api-info-element">
+    <h2 class="clickable" (click)="collapsedExtensions = !collapsedExtensions">Extensions</h2>
+    @if (!collapsedExtensions) {
+      <swadit-extensions-view
+        [obj]="apis.current['paths'][path][method]">
+      </swadit-extensions-view>
+    }
+  </div>
+}
 </div>
+}
+@if (!method) {
+  <div class="api-info-element">
+    <a href="javascript:void(0)" (click)="editPath($event, path)">Add a method...</a>
+  </div>
+}
+</div>
+}

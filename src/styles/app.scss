@@ -1,10 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
-@import "theme";
-@import "spinner";
-@import "utils";
-@import "rtl";
-@import "responsive";
-@import "themeOverrides";
+@use "theme";
+@use "spinner";
+@use "utils";
+@use "rtl";
+@use "responsive";
+@use "themeOverrides";
 
 p, table {
 	margin-bottom: 0.5rem;
@@ -195,4 +195,22 @@ pre[class*="language-"]::before, pre[class*="language-"]::after {
 .card-header {
 	margin-bottom: 0;
 	border: none;
+}
+/* route transitions for animate.enter / animate.leave (formerly @angular/animations slideToTop) */
+@keyframes route-slide-in {
+	from { transform: translateY(100%); }
+	to { transform: translateY(0%); }
+}
+
+@keyframes route-slide-out {
+	from { transform: translateY(0%); }
+	to { transform: translateY(-100%); }
+}
+
+.route-enter {
+	animation: route-slide-in 0.5s ease-in-out;
+}
+
+.route-leave {
+	animation: route-slide-out 0.5s ease-in-out;
 }

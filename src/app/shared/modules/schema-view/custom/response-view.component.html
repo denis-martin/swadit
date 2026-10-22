@@ -1,95 +1,133 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <div class="schemaView">
-	<markdown *ngIf="obj['description']" class="markdown" 
-		[data]="obj['description']">
-	</markdown>
+  @if (obj['description']) {
+    <markdown class="markdown"
+      [data]="obj['description']">
+    </markdown>
+  }
 
-	<!-- OAS2: schema -->
-	<div *ngIf="apis.isOas2">
-		<div *ngIf="obj['schema']">
-			<p>
-				Response schema:
-				<span *ngIf="obj['schema']['$ref']" class="headerType">{{obj['schema']['$ref']}}</span>
-			</p>
-			<swadit-swagger-schema-view [obj]="apis.resolveObj(obj['schema'])">
-			</swadit-swagger-schema-view>
-		</div>
-		
-		<!-- TODO -->
-		<div *ngIf="obj['examples']">
-			<p>Examples:</p>
-			<div *ngFor="let k of apis.keys(obj['examples'])">
-				<p><label>{{k}}:</label><br>
-					<markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown>
-				</p>
-			</div>
-		</div>
+  <!-- OAS2: schema -->
+  @if (apis.isOas2) {
+    <div>
+      @if (obj['schema']) {
+        <div>
+          <p>
+            Response schema:
+            @if (obj['schema']['$ref']) {
+              <span class="headerType">{{obj['schema']['$ref']}}</span>
+            }
+          </p>
+          <swadit-swagger-schema-view [obj]="apis.resolveObj(obj['schema'])">
+          </swadit-swagger-schema-view>
+        </div>
+      }
+      <!-- TODO -->
+      @if (obj['examples']) {
+        <div>
+          <p>Examples:</p>
+          @for (k of apis.keys(obj['examples']); track k) {
+            <div>
+              <p><label>{{k}}:</label><br>
+              <markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown>
+            </p>
+          </div>
+        }
+      </div>
+    }
+    @if (obj['schema']) {
+      <div>
+        <p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+          Example (generated)@if (showGeneratedExample) {
+          <span>:</span>
+          }@if (!showGeneratedExample) {
+          <span>...</span>
+        }
+      </p>
+      @if (showGeneratedExample) {
+        <markdown
+          [data]="generateExample(obj['schema']) | language: 'json'">
+        </markdown>
+      }
+    </div>
+  }
+</div>
+}
 
-		<div *ngIf="obj['schema']">
-			<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
-				Example (generated)<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
-			</p>
-			<markdown *ngIf="showGeneratedExample"
-				[data]="generateExample(obj['schema']) | language: 'json'">
-			</markdown>
-		</div>
-	</div>
+<!-- OAS3: schema -->
+@if (apis.isOas3 && obj['content']) {
+  <div>
+    @for (contentType of apis.keys(obj['content']); track contentType) {
+      <div>
+        <p>
+          Response as {{ contentType }}:
+          @if (obj['content'][contentType]['schema']['$ref']) {
+            <span class="headerType">{{obj['content'][contentType]['schema']['$ref']}}</span>
+          }
+        </p>
+        <swadit-swagger-schema-view [obj]="apis.resolveObj(obj['content'][contentType]['schema'])">
+        </swadit-swagger-schema-view>
+        <!-- TODO -->
+        @if (obj['example']) {
+          <div>
+            <p>Example:</p>
+            <p><markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown></p>
+          </div>
+        }
+        @if (obj['examples']) {
+          <div>
+            <p>Examples:</p>
+            @for (k of apis.keys(obj['examples']); track k) {
+              <div>
+                <p><label>{{k}}:</label><br>
+                <markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown>
+              </p>
+            </div>
+          }
+        </div>
+      }
+      @if (obj['content'][contentType]['schema']) {
+        <div>
+          <p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
+            Example (generated)@if (showGeneratedExample) {
+            <span>:</span>
+            }@if (!showGeneratedExample) {
+            <span>...</span>
+          }
+        </p>
+        @if (showGeneratedExample) {
+          <markdown
+            [data]="generateExample(obj['content'][contentType]['schema']) | language: 'json'">
+          </markdown>
+        }
+      </div>
+    }
+  </div>
+}
+</div>
+}
 
-	<!-- OAS3: schema -->
-	<div *ngIf="apis.isOas3 && obj['content']">
-		<div *ngFor="let contentType of apis.keys(obj['content'])">
-			<p>
-				Response as {{ contentType }}:
-				<span *ngIf="obj['content'][contentType]['schema']['$ref']" class="headerType">{{obj['content'][contentType]['schema']['$ref']}}</span>
-			</p>
-			<swadit-swagger-schema-view [obj]="apis.resolveObj(obj['content'][contentType]['schema'])">
-			</swadit-swagger-schema-view>
+<!-- TODO: headers -->
 
-			<!-- TODO -->
-			<div *ngIf="obj['example']">
-				<p>Example:</p>
-				<p><markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown></p>
-			</div>
-			<div *ngIf="obj['examples']">
-				<p>Examples:</p>
-				<div *ngFor="let k of apis.keys(obj['examples'])">
-					<p><label>{{k}}:</label><br>
-						<markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown>
-					</p>
-				</div>
-			</div>
-
-			<div *ngIf="obj['content'][contentType]['schema']">
-				<p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
-					Example (generated)<span *ngIf="showGeneratedExample">:</span><span *ngIf="!showGeneratedExample">...</span>
-				</p>
-				<markdown *ngIf="showGeneratedExample"
-					[data]="generateExample(obj['content'][contentType]['schema']) | language: 'json'">
-				</markdown>
-			</div>
-		</div>
-	</div>
-
-	<!-- TODO: headers -->
-
-	<div *ngIf="obj['headers']">
-		<p>Headers:</p>
-		<markdown [data]="apis.toYaml(obj['headers']) | language: 'yaml'"></markdown>
-	</div>
+@if (obj['headers']) {
+  <div>
+    <p>Headers:</p>
+    <markdown [data]="apis.toYaml(obj['headers']) | language: 'yaml'"></markdown>
+  </div>
+}
 </div>

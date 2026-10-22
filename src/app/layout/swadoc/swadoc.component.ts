@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { ApisService } from '../../shared/services';
 
 @Component({
-	selector: 'app-swadoc',
-	templateUrl: './swadoc.component.html',
-	styleUrls: ['./swadoc.component.scss']
+    selector: 'app-swadoc',
+    templateUrl: './swadoc.component.html',
+    styleUrls: ['./swadoc.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class SwadocComponent implements OnInit {
 

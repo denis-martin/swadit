@@ -1,191 +1,241 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-<div *ngIf="obj['allOf']">
-	<div *ngFor="let allOfObj of obj['allOf']; let i = index">
-		<label>Composite schema item {{i+1}}:</label>
-		<span class="clickable" (click)="deleteAllOfItem($event, i)">
-			<i class="fa fa-fw fa-trash"></i>
-		</span>
-		<swadit-swagger-schema-editor [(obj)]="obj['allOf'][i]" [allowComposite]="false">
-		</swadit-swagger-schema-editor>
-	</div>
-	<button
-		type="button" class="btn" (click)="addToAllOf(obj)"
-		title='adds a new schema to the composite ("allOf")'>
-		add schema
-	</button>
-	<button *ngIf="obj['allOf'].length <= 1"
-		type="button" class="btn" (click)="convertToSingleSchema(obj)"
-		title='remove the composite ("allOf")'>
-		remove composite
-	</button>
-</div>
+@if (obj['allOf']) {
+  <div>
+    @for (allOfObj of obj['allOf']; track allOfObj; let i = $index) {
+      <div>
+        <label>Composite schema item {{i+1}}:</label>
+        <span class="clickable" (click)="deleteAllOfItem($event, i)">
+          <i class="fa fa-fw fa-trash"></i>
+        </span>
+        <swadit-swagger-schema-editor [(obj)]="obj['allOf'][i]" [allowComposite]="false">
+        </swadit-swagger-schema-editor>
+      </div>
+    }
+    <button
+      type="button" class="btn" (click)="addToAllOf(obj)"
+      title='adds a new schema to the composite ("allOf")'>
+      add schema
+    </button>
+    @if (obj['allOf'].length <= 1) {
+      <button
+        type="button" class="btn" (click)="convertToSingleSchema(obj)"
+        title='remove the composite ("allOf")'>
+        remove composite
+      </button>
+    }
+  </div>
+}
 
-<table *ngIf="!obj['allOf']" class="swagger-schema-editor border-left">
-	<tr *ngIf="obj['$ref']">
-		<td class="label-text">$ref</td>
-		<td>
-			<select [(ngModel)]="obj['$ref']" class="form-control schema-control" style="max-width: 15em"
-				title="Reference to a #/definition">
-				<option value="">(none)</option>
-				<option *ngFor="let def of keys(apis.current['definitions'])" value="#/definitions/{{def}}">
-					{{def}}
-				</option>
-			</select>
-		</td>
-	</tr>
-
-	<tr *ngIf="!obj['$ref'] && schema['properties']">
-		<td class="label-text">type</td>
-		<td class="no-padding">
-			<table>
-				<tr>
-					<td>
-						<select id="{{id}}" [(ngModel)]="obj['type']" title="Type" class="form-control schema-control">
-							<option *ngFor="let t of schema['properties']['type']['anyOf'][0]['enum']" value="{{t}}">
-								{{t}}
-							</option>
-						</select>
-					</td>
-					<td class="label-text">or $ref</td>
-					<td class="no-padding">
-						<select [(ngModel)]="obj['$ref']" class="form-control schema-control" style="max-width: 15em"
-							title="Reference to a #/definition">
-							<option value="">(none)</option>
-							<option *ngFor="let def of keys(apis.current['definitions'])" value="#/definitions/{{def}}">
-								{{def}}
-							</option>
-						</select>
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	<tr *ngIf="!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array'">
-		<td class="label-text">format</td>
-		<td><input type="text" class="form-control schema-control" elastic-input
-				title="Format of type (optional). Examples:&#10;integer: int32, int64&#10;number: float, double&#10;string: byte, binary, date, date-time, password"
-				placeholder="Format (optional)" [(ngModel)]="obj['format']">
-		</td>
-	</tr>
-	
-	<tr *ngIf="!obj['$ref']">
-		<td class="label-text">description</td>
-		<td><textarea title="Description (optional)" placeholder="Description (optional)" cols="30" rows="1" 
-			class="form-control schema-control" fz-elastic
-			[(ngModel)]="obj['description']"></textarea></td>
-	</tr>
-	
-	<!-- TODO: validate field -->
-	<tr *ngIf="!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array'">
-		<td class="label-text">default</td>
-		<td><input type="text" title="Default value (optional)" placeholder="Default value (optional)" elastic-input
-			[(ngModel)]="obj['default']" class="form-control schema-control">
-		</td>
-	</tr>
-	<!-- TODO: validate field -->
-	<tr *ngIf="!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array'">
-		<td class="label-text">example</td>
-		<td><input type="text" title="Example value (optional)" placeholder="Example value (optional)" elastic-input
-				[(ngModel)]="obj['example']" class="form-control schema-control">
-		</td>
-	</tr>
-
-	<tr *ngIf="!obj['$ref'] && obj['type'] == 'array'">
-		<td class="label-text clickable" (click)="itemsVisible = !itemsVisible" title="Show/hide the details of the items">
-			<i *ngIf="obj['items'] && !obj['items']['$ref'] && !itemsVisible" class="fa fa-caret-right"></i>
-			<i *ngIf="obj['items'] && !obj['items']['$ref'] && itemsVisible" class="fa fa-caret-down"></i>
-			items
-		</td>
-		<td class="no-padding">
-			<button *ngIf="!obj['items'] || (!obj['items']['$ref'] && !obj['items']['type'])" 
-				class="btn"
-				(click)="obj['items'] = { 'type': 'string'}; itemsVisible = true">
-				add
-			</button>
-			<div *ngIf="obj['items'] && !obj['items']['$ref'] && obj['items']['type'] && !itemsVisible" 
-				class="typePreview clickable" (click)="itemsVisible = !itemsVisible" title="Show/hide the details of the items">
-				{{obj['items']['type']}}
-			</div>
-			<swadit-swagger-schema-editor *ngIf="obj['items'] && (itemsVisible || obj['items']['$ref'])"
-				[schema]="apis.schemas['schema']" [(obj)]="obj['items']" [id]="id+'_items'">
-			</swadit-swagger-schema-editor>
-		</td>
-	</tr>
-	
-	<tr *ngIf="!obj['$ref'] && obj['type'] == 'object'">
-		<td class="label-text">properties</td>
-		<td class="no-padding-right">
-			<div *ngFor="let propKey of keys(obj['properties']); let index = index; trackBy:trackByIndex">
-				<div class="input-group input-group-overlapping-border">
-					<span class="input-group-addon clickable propertyTypeAddon" (click)="uncollapsed[propKey] = !uncollapsed[propKey]">
-						<span>
-							<i *ngIf="!uncollapsed[propKey]" class="fa fa-fw-sm fa-caret-right"></i>
-							<i *ngIf="uncollapsed[propKey]" class="fa fa-fw-sm fa-caret-down"></i>
-							<span *ngIf="!obj['properties'][propKey]['$ref'] && (obj['properties'][propKey]['type'] || obj['properties'][propKey]['allOf'])">
-								{{getType(obj['properties'][propKey])}}</span>
-							<span *ngIf="obj['properties'][propKey]['$ref']">
-								$ref</span>
-						</span>
-					</span>
-					<span class="input-group-addon clickable propertyRequired" 
-						[ngClass]="{'propertyIsRequired': propertyIsRequired(propKey)}"
-						title="Set property as required property"
-						(click)="changePropertyIsRequired(propKey)">
-						<i class="fa fa-asterisk"></i>
-					</span>
-					<input type="text" placeholder="Name of property" title="Name of property" required
-						class="form-control schema-control" id="{{id}}_{{propKey}}" name="{{id}}_{{propKey}}"
-						[ngModel]="propKey"
-						(ngModelChange)="changeProperty($event, propKey)"
-						(keydown.enter)="changePropertyKeyDown($event, propKey)">
-					<span class="input-group-addon clickable" (click)="deleteProperty($event, propKey)">
-						<i class="fa fa-fw fa-trash"></i>
-					</span>
-				</div>
-				<div *ngIf="uncollapsed[propKey]" style="margin-top: 2px; margin-bottom: 1px">
-					<swadit-swagger-schema-editor
-						[schema]="apis.schemas['schema']" [(obj)]="obj['properties'][propKey]" [id]="id+'_'+propKey">
-					</swadit-swagger-schema-editor>
-				</div>
-			</div>
-			<div class="input-group" [ngClass]="{'propertyAddMargin': keys(obj['properties']).length>0}">
-				<div class="input-group-addon" title="{{addPropertyError}}" *ngIf="addPropertyError">
-					<i class="fa fa-fw-sm fa-exclamation" style="color: red"></i>
-				</div>
-				<input type="text" placeholder="Name of property to add" title="Name of property to add" 
-					class="form-control schema-control" 
-					[(ngModel)]="propertyToAdd" (keydown.enter)="addProperty($event)">
-				<div class="input-group-addon clickable" (click)="addProperty($event)" title="Adds a new property to the object schema">
-					<i class="fa fa-fw fa-plus"></i>
-				</div>
-			</div>
-		</td>
-	</tr>
-
-	<tr *ngIf="allowComposite && (obj['$ref'] || obj['type']=='object')">
-		<td class="label-text">&nbsp;</td>
-		<td>
-			<button 
-				class="btn" (click)="convertToAllOf(obj)"
-				title='create a composite schema ("allOf")'>
-				create composite
-			</button>
-		</td>
-	</tr>
-</table>
+@if (!obj['allOf']) {
+  <table class="swagger-schema-editor border-left">
+    @if (obj['$ref']) {
+      <tr>
+        <td class="label-text">$ref</td>
+        <td>
+          <select [(ngModel)]="obj['$ref']" [ngModelOptions]="{standalone: true}" class="form-control schema-control" style="max-width: 15em"
+            title="Reference to a #/definition">
+            <option value="">(none)</option>
+            @for (def of keys(apis.current['definitions']); track def) {
+              <option value="#/definitions/{{def}}">
+                {{def}}
+              </option>
+            }
+          </select>
+        </td>
+      </tr>
+    }
+    @if (!obj['$ref'] && schema['properties']) {
+      <tr>
+        <td class="label-text">type</td>
+        <td class="no-padding">
+          <table>
+            <tr>
+              <td>
+                <select id="{{id}}" [(ngModel)]="obj['type']" [ngModelOptions]="{standalone: true}" title="Type" class="form-control schema-control">
+                  @for (t of schema['properties']['type']['anyOf'][0]['enum']; track t) {
+                    <option value="{{t}}">
+                      {{t}}
+                    </option>
+                  }
+                </select>
+              </td>
+              <td class="label-text">or $ref</td>
+              <td class="no-padding">
+                <select [(ngModel)]="obj['$ref']" [ngModelOptions]="{standalone: true}" class="form-control schema-control" style="max-width: 15em"
+                  title="Reference to a #/definition">
+                  <option value="">(none)</option>
+                  @for (def of keys(apis.current['definitions']); track def) {
+                    <option value="#/definitions/{{def}}">
+                      {{def}}
+                    </option>
+                  }
+                </select>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    }
+    @if (!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array') {
+      <tr>
+        <td class="label-text">format</td>
+        <td><input type="text" class="form-control schema-control" elastic-input
+          title="Format of type (optional). Examples:&#10;integer: int32, int64&#10;number: float, double&#10;string: byte, binary, date, date-time, password"
+          placeholder="Format (optional)" [(ngModel)]="obj['format']" [ngModelOptions]="{standalone: true}">
+        </td>
+      </tr>
+    }
+    @if (!obj['$ref']) {
+      <tr>
+        <td class="label-text">description</td>
+        <td><textarea title="Description (optional)" placeholder="Description (optional)" cols="30" rows="1"
+          class="form-control schema-control" fz-elastic
+        [(ngModel)]="obj['description']" [ngModelOptions]="{standalone: true}"></textarea></td>
+      </tr>
+    }
+    <!-- TODO: validate field -->
+    @if (!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array') {
+      <tr>
+        <td class="label-text">default</td>
+        <td><input type="text" title="Default value (optional)" placeholder="Default value (optional)" elastic-input
+          [(ngModel)]="obj['default']" [ngModelOptions]="{standalone: true}" class="form-control schema-control">
+        </td>
+      </tr>
+    }
+    <!-- TODO: validate field -->
+    @if (!obj['$ref'] && obj['type'] != 'object' && obj['type'] != 'array') {
+      <tr>
+        <td class="label-text">example</td>
+        <td><input type="text" title="Example value (optional)" placeholder="Example value (optional)" elastic-input
+          [(ngModel)]="obj['example']" [ngModelOptions]="{standalone: true}" class="form-control schema-control">
+        </td>
+      </tr>
+    }
+    @if (!obj['$ref'] && obj['type'] == 'array') {
+      <tr>
+        <td class="label-text clickable" (click)="itemsVisible = !itemsVisible" title="Show/hide the details of the items">
+          @if (obj['items'] && !obj['items']['$ref'] && !itemsVisible) {
+            <i class="fa fa-caret-right"></i>
+          }
+          @if (obj['items'] && !obj['items']['$ref'] && itemsVisible) {
+            <i class="fa fa-caret-down"></i>
+          }
+          items
+        </td>
+        <td class="no-padding">
+          @if (!obj['items'] || (!obj['items']['$ref'] && !obj['items']['type'])) {
+            <button
+              class="btn"
+              (click)="obj['items'] = { 'type': 'string'}; itemsVisible = true">
+              add
+            </button>
+          }
+          @if (obj['items'] && !obj['items']['$ref'] && obj['items']['type'] && !itemsVisible) {
+            <div
+              class="typePreview clickable" (click)="itemsVisible = !itemsVisible" title="Show/hide the details of the items">
+              {{obj['items']['type']}}
+            </div>
+          }
+          @if (obj['items'] && (itemsVisible || obj['items']['$ref'])) {
+            <swadit-swagger-schema-editor
+              [schema]="apis.schemas['schema']" [(obj)]="obj['items']" [id]="id+'_items'">
+            </swadit-swagger-schema-editor>
+          }
+        </td>
+      </tr>
+    }
+    @if (!obj['$ref'] && obj['type'] == 'object') {
+      <tr>
+        <td class="label-text">properties</td>
+        <td class="no-padding-right">
+          @for (propKey of keys(obj['properties']); track trackByIndex(index, propKey); let index = $index) {
+            <div>
+              <div class="input-group input-group-overlapping-border">
+                <span class="input-group-addon clickable propertyTypeAddon" (click)="uncollapsed[propKey] = !uncollapsed[propKey]">
+                  <span>
+                    @if (!uncollapsed[propKey]) {
+                      <i class="fa fa-fw-sm fa-caret-right"></i>
+                    }
+                    @if (uncollapsed[propKey]) {
+                      <i class="fa fa-fw-sm fa-caret-down"></i>
+                    }
+                    @if (!obj['properties'][propKey]['$ref'] && (obj['properties'][propKey]['type'] || obj['properties'][propKey]['allOf'])) {
+                      <span>
+                      {{getType(obj['properties'][propKey])}}</span>
+                    }
+                    @if (obj['properties'][propKey]['$ref']) {
+                      <span>
+                      $ref</span>
+                    }
+                  </span>
+                </span>
+                <span class="input-group-addon clickable propertyRequired"
+                  [ngClass]="{'propertyIsRequired': propertyIsRequired(propKey)}"
+                  title="Set property as required property"
+                  (click)="changePropertyIsRequired(propKey)">
+                  <i class="fa fa-asterisk"></i>
+                </span>
+                <input type="text" placeholder="Name of property" title="Name of property" required
+                  class="form-control schema-control" id="{{id}}_{{propKey}}" name="{{id}}_{{propKey}}"
+                  [ngModel]="propKey"
+                  (ngModelChange)="changeProperty($event, propKey)"
+                  (keydown.enter)="changePropertyKeyDown($event, propKey)">
+                <span class="input-group-addon clickable" (click)="deleteProperty($event, propKey)">
+                  <i class="fa fa-fw fa-trash"></i>
+                </span>
+              </div>
+              @if (uncollapsed[propKey]) {
+                <div style="margin-top: 2px; margin-bottom: 1px">
+                  <swadit-swagger-schema-editor
+                    [schema]="apis.schemas['schema']" [(obj)]="obj['properties'][propKey]" [id]="id+'_'+propKey">
+                  </swadit-swagger-schema-editor>
+                </div>
+              }
+            </div>
+          }
+          <div class="input-group" [ngClass]="{'propertyAddMargin': keys(obj['properties']).length>0}">
+            @if (addPropertyError) {
+              <div class="input-group-addon" title="{{addPropertyError}}">
+                <i class="fa fa-fw-sm fa-exclamation" style="color: red"></i>
+              </div>
+            }
+            <input type="text" placeholder="Name of property to add" title="Name of property to add"
+              class="form-control schema-control"
+              [(ngModel)]="propertyToAdd" [ngModelOptions]="{standalone: true}" (keydown.enter)="addProperty($event)">
+            <div class="input-group-addon clickable" (click)="addProperty($event)" title="Adds a new property to the object schema">
+              <i class="fa fa-fw fa-plus"></i>
+            </div>
+          </div>
+        </td>
+      </tr>
+    }
+    @if (allowComposite && (obj['$ref'] || obj['type']=='object')) {
+      <tr>
+        <td class="label-text">&nbsp;</td>
+        <td>
+          <button
+            class="btn" (click)="convertToAllOf(obj)"
+            title='create a composite schema ("allOf")'>
+            create composite
+          </button>
+        </td>
+      </tr>
+    }
+  </table>
+}

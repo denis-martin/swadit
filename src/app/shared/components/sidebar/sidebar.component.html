@@ -1,105 +1,141 @@
 <nav class="sidebar" [ngClass]="{sidebarPushRight: isActive}">
-    <ul class="list-group">
-        <div class="nested-menu when-collapsed">
-            <a class="list-group-item" (click)="addExpandClass('file')">
-                <span><i class="fa fa-fw fa-folder-open"></i> {{ apis.config.menu.title }}</span>
-            </a>
-            <li class="nested" [class.expand]="showMenu === 'file'">
-                <ul class="submenu">
-                    <li *ngFor="let catItem of apis.config.catalog">
-                        <a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFile(catItem.path)">
-                        <i class="fa fa-fw fa-folder-open"></i> {{ catItem.title }}</a></li>
-                    <li *ngIf="!apis.config.menu.hideItems['new']">
-                        <a href="javascript:void(0)" (click)="apis.newFile()">
-                        <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a></li>
-                    <li *ngIf="!apis.config.menu.hideItems['open']">
-                        <a href="javascript:void(0)" (click)="apis.openFileModal()">
+  <ul class="list-group">
+    <div class="nested-menu when-collapsed">
+      <a class="list-group-item" (click)="addExpandClass('file')">
+        <span><i class="fa fa-fw fa-folder-open"></i> {{ apis.config.menu.title }}</span>
+      </a>
+      <li class="nested" [class.expand]="showMenu === 'file'">
+        <ul class="submenu">
+          @for (catItem of apis.config.catalog; track catItem) {
+            <li>
+              <a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFile(catItem.path)">
+                <i class="fa fa-fw fa-folder-open"></i> {{ catItem.title }}</a></li>
+              }
+              @if (!apis.config.menu.hideItems['new']) {
+                <li>
+                  <a href="javascript:void(0)" (click)="apis.newFile()">
+                    <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a></li>
+                  }
+                  @if (!apis.config.menu.hideItems['open']) {
+                    <li>
+                      <a href="javascript:void(0)" (click)="apis.openFileModal()">
                         <i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a></li>
-                    <li *ngIf="!apis.config.menu.hideItems['add'] && apis.isOas2">
-                        <a href="javascript:void(0)" (click)="apis.addFilesModal()">
-                        <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>
-                    <li *ngIf="!apis.config.menu.hideItems['download']">
-                        <a href="javascript:void(0)" (click)="apis.downloadFileModal()">
-                        <i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a></li>
-                    <li *ngIf="!apis.config.menu.hideItems['source']">
-                        <a [routerLink]="['/source']">
-                        <i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a></li>
-                    <!--
-                    <li><a [routerLink]="['/print']">
-                        <i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a></li>
-                    -->
-                    <li *ngIf="!apis.config.menu.hideItems['printPreview'] && apis.isOas2">
-                        <a [routerLink]="['/swadoc']">
-                        <i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a></li>
-                    <li *ngIf="!apis.config.menu.hideItems['swaggerUi']">
-                        <a [routerLink]="['/swaggerui']">
-                        <i class="fa fa-fw fa-eye"></i> Swagger UI</a></li>
-                    <!--
-                    <li><a href="javascript:void(0)" (click)="apis.settingsModal()">
-                        <i class="fa fa-fw fa-cog"></i> {{ 'Settings' | translate }}</a></li>
-                    -->
-                </ul>
-            </li>
-        </div>
-        <a [routerLink]="['/api-info']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-info"></i>&nbsp;API Info
-        </a>
-        <a [routerLink]="['/definitions']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-book"></i>&nbsp;Definitions
-        </a>
-        <a [routerLink]="['/paths']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-fw fa-road"></i>&nbsp;Paths
-        </a>
+                      }
+                      @if (!apis.config.menu.hideItems['add'] && apis.isOas2) {
+                        <li>
+                          <a href="javascript:void(0)" (click)="apis.addFilesModal()">
+                            <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>
+                          }
+                          @if (!apis.config.menu.hideItems['download']) {
+                            <li>
+                              <a href="javascript:void(0)" (click)="apis.downloadFileModal()">
+                                <i class="fa fa-fw fa-download"></i> {{ 'Download' | translate }}</a></li>
+                              }
+                              @if (!apis.config.menu.hideItems['source']) {
+                                <li>
+                                  <a [routerLink]="['/source']">
+                                    <i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a></li>
+                                  }
+                                  <!--
+                                  <li><a [routerLink]="['/print']">
+                                    <i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a></li>
+                                    -->
+                                    @if (!apis.config.menu.hideItems['printPreview'] && apis.isOas2) {
+                                      <li>
+                                        <a [routerLink]="['/swadoc']">
+                                          <i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a></li>
+                                        }
+                                        @if (!apis.config.menu.hideItems['swaggerUi']) {
+                                          <li>
+                                            <a [routerLink]="['/swaggerui']">
+                                              <i class="fa fa-fw fa-eye"></i> Swagger UI</a></li>
+                                            }
+                                            <!--
+                                            <li><a href="javascript:void(0)" (click)="apis.settingsModal()">
+                                              <i class="fa fa-fw fa-cog"></i> {{ 'Settings' | translate }}</a></li>
+                                              -->
+                                            </ul>
+                                          </li>
+                                        </div>
+                                        <a [routerLink]="['/api-info']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+                                          <i class="fa fa-fw fa-info"></i>&nbsp;API Info
+                                        </a>
+                                        <a [routerLink]="['/definitions']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+                                          <i class="fa fa-fw fa-book"></i>&nbsp;Definitions
+                                        </a>
+                                        <a [routerLink]="['/paths']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+                                          <i class="fa fa-fw fa-road"></i>&nbsp;Paths
+                                        </a>
 
-        <div class="list-group-item">
-            <input type="text" class="form-control" placeholder="Filter paths" [(ngModel)]="filterText">
-            <span class="input-clear-button" *ngIf="filterText" (click)="filterText=''">
-                <i class="fa fa-times"></i>
-            </span>
-        </div>
+                                        <div class="list-group-item">
+                                          <input type="text" class="form-control" placeholder="Filter paths" [(ngModel)]="filterText">
+                                          @if (filterText) {
+                                            <span class="input-clear-button" (click)="filterText=''">
+                                              <i class="fa fa-times"></i>
+                                            </span>
+                                          }
+                                        </div>
 
-        <a *ngFor="let p of apis.filterList(apis.keys(apis.current['paths']), filterText, true); let index = index"
-            [routerLink]="['/path', p]" [routerLinkActive]="['router-link-active']" class="list-group-item" 
-            style="font-size: 80%">
-            {{p}}
-        </a>
+                                        @for (p of apis.filterList(apis.keys(apis.current['paths']), filterText, true); track p; let index = $index) {
+                                          <a
+                                            [routerLink]="['/path', p]" [routerLinkActive]="['router-link-active']" class="list-group-item"
+                                            style="font-size: 80%">
+                                            {{p}}
+                                          </a>
+                                        }
 
-        <!--
-        <div class="nested-menu">
-            <a class="list-group-item" (click)="addExpandClass('pages')">
-                <span><i class="fa fa-plus"></i>&nbsp; {{ 'Menu' | translate }}</span>
-            </a>
-            <li class="nested" [class.expand]="showMenu === 'pages'">
-                <ul class="submenu">
-                    <li>
-                        <a href="javascript:void(0)"><span>{{ 'Submenu' | translate }}</span></a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)"><span>{{ 'Submenu' | translate }}</span></a>
-                    </li>
-                    <li>
-                        <a href="javascript:void(0)"><span>{{ 'Submenu' | translate }}</span></a>
-                    </li>
-                </ul>
-            </li>
-        </div>
-        <a [routerLink]="['/blank-page']" [routerLinkActive]="['router-link-active']" class="list-group-item">
-            <i class="fa fa-file-o"></i>&nbsp;{{ 'Blank Page' | translate }}
-        </a>
-        -->
-    </ul>
-    <div class="footerLinks">
-        <p>
-            <a href="https://github.com/denis-martin/swadit/issues" target="_blank">Support &amp; Bug Reports</a>
-        </p>
-        <p *ngIf="apis.config.termsOfUseLink || apis.config.licensesLink || apis.config.privacyPolicyLink || apis.config.imprintLink">
-            <a href="{{ apis.config.licensesLink }}" target="_blank" *ngIf="apis.config.licensesLink">Licenses</a>
-            <span *ngIf="apis.config.termsOfUseLink && apis.config.licensesLink"> &nbsp;&bull;&nbsp; </span>
-            <a href="{{ apis.config.termsOfUseLink }}" target="_blank" *ngIf="apis.config.termsOfUseLink">Terms of Use</a> 
-            <span *ngIf="(apis.config.termsOfUseLink || apis.config.licensesLink) && (apis.config.privacyPolicyLink || apis.config.imprintLink)"><br></span>
-            <a href="{{ apis.config.privacyPolicyLink }}" target="_blank" *ngIf="apis.config.privacyPolicyLink">Privacy Policy</a> 
-            <span *ngIf="apis.config.privacyPolicyLink && apis.config.imprintLink"> &nbsp;&bull;&nbsp; </span>
-            <a href="{{ apis.config.imprintLink }}" target="_blank" *ngIf="apis.config.imprintLink">Imprint</a>
-        </p>
-    </div>
-</nav>
+                                        <!--
+                                        <div class="nested-menu">
+                                          <a class="list-group-item" (click)="addExpandClass('pages')">
+                                            <span><i class="fa fa-plus"></i>&nbsp; {{ 'Menu' | translate }}</span>
+                                          </a>
+                                          <li class="nested" [class.expand]="showMenu === 'pages'">
+                                            <ul class="submenu">
+                                              <li>
+                                                <a href="javascript:void(0)"><span>{{ 'Submenu' | translate }}</span></a>
+                                              </li>
+                                              <li>
+                                                <a href="javascript:void(0)"><span>{{ 'Submenu' | translate }}</span></a>
+                                              </li>
+                                              <li>
+                                                <a href="javascript:void(0)"><span>{{ 'Submenu' | translate }}</span></a>
+                                              </li>
+                                            </ul>
+                                          </li>
+                                        </div>
+                                        <a [routerLink]="['/blank-page']" [routerLinkActive]="['router-link-active']" class="list-group-item">
+                                          <i class="fa fa-file-o"></i>&nbsp;{{ 'Blank Page' | translate }}
+                                        </a>
+                                        -->
+                                      </ul>
+                                      <div class="footerLinks">
+                                        <p>
+                                          <a href="https://github.com/denis-martin/swadit/issues" target="_blank">Support &amp; Bug Reports</a>
+                                        </p>
+                                        @if (apis.config.termsOfUseLink || apis.config.licensesLink || apis.config.privacyPolicyLink || apis.config.imprintLink) {
+                                          <p>
+                                            @if (apis.config.licensesLink) {
+                                              <a href="{{ apis.config.licensesLink }}" target="_blank">Licenses</a>
+                                            }
+                                            @if (apis.config.termsOfUseLink && apis.config.licensesLink) {
+                                              <span> &nbsp;&bull;&nbsp; </span>
+                                            }
+                                            @if (apis.config.termsOfUseLink) {
+                                              <a href="{{ apis.config.termsOfUseLink }}" target="_blank">Terms of Use</a>
+                                            }
+                                            @if ((apis.config.termsOfUseLink || apis.config.licensesLink) && (apis.config.privacyPolicyLink || apis.config.imprintLink)) {
+                                              <span><br></span>
+                                            }
+                                            @if (apis.config.privacyPolicyLink) {
+                                              <a href="{{ apis.config.privacyPolicyLink }}" target="_blank">Privacy Policy</a>
+                                            }
+                                            @if (apis.config.privacyPolicyLink && apis.config.imprintLink) {
+                                              <span> &nbsp;&bull;&nbsp; </span>
+                                            }
+                                            @if (apis.config.imprintLink) {
+                                              <a href="{{ apis.config.imprintLink }}" target="_blank">Imprint</a>
+                                            }
+                                          </p>
+                                        }
+                                      </div>
+                                    </nav>

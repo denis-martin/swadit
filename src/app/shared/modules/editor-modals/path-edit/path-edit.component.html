@@ -1,102 +1,112 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <form (ngSubmit)="ok()" #editForm="ngForm">
-	<!--
-	<div class="modal-header">
-		<h3 class="modal-title" id="modal-title">Path</h3>
-	</div>
-	-->
-	<div class="modal-body" id="modal-body">
-		<div class="row">
-			<div class="col-md-2">
-				<label for="methodKey">Operation</label>
-				<select id="methodKey" name="methodKey" [(ngModel)]="methodKey" required
-					class="form-control" style="text-transform: uppercase">
-					<option *ngFor="let methodKey of apis.methodKeys" 
-						style="text-transform: uppercase">
-						{{methodKey}}
-					</option>
-				</select>
-			</div>
-			<div class="col-md-10">
-				<div class="form-group">
-					<label for="pathKey">Path</label>
-					<input type="text" id="pathKey" name="pathKey" [(ngModel)]="pathKey" required
-						class="form-control" placeholder="Enter path" title="Path">
-				</div>
-			</div>
-		</div>
-		<ul ngbNav #nav="ngbNav" class="nav-tabs">
-			<li ngbNavItem>
-				<a ngbNavLink>Info</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="0">
-						</swadit-schema-editor>
-					</div>
-				</ng-template>
-			</li>
-			<li ngbNavItem>
-				<a ngbNavLink>General</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="1">
-						</swadit-schema-editor>
-					</div>
-				</ng-template>
-			</li>
-			<li ngbNavItem>
-				<a ngbNavLink>Docs</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="2">
-						</swadit-schema-editor>
-					</div>
-				</ng-template>
-			</li>
-			<li ngbNavItem *ngIf="apis.current['securityDefinitions'] || obj['security']">
-				<a ngbNavLink>Security</a>
-				<ng-template ngbNavContent>
-					<div class="tab-content">
-						<label for="security">Security</label>
-						<swadit-security-editor [schema]="apis.schemas.security" [(obj)]="obj['security']" [id]="'security'"
-							[securityDefinitions]="apis.current['securityDefinitions']">
-						</swadit-security-editor>
-					</div>
-				</ng-template>
-			</li>
-		</ul>
-		<div [ngbNavOutlet]="nav" class="mt-2"></div>
-	</div>
-	<div class="modal-footer">
-		<button *ngIf="pathKey_orig" class="btn btn-danger" type="button" 
-			(click)="deletePath()" title="Delete path"
-			[ngClass]="{ 'mr-auto': !methodKey_orig }">
-			Delete Path</button>
-		<button *ngIf="methodKey_orig" class="btn btn-danger mr-auto" type="button" 
-			(click)="deleteMethod()" title="Delete method">
-			Delete Method</button>
-		<span *ngIf="errorStr" style="color: red">
-			{{errorStr}}
-		</span>
-		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
-			Apply</button>
-		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
-			Cancel</button>
-	</div>
+  <!--
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-title">Path</h3>
+  </div>
+  -->
+  <div class="modal-body" id="modal-body">
+    <div class="row">
+      <div class="col-md-2">
+        <label for="methodKey">Operation</label>
+        <select id="methodKey" name="methodKey" [(ngModel)]="methodKey" required
+          class="form-control" style="text-transform: uppercase">
+          @for (methodKey of apis.methodKeys; track methodKey) {
+            <option
+              style="text-transform: uppercase">
+              {{methodKey}}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="col-md-10">
+        <div class="form-group">
+          <label for="pathKey">Path</label>
+          <input type="text" id="pathKey" name="pathKey" [(ngModel)]="pathKey" required
+            class="form-control" placeholder="Enter path" title="Path">
+        </div>
+      </div>
+    </div>
+    <ul ngbNav #nav="ngbNav" class="nav-tabs">
+      <li ngbNavItem>
+        <a ngbNavLink>Info</a>
+        <ng-template ngbNavContent>
+          <div class="tab-content">
+            <swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="0">
+            </swadit-schema-editor>
+          </div>
+        </ng-template>
+      </li>
+      <li ngbNavItem>
+        <a ngbNavLink>General</a>
+        <ng-template ngbNavContent>
+          <div class="tab-content">
+            <swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="1">
+            </swadit-schema-editor>
+          </div>
+        </ng-template>
+      </li>
+      <li ngbNavItem>
+        <a ngbNavLink>Docs</a>
+        <ng-template ngbNavContent>
+          <div class="tab-content">
+            <swadit-schema-editor [schema]="apis.schemas['operation']" [(obj)]="obj" [id]="'pathSchema'" [group]="2">
+            </swadit-schema-editor>
+          </div>
+        </ng-template>
+      </li>
+      @if (apis.current['securityDefinitions'] || obj['security']) {
+        <li ngbNavItem>
+          <a ngbNavLink>Security</a>
+          <ng-template ngbNavContent>
+            <div class="tab-content">
+              <label for="security">Security</label>
+              <swadit-security-editor [schema]="apis.schemas.security" [(obj)]="obj['security']" [id]="'security'"
+                [securityDefinitions]="apis.current['securityDefinitions']">
+              </swadit-security-editor>
+            </div>
+          </ng-template>
+        </li>
+      }
+    </ul>
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+  </div>
+  <div class="modal-footer">
+    @if (pathKey_orig) {
+      <button class="btn btn-danger" type="button"
+        (click)="deletePath()" title="Delete path"
+        [ngClass]="{ 'mr-auto': !methodKey_orig }">
+      Delete Path</button>
+    }
+    @if (methodKey_orig) {
+      <button class="btn btn-danger mr-auto" type="button"
+        (click)="deleteMethod()" title="Delete method">
+      Delete Method</button>
+    }
+    @if (errorStr) {
+      <span style="color: red">
+        {{errorStr}}
+      </span>
+    }
+    <button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
+    Apply</button>
+    <button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+    Cancel</button>
+  </div>
 </form>

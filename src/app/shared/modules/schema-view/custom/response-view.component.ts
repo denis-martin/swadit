@@ -15,16 +15,18 @@
  * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import * as YAML from 'js-yaml';
 
 import { ApisService } from '../../../services';
 
 @Component({
-	selector: 'swadit-response-view',
-	templateUrl: './response-view.component.html',
-	styleUrls: ['./../schema-view.component.scss']
+    selector: 'swadit-response-view',
+    templateUrl: './response-view.component.html',
+    styleUrls: ['./../schema-view.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
+    standalone: false
 })
 export class ResponseViewComponent implements OnInit {
 	@Input() obj: any;

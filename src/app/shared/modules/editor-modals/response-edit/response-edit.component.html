@@ -1,70 +1,86 @@
 <!--
-	Copyright 2017 Denis Martin.  This file is part of swadit.
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-	swadit is free software: you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-	swadit is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <form (ngSubmit)="ok()" #editForm="ngForm">
-	<div class="modal-header" *ngIf="pathMode">
-		<span class="modal-title" id="modal-title">Response definition</span>
-	</div>
-	<div class="modal-body" id="modal-body">
-		<div class="form-group" *ngIf="!pathMode">
-			<label for="responseKey">Name of response definition</label>
-			<input type="text" id="responseKey" name="responseKey" [(ngModel)]="key" required
-				class="form-control" placeholder="Enter name for response" title="Name of response">
-		</div>
-		<div *ngIf="pathMode">
-			<div class="row">
-				<div class="form-group col-md-6">
-					<label for="responseKey">Response code</label>
-					<select id="responseKey" name="responseKey" [ngModel]="key" required
-						(ngModelChange)="statusCodeChanged($event)"
-						class="form-control" title="Response code">
-						<option *ngFor="let code of keys(httpStatusCodes)" value="{{code}}">
-							{{code}} &ndash; {{httpStatusCodes[code]}}
-						</option>
-						<option>default</option>
-					</select>
-				</div>
-				<div class="form-group col-md-6">
-					<label for="refKey">Reference</label>
-					<select id="refKey" name="refKey"
-						[(ngModel)]="obj['$ref']" class="form-control" title="Reference to #/responses">
-						<option [ngValue]="null || undefined">(none)</option>
-						<option *ngFor="let def of keys(apis.current['responses'])" value="#/responses/{{def}}">
-							{{def}}
-						</option>
-					</select>
-				</div>
-			</div>
-		</div>
-		<div class="form-group" *ngIf="!obj['$ref']">
-			<swadit-object-editor
-				[schema]="apis.schemas.response" [(obj)]="obj" [title]="false">
-			</swadit-object-editor>
-		</div>
-	</div>
-	<div class="modal-footer">
-		<button *ngIf="key_orig" class="btn btn-danger mr-auto" type="button" (click)="deleteResponse()" title="Delete response">
-			Delete</button>
-		<span *ngIf="errorStr" style="color: red">
-			{{errorStr}}
-		</span>
-		<button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
-			Apply</button>
-		<button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
-			Cancel</button>
-	</div>
+  @if (pathMode) {
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Response definition</span>
+    </div>
+  }
+  <div class="modal-body" id="modal-body">
+    @if (!pathMode) {
+      <div class="form-group">
+        <label for="responseKey">Name of response definition</label>
+        <input type="text" id="responseKey" name="responseKey" [(ngModel)]="key" required
+          class="form-control" placeholder="Enter name for response" title="Name of response">
+      </div>
+    }
+    @if (pathMode) {
+      <div>
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="responseKey">Response code</label>
+            <select id="responseKey" name="responseKey" [ngModel]="key" required
+              (ngModelChange)="statusCodeChanged($event)"
+              class="form-control" title="Response code">
+              @for (code of keys(httpStatusCodes); track code) {
+                <option value="{{code}}">
+                  {{code}} &ndash; {{httpStatusCodes[code]}}
+                </option>
+              }
+              <option>default</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="refKey">Reference</label>
+            <select id="refKey" name="refKey"
+              [(ngModel)]="obj['$ref']" class="form-control" title="Reference to #/responses">
+              <option [ngValue]="null || undefined">(none)</option>
+              @for (def of keys(apis.current['responses']); track def) {
+                <option value="#/responses/{{def}}">
+                  {{def}}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+      </div>
+    }
+    @if (!obj['$ref']) {
+      <div class="form-group">
+        <swadit-object-editor
+          [schema]="apis.schemas.response" [(obj)]="obj" [title]="false">
+        </swadit-object-editor>
+      </div>
+    }
+  </div>
+  <div class="modal-footer">
+    @if (key_orig) {
+      <button class="btn btn-danger mr-auto" type="button" (click)="deleteResponse()" title="Delete response">
+      Delete</button>
+    }
+    @if (errorStr) {
+      <span style="color: red">
+        {{errorStr}}
+      </span>
+    }
+    <button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
+    Apply</button>
+    <button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+    Cancel</button>
+  </div>
 </form>

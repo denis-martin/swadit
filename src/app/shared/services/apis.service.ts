@@ -22,7 +22,7 @@ import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-boo
 import { Subject } from 'rxjs';
 
 import { OpenAPI } from 'openapi-types';
-import * as SwaggerParser from '@apidevtools/swagger-parser';
+import SwaggerParser from '@apidevtools/swagger-parser';
 import * as YAML from 'js-yaml';
 import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _remove } from "lodash-es";
 
@@ -519,12 +519,14 @@ export class ApisService
 			});
 		} else {
 			schema = this.resolveObj(schema, this.schemas.root);
+			// incomplete schemas (e.g. arrays without "items", unresolvable refs)
+			if (!schema) return;
 			if (schema['type'] == 'object') {
 				if (schema['properties']) {
 					this.keys(schema['properties']).forEach(p => {
 						if (api[p] != null) {
 							this.cleanUp(schema['properties'][p], api[p]);
-							const propertySchema = this.resolveObj(schema['properties'][p], this.schemas.root);
+							const propertySchema = this.resolveObj(schema['properties'][p], this.schemas.root) || {};
 							if (propertySchema['type'] == 'array') {
 								if (api[p].length == 0 && !this.propertyIsRequired(schema, p)) {
 									delete api[p];
@@ -744,14 +746,27 @@ export class ApisService
 			}
 		}
 
-		try {
-			const refParts = _ref.split('/');
-			refParts.forEach(p => {
+		const lookup = (src: any, r: string): any => {
+			r.split('/').forEach(p => {
 				if (p != "#") {
-					source = source[p];
+					src = src[p];
 				}
 			});
-			return source;
+			return src;
+		};
+
+		try {
+			const result = lookup(source, _ref);
+			if (result != null || !_ref.startsWith("#")) return result;
+			// Local refs inside an embedded JSON schema (e.g. draft-04) are relative to
+			// that schema, but we only know the root schema here, so try those as well.
+			for (const k in this.jsonSchemas) {
+				try {
+					const r = lookup(this.jsonSchemas[k], _ref);
+					if (r != null) return r;
+				} catch (e) { /* try next */ }
+			}
+			return result;
 		} catch (err) {
 			console.error("Exception resolving ref", err, ref, _ref, rootSchema, source);
 		}
@@ -762,7 +777,15 @@ export class ApisService
 	{
 		if (obj) {
 			if (obj['$ref']) {
+				const siblings = obj;
 				obj = this.resolveRef(obj['$ref'], rootSchema);
+				if (obj == null) return obj;
+				// keep swadit annotations that sit next to the $ref
+				const annotations = Object.keys(siblings).filter(k => k.startsWith('x-swadit-') && !(k in obj));
+				if (annotations.length > 0) {
+					obj = Object.assign({}, obj);
+					annotations.forEach(k => obj[k] = siblings[k]);
+				}
 			} 
 			if (Array.isArray(obj['allOf'])) {
 				const mergedObj = {};
