@@ -46,12 +46,15 @@ export class ObjectEditorComponent implements OnInit
 	set obj(val) 
 	{
 		this._obj = val;
-		if (this._obj) {
-			this.schemaProperties().forEach(p => {
+		if (this._obj && this.schema) {
+			const schema = this.apis.resolveObj(this.schema, this.apis.schemas.root) || {};
+			this.schemaProperties(schema).forEach(p => {
 				if (!this._obj[p]) {
-					if (this.schema.properties[p]['type'] == 'object') {
+					// property schemas may be references, too
+					const propertySchema = this.apis.resolveObj(schema.properties[p], this.apis.schemas.root) || {};
+					if (propertySchema['type'] == 'object') {
 						this._obj[p] = {};
-					} else if (this.schema.properties[p]['type'] == 'array') {
+					} else if (propertySchema['type'] == 'array') {
 						this._obj[p] = [];
 					}
 				}
@@ -92,14 +95,14 @@ export class ObjectEditorComponent implements OnInit
 		}
 	}
 
-	schemaProperties(): string[]
+	schemaProperties(schema: any = this.schema): string[]
 	{
-		if (!this.schema.properties) {
+		if (!schema.properties) {
 			return [];
 		} else {
 			const properties: string[] = [];
-			for (const k in this.schema.properties) {
-				if (!this.schema.properties[k]['x-swadit-input-hidden']) {
+			for (const k in schema.properties) {
+				if (!schema.properties[k]['x-swadit-input-hidden']) {
 					properties.push(k);
 				}
 			}
@@ -136,7 +139,7 @@ export class ObjectEditorComponent implements OnInit
 	{
 		event.preventDefault();
 		console.log("addProperty", this.propertyToAdd);
-		if (!this.propertyToAdd) {
+		if (!this.propertyToAdd || this.obj.hasOwnProperty(this.propertyToAdd)) {
 			this.noItemToAdd = true;
 			return
 		}
@@ -163,7 +166,8 @@ export class ObjectEditorComponent implements OnInit
 
 	changeProperty(newp: any, p: string): void
 	{
-		if (newp != p) {
+		// do not overwrite other properties (the name is changed with each keystroke)
+		if (newp != p && !this.obj.hasOwnProperty(newp)) {
 			this.collapsed[newp] = this.collapsed[p];
 			Object.keys(this.obj).forEach(op => {
 				const val = this.obj[op];
@@ -200,10 +204,10 @@ export class ObjectEditorComponent implements OnInit
 	{
 		if (group == null) group = this.group;
 		if (group == null || !this.schema['x-swadit-editor-groups']) {
-			return this.schema['x-swadit-editor-grid-cols'];
+			return this.schema['x-swadit-editor-grid-cols'] || {};
 		} else {
 			if (this.schema['x-swadit-editor-groups']) {
-				return this.schema['x-swadit-editor-groups'][group]['x-swadit-editor-grid-cols'];
+				return this.schema['x-swadit-editor-groups'][group]['x-swadit-editor-grid-cols'] || {};
 			} else {
 				return null;
 			}

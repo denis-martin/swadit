@@ -57,8 +57,9 @@ export class SchemaViewComponent implements OnInit
 
 	getKeys()
 	{
-		if (this.schema['additionalProperties'] === true) {
-			return Object.keys(this.obj);
+		if (this.schema['additionalProperties'] === true || !this.schema['properties']) {
+			// maps (e.g. additionalProperties: { ... }) show all their keys
+			return Object.keys(this.obj || {}).filter(k => !this.doSkip(k));
 		} else {
 			const schemaKeys = Object.keys(this.schema['properties']);
 			const objKeys = Object.keys(this.obj);

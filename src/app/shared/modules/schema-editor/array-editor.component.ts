@@ -53,9 +53,6 @@ export class ArrayEditorComponent implements OnInit
 	constructor(public apis: ApisService) {}
 
 	ngOnInit(): void {
-		if (!this._obj) {
-			this._obj = [];
-		}
 		this.schema = this.apis.resolveObj(this.schema, this.apis.schemas.root);
 		this.itemsSchema = this.apis.resolveObj(this.schema['items'], this.apis.schemas.root) || {};
 		if (this.itemsSchema['type'] == 'object') {
@@ -69,11 +66,15 @@ export class ArrayEditorComponent implements OnInit
 	{
 		event.preventDefault();
 		console.log("addItem", this.itemToAdd);
-		if (!this.itemToAdd) {
+		if (!this.itemToAdd || (this.schema['uniqueItems'] && this.obj && this.obj.includes(this.itemToAdd))) {
 			this.noItemToAdd = true;
 			return;
 		}
 		this.noItemToAdd = false;
+		if (!Array.isArray(this.obj)) {
+			// creates the array in the parent object (two-way binding)
+			this.obj = [];
+		}
 		this.obj.push(this.itemToAdd);
 		if (this.itemsSchema['type'] == 'object') {
 			this.itemToAdd = {};

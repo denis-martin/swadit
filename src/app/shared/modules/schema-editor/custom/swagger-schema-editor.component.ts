@@ -64,6 +64,25 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		}
 	}
 
+	/** the types of the schema object (the OAS2 and OAS3 meta schemas define them differently) */
+	typeOptions(): string[]
+	{
+		const typeSchema = this.schema['properties']['type'];
+		if (typeSchema['enum']) {
+			return typeSchema['enum'];
+		} else if (typeSchema['anyOf']) {
+			return typeSchema['anyOf'][0]['enum'];
+		}
+		return [];
+	}
+
+	/** the schemas that can be referenced */
+	refOptions(): Array<{ ref: string, name: string }>
+	{
+		const prefix = this.apis.isOas3 ? '#/components/schemas/' : '#/definitions/';
+		return this.keys(this.apis.getComponents('schemas')).map(name => ({ ref: prefix + name, name: name }));
+	}
+
 	keys(obj): string[]
 	{
 		if (!obj) return [];
@@ -101,12 +120,21 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		event.preventDefault();
 		console.log("deleteProperty", propKey);
 		delete this.obj['properties'][propKey];
+		if (this.propertyIsRequired(propKey)) {
+			this.changePropertyIsRequired(propKey);
+		}
+		if (this.obj['required'] && this.obj['required'].length == 0) {
+			delete this.obj['required'];
+		}
 	}
 
 	changeProperty(newPropKey: any, propKey: any): void
 	{
-		if (newPropKey && newPropKey != propKey) {
+		if (newPropKey && newPropKey != propKey && !this.obj['properties'].hasOwnProperty(newPropKey)) {
 			this.apis.renameObjectKey(this.obj['properties'], propKey, newPropKey);
+			if (this.propertyIsRequired(propKey)) {
+				this.obj['required'][this.obj['required'].indexOf(propKey)] = newPropKey;
+			}
 		}
 	}
 

@@ -90,7 +90,7 @@ export class DefinitionEditComponent implements OnInit
 			}
 			this.apis.current['definitions'][this.key] = this.obj_orig;
 		} else if (this.key != this.key_orig) {
-			this.apis.renameObjectKey(this.apis.current['definitions'], this.key_orig, this.key);
+			this.apis.renameComponent('definitions', this.key_orig, this.key);
 		}
 
 		this.errorStr = "";

@@ -111,7 +111,11 @@ export class ResponseEditComponent implements OnInit
 			}
 			this.parent['responses'][this.key] = this.obj_orig;
 		} else if (this.key != this.key_orig) {
-			this.apis.renameObjectKey(this.parent['responses'], this.key_orig, this.key);
+			if (this.pathMode) {
+				this.apis.renameObjectKey(this.parent['responses'], this.key_orig, this.key);
+			} else {
+				this.apis.renameComponent('responses', this.key_orig, this.key);
+			}
 		}
 
 		this.errorStr = "";
