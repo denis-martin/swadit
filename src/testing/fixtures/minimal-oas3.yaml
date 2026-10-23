@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: Minimal OAS3
+  version: '1.0'
+paths:
+  /items/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: getItem
+      parameters:
+        - $ref: '#/components/parameters/Verbose'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Item'
+        default:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    Item:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+  parameters:
+    Verbose:
+      name: verbose
+      in: query
+      schema:
+        type: boolean
+  responses:
+    Error:
+      description: error
+  securitySchemes:
+    key:
+      type: apiKey
+      name: X-Key
+      in: header
