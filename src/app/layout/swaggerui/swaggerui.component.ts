@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ApisService } from '../../shared/services';
 
@@ -20,7 +21,7 @@ export class SwaggerUiComponent implements OnInit
 
 	constructor(public apis: ApisService) 
 	{
-		this.apis.eventApiChanged.subscribe(param => {
+		this.apis.eventApiChanged.pipe(takeUntilDestroyed()).subscribe(param => {
 			this.swaggerUi.getSystem().specActions.updateSpec(JSON.stringify(this.apis.current));
 		});
 	}

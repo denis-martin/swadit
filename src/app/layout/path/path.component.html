@@ -194,25 +194,26 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
             <div class="card-block">
               @for (contentType of apis.keys(local.values.obj['content']); track contentType) {
                 <div>
-                  <p>{{ contentType }}: @if (local.values.obj['content'][contentType]['schema']['$ref']) {
+                  <p>{{ contentType }}: @if (local.values.obj['content'][contentType]['schema'] && local.values.obj['content'][contentType]['schema']['$ref']) {
                     <span class="headerType">{{ local.values.obj['content'][contentType]['schema']['$ref'] }}</span>
                   }</p>
-                  <swadit-swagger-schema-view [obj]="apis.resolveObj(local.values.obj['content'][contentType]['schema'])">
-                  </swadit-swagger-schema-view>
-                  <!-- TODO -->
-                  @if (local.values.obj['example']) {
+                  @if (local.values.obj['content'][contentType]['schema']) {
+                    <swadit-swagger-schema-view [obj]="apis.resolveObj(local.values.obj['content'][contentType]['schema'])">
+                    </swadit-swagger-schema-view>
+                  }
+                  @if (local.values.obj['content'][contentType]['example'] != null) {
                     <div>
                       <p>Example:</p>
-                      <p><markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown></p>
+                      <p><markdown [data]="apis.toJson(local.values.obj['content'][contentType]['example']) | language: 'json'"></markdown></p>
                     </div>
                   }
-                  @if (local.values.obj['examples']) {
+                  @if (local.values.obj['content'][contentType]['examples']) {
                     <div>
                       <p>Examples:</p>
-                      @for (k of apis.keys(local.values.obj['examples']); track k) {
+                      @for (k of apis.keys(local.values.obj['content'][contentType]['examples']); track k) {
                         <div>
                           <p><label>{{k}}:</label><br>
-                          <markdown [data]="apis.toJson(local.values.obj['examples'][k]) | language: 'json'"></markdown>
+                          <markdown [data]="apis.toJson(local.values.obj['content'][contentType]['examples'][k]) | language: 'json'"></markdown>
                         </p>
                       </div>
                     }
@@ -264,8 +265,8 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
               @if (local.values.obj['schema'] && local.values.obj['schema']['type']) {
                 <span class="headerType"> ({{local.values.obj['schema']['type']}})</span>
               }
-              @if (local.values.obj['schema'] && local.values.obj['$ref']) {
-                <span class="headerType"> ({{local.values.obj['$ref']}})</span>
+              @if (local.values.obj['schema'] && local.values.obj['schema']['$ref']) {
+                <span class="headerType"> ({{local.values.obj['schema']['$ref']}})</span>
               }
               @if (local.values.obj['description']) {
                 <span> {{local.values.obj['description']}}</span>
@@ -354,13 +355,18 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       <div>
         @for (req of apis.current['paths'][path][method]['security']; track req) {
           <div>
-            <p style="font-weight: bold">{{apis.keys(req)[0]}}</p>
-            @if (req[apis.keys(req)[0]].length>0) {
-              <ul>
-                @for (scope of req[apis.keys(req)[0]]; track scope) {
-                  <li>{{scope}}</li>
-                }
-              </ul>
+            <!-- all schemes of a requirement are required, an empty requirement makes security optional -->
+            @for (scheme of apis.keys(req); track scheme) {
+              <p style="font-weight: bold">{{scheme}}</p>
+              @if (req[scheme].length>0) {
+                <ul>
+                  @for (scope of req[scheme]; track scope) {
+                    <li>{{scope}}</li>
+                  }
+                </ul>
+              }
+            } @empty {
+              <p>(none)</p>
             }
           </div>
         }
@@ -379,7 +385,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
               {{apis.current['paths'][path][method]['externalDocs']['description']}}
             </span>
           } @else {
-            <ng-template [ngTemplateOutlet]="'More'"></ng-template>
+            More
           }
         </a>
       </p>

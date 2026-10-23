@@ -90,32 +90,18 @@ export class PathsComponent implements OnInit
 		ModifyComponent.open(this.modalService, this.apis.getLength(this.apis.selectedPaths))
 			.then((result) => {
 				console.info("modify()", result);
-				if (result.deprecationSet) {
-					for (const p in self.apis.selectedPaths) {
-						if (self.apis.current['paths'][p]) {
-							for (const m in self.apis.current['paths'][p]) {
-								if (m != 'parameters') {
-									self.apis.current['paths'][p][m]['deprecated'] = true;
-								}
+				for (const p in self.apis.selectedPaths) {
+					if (self.apis.current['paths'][p]) {
+						for (const method of self.apis.getMethods(p)) {
+							if (result.deprecationSet) {
+								method['obj']['deprecated'] = true;
+							} else if (result.deprecationRemove) {
+								delete method['obj']['deprecated'];
 							}
-						} else {
-							delete self.apis.selectedPaths[p];
 						}
+					} else {
+						delete self.apis.selectedPaths[p];
 					}
-
-				} else if (result.deprecationRemove) {
-					for (const p in self.apis.selectedPaths) {
-						if (self.apis.current['paths'][p]) {
-							for (const m in self.apis.current['paths'][p]) {
-								if (m != 'parameters') {
-									delete self.apis.current['paths'][p][m]['deprecated'];
-								}
-							}
-						} else {
-							delete self.apis.selectedPaths[p];
-						}
-					}
-
 				}
 				
 			}, (reason) => {

@@ -16,10 +16,9 @@
  */
 
 import { Component, OnInit, Directive, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-
-import { pull as _pull } from "lodash-es";
 
 import { ApisService } from '../../shared/services';
 import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
@@ -66,7 +65,7 @@ export class PathComponent implements OnInit {
 
 			this.apis.activePath = this.path;
 		});
-		this.apis.eventApiChanged.subscribe(param => {
+		this.apis.eventApiChanged.pipe(takeUntilDestroyed()).subscribe(param => {
 			if (!this.apis.current['paths'][this.path]) {
 				this.path = "";
 				this.method = "";
@@ -99,10 +98,7 @@ export class PathComponent implements OnInit {
 	}
 
 	getMethods(): Array<string> {
-		if (!this.apis.current['paths']) return [];
-		const methods = this.apis.keys(this.apis.current['paths'][this.path]);
-		_pull(methods, "parameters");
-		return methods;
+		return this.apis.getMethods(this.path).map(m => m['key']);
 	}
 
 	getParameters(path: string, method: string): Array<any> {

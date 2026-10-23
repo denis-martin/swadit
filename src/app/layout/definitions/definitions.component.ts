@@ -16,6 +16,7 @@
  */
 
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgbModal, ModalDismissReasons, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from '../../shared/services';
@@ -44,7 +45,7 @@ export class DefinitionsComponent implements OnInit
 	
 	constructor(public apis: ApisService, private modalService: NgbModal) 
 	{
-		this.apis.eventApiChanged.subscribe(() => {
+		this.apis.eventApiChanged.pipe(takeUntilDestroyed()).subscribe(() => {
 			this.initDefCat();
 		});
 	}
