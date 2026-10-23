@@ -15,14 +15,16 @@ npm install                 # install dependencies (Node ^22.22.3 || ^24.15.0)
 npm start                   # dev server on http://localhost:4201
 npm run build               # production build into dist/ (dist/ is gitignored)
 npm run lint                # eslint (flat config: eslint.config.mjs)
-npm test                    # NOTE: this only runs `ng build`, not unit tests
-npx ng test --watch=false   # Vitest unit tests (jsdom)
-npm run e2e                 # Playwright smoke test (starts the dev server)
+npm test                    # Vitest unit tests (jsdom), single run
+npm run test:watch          # unit tests in watch mode
+npm run test:coverage       # unit tests with coverage report (coverage/)
+npx ng test --watch=false --include 'src/app/layout/path/**/*.spec.ts'   # a subset
+npm run e2e                 # Playwright tests (starts the dev server; needs `npx playwright install chromium` once)
 ```
 
 - Use `npm run build` as the main check that a change compiles. It currently succeeds with no warnings.
 - `npm run lint` currently reports 0 errors and a few dozen warnings. Don't add errors; you don't need to fix existing warnings unless asked.
-- Most `*.spec.ts` files are template stubs left over from scaffolding, so unit tests give little coverage. Many of them fail because they don't provide `ApisService` / `NgbActiveModal`.
+- All unit tests are expected to pass. Run `npm test` after changes, in addition to `npm run build`.
 - The production build uses the esbuild-based `@angular/build:application` builder. Node built-ins aren't polyfilled automatically. `util`, `process` and `buffer` are explicit dependencies for swagger-parser (see `src/polyfills.ts`).
 - The print preview at `src/assets/swadoc/` is a separate package with its own `package.json`. Only run `npm install` inside it if you're working on swadoc.
 
@@ -70,6 +72,18 @@ On startup the service loads `src/assets/petstore.yaml` as the default API. It t
 ### i18n
 
 `@ngx-translate`, with translations in `src/assets/i18n/*.json`. These are mostly template leftovers. Only the sidebar uses the `translate` pipe; the rest of the UI text is hardcoded English.
+
+## Testing
+
+- Unit tests sit next to the code (`*.spec.ts`), run with Vitest in jsdom via `@angular/build:unit-test`, and use Vitest globals (`vi`, `describe`, ...).
+- Shared helpers are in `src/testing/test-helpers.ts` (import as `testing/test-helpers`; the alias exists only in `src/tsconfig.spec.json`):
+  - `renderComponent(Component, { imports: [FeatureModule], api, props })` configures TestBed with all providers (`ApisService`, HTTP testing, router, translate, markdown, a mocked `NgbActiveModal`), loads an API (default: petstore) and renders the component. It returns `validated`, a promise for the end of the API's async validation.
+  - `createApisService()` / `setCurrentApi()` / `loadFixture()` for service tests. `Router.navigate` is stubbed.
+- Fixtures: `src/assets/petstore.yaml` (OAS2, the default API), `src/testing/fixtures/minimal-oas3.yaml`, and `features-oas2.yaml` (many OAS2 features, used for the OAS2→3 conversion tests). YAML files are imported as text with `with { loader: 'text' }`.
+- Globals from `angular.json` scripts (Ace, Swagger UI) are not available in unit tests; stub them with `vi.stubGlobal` (see `source.component.spec.ts`, `swaggerui.component.spec.ts`).
+- To test two-way bound editors (`[(obj)]`), render a small standalone host component (see `schema-editor/*.spec.ts`).
+- `swaggerLoaded()` fires `eventApiChanged` twice: immediately and again after the async validation. Await `validated` before interacting if a test depends on that.
+- E2E tests in `e2e/app.spec.ts` drive the real app (Ace, Swagger UI). The page sweeps fail on any uncaught page error or console error.
 
 ## Code style
 

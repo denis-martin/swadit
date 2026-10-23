@@ -1,39 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslatePipe, provideTranslateService } from '@ngx-translate/core';
+import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
 
-import { HeaderComponent, SidebarComponent } from '../shared';
+import { LayoutModule } from './layout.module';
 import { LayoutComponent } from './layout.component';
+import { renderComponent } from 'testing/test-helpers';
 
 describe('LayoutComponent', () => {
-  let component: LayoutComponent;
-  let fixture: ComponentFixture<LayoutComponent>;
+	it('shows header and sidebar', () => {
+		const { element } = renderComponent(LayoutComponent, { imports: [LayoutModule] });
+		expect(element.querySelector('app-header')).toBeTruthy();
+		expect(element.querySelector('app-sidebar')).toBeTruthy();
+		expect(element.textContent).toContain('Swagger Petstore');
+	});
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-    imports: [
-      RouterTestingModule,
-      NgbDropdownModule,
-      TranslatePipe,
-    ],
-      providers: [provideTranslateService()],
-      declarations: [
-        LayoutComponent,
-        HeaderComponent,
-        SidebarComponent,
-      ]
-    })
-    .compileComponents();
-  });
-
-  beforeEach(() => {
-    fixture = TestBed.createComponent(LayoutComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+	it('shows the API info by default', () => {
+		const { fixture } = renderComponent(LayoutComponent, { imports: [LayoutModule], detectChanges: false });
+		const router = TestBed.inject(Router);
+		vi.spyOn(router, 'url', 'get').mockReturnValue('/');
+		fixture.detectChanges();
+		expect(router.navigate).toHaveBeenCalledWith(['/api-info']);
+	});
 });

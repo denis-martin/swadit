@@ -76,26 +76,27 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       <div>
         <p>
           Response as {{ contentType }}:
-          @if (obj['content'][contentType]['schema']['$ref']) {
+          @if (obj['content'][contentType]['schema'] && obj['content'][contentType]['schema']['$ref']) {
             <span class="headerType">{{obj['content'][contentType]['schema']['$ref']}}</span>
           }
         </p>
-        <swadit-swagger-schema-view [obj]="apis.resolveObj(obj['content'][contentType]['schema'])">
-        </swadit-swagger-schema-view>
-        <!-- TODO -->
-        @if (obj['example']) {
+        @if (obj['content'][contentType]['schema']) {
+          <swadit-swagger-schema-view [obj]="apis.resolveObj(obj['content'][contentType]['schema'])">
+          </swadit-swagger-schema-view>
+        }
+        @if (obj['content'][contentType]['example'] != null) {
           <div>
             <p>Example:</p>
-            <p><markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown></p>
+            <p><markdown [data]="apis.toJson(obj['content'][contentType]['example']) | language: 'json'"></markdown></p>
           </div>
         }
-        @if (obj['examples']) {
+        @if (obj['content'][contentType]['examples']) {
           <div>
             <p>Examples:</p>
-            @for (k of apis.keys(obj['examples']); track k) {
+            @for (k of apis.keys(obj['content'][contentType]['examples']); track k) {
               <div>
                 <p><label>{{k}}:</label><br>
-                <markdown [data]="apis.toJson(obj['examples'][k]) | language: 'json'"></markdown>
+                <markdown [data]="apis.toJson(obj['content'][contentType]['examples'][k]) | language: 'json'"></markdown>
               </p>
             </div>
           }

@@ -32,7 +32,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                   }@if (collapsed[p]) {
                   <span>...</span>
                 }
-                @if (obj[p] != undefined && obj[p] != null && schema['properties'][p]['type'] == object && !propertyIsRequired(schema, p)) {
+                @if (obj[p] != undefined && obj[p] != null && schema['properties'][p]['type'] == 'object' && !propertyIsRequired(schema, p)) {
                   <span
                     (click)="deleteProperty($event, p)">
                     <i class="fa fa-trash"></i>
@@ -40,12 +40,12 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                 }
               </label>
               <div [ngbCollapse]="collapsed[p]">
-                @if ((obj[p] != undefined && obj[p] != null) || schema['properties'][p]['type'] != object) {
+                @if ((obj[p] != undefined && obj[p] != null) || schema['properties'][p]['type'] != 'object') {
                   <swadit-schema-editor
                     [schema]="schema.properties[p]" [(obj)]="obj[p]" [id]="p">
                   </swadit-schema-editor>
                 } @else {
-                  <button class="btn" (click)="obj[p] = { type: 'object' }">add</button>
+                  <button class="btn" (click)="obj[p] = {}">add</button>
                 }
               </div>
             </div>

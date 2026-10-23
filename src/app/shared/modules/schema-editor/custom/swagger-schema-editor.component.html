@@ -51,9 +51,9 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           <select [(ngModel)]="obj['$ref']" [ngModelOptions]="{standalone: true}" class="form-control schema-control" style="max-width: 15em"
             title="Reference to a #/definition">
             <option value="">(none)</option>
-            @for (def of keys(apis.current['definitions']); track def) {
-              <option value="#/definitions/{{def}}">
-                {{def}}
+            @for (def of refOptions(); track def.ref) {
+              <option value="{{def.ref}}">
+                {{def.name}}
               </option>
             }
           </select>
@@ -68,7 +68,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
             <tr>
               <td>
                 <select id="{{id}}" [(ngModel)]="obj['type']" [ngModelOptions]="{standalone: true}" title="Type" class="form-control schema-control">
-                  @for (t of schema['properties']['type']['anyOf'][0]['enum']; track t) {
+                  @for (t of typeOptions(); track t) {
                     <option value="{{t}}">
                       {{t}}
                     </option>
@@ -80,9 +80,9 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                 <select [(ngModel)]="obj['$ref']" [ngModelOptions]="{standalone: true}" class="form-control schema-control" style="max-width: 15em"
                   title="Reference to a #/definition">
                   <option value="">(none)</option>
-                  @for (def of keys(apis.current['definitions']); track def) {
-                    <option value="#/definitions/{{def}}">
-                      {{def}}
+                  @for (def of refOptions(); track def.ref) {
+                    <option value="{{def.ref}}">
+                      {{def.name}}
                     </option>
                   }
                 </select>
@@ -193,7 +193,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                 </span>
                 <input type="text" placeholder="Name of property" title="Name of property" required
                   class="form-control schema-control" id="{{id}}_{{propKey}}" name="{{id}}_{{propKey}}"
-                  [ngModel]="propKey"
+                  [ngModel]="propKey" [ngModelOptions]="{standalone: true}"
                   (ngModelChange)="changeProperty($event, propKey)"
                   (keydown.enter)="changePropertyKeyDown($event, propKey)">
                 <span class="input-group-addon clickable" (click)="deleteProperty($event, propKey)">

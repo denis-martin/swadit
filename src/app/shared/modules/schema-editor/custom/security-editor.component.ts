@@ -107,6 +107,10 @@ export class SecurityEditorComponent implements OnInit
 			return;
 		}
 		this.noItemToAdd = false;
+		if (!Array.isArray(this.obj)) {
+			// creates the array in the parent object (two-way binding)
+			this.obj = [];
+		}
 		const req = {};
 		req[this.propertyToAdd] = [];
 		this.obj.push(req);

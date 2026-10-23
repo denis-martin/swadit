@@ -120,7 +120,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           <td class="description"><markdown [data]="obj['description']"></markdown></td>
         </tr>
       }
-      @if (obj['default']) {
+      @if (obj['default'] != null) {
         <tr>
           <td class="label-text">default</td>
           <td>
@@ -133,7 +133,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           </td>
         </tr>
       }
-      @if (obj['example']) {
+      @if (obj['example'] != null) {
         <tr>
           <td class="label-text">example</td>
           <td>

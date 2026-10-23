@@ -16,6 +16,7 @@
  */
 
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ApisService } from '../../shared/services';
 
@@ -33,7 +34,7 @@ export class PrintComponent implements OnInit
 
 	constructor(public apis: ApisService)
 	{
-		this.apis.eventApiChanged.subscribe(param => {
+		this.apis.eventApiChanged.pipe(takeUntilDestroyed()).subscribe(param => {
 			console.warn("PrintComponent: API changed event (nyi)");
 		});
 	}

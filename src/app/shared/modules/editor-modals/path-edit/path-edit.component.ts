@@ -88,6 +88,10 @@ export class PathEditComponent implements OnInit
 			return;
 		}
 
+		if (!this.methodKey) {
+			this.errorStr = "Please select an operation.";
+			return;
+		}
 		if (this.pathKey != this.pathKey_orig && 
 			this.apis.current['paths'] && 
 			this.apis.current['paths'][this.pathKey]) 
@@ -133,7 +137,7 @@ export class PathEditComponent implements OnInit
 			this.apis.renameObjectKey(this.apis.current['paths'][this.pathKey], this.methodKey_orig, this.methodKey);
 		}
 
-		if (!this.apis.current['paths'][this.pathKey][this.methodKey]['responses']) {
+		if (this.apis.getLength(this.apis.current['paths'][this.pathKey][this.methodKey]['responses']) == 0) {
 			this.apis.current['paths'][this.pathKey][this.methodKey]['responses'] = {
 				'default': {
 					'description': "Default"
