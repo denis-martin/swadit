@@ -78,7 +78,7 @@
 
                                         @for (p of apis.filterList(apis.keys(apis.current['paths']), filterText, true); track p; let index = $index) {
                                           <a
-                                            [routerLink]="['/path', p]" [routerLinkActive]="['router-link-active']" class="list-group-item"
+                                            [routerLink]="['/path']" [queryParams]="{ name: p }" [routerLinkActive]="['router-link-active']" class="list-group-item"
                                             style="font-size: 80%">
                                             {{p}}
                                           </a>
