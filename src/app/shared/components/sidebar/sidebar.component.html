@@ -36,11 +36,7 @@
                                   <a [routerLink]="['/source']">
                                     <i class="fa fa-fw fa-align-left"></i> {{ 'Source' | translate }}</a></li>
                                   }
-                                  <!--
-                                  <li><a [routerLink]="['/print']">
-                                    <i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a></li>
-                                    -->
-                                    @if (!apis.config.menu.hideItems['printPreview'] && apis.isOas2) {
+                                    @if (!apis.config.menu.hideItems['printPreview']) {
                                       <li>
                                         <a [routerLink]="['/swadoc']">
                                           <i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a></li>

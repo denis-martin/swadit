@@ -26,7 +26,7 @@ describe('HeaderComponent', () => {
 
 	it('hides the functions that are not available for OAS3', () => {
 		const { element } = render(loadFixture('minimalOas3Yaml'));
-		expect(menuItems(element)).toEqual(['New', 'Open', 'Download', 'Source', 'Swagger UI']);
+		expect(menuItems(element)).toEqual(['New', 'Open', 'Download', 'Source', 'Print Preview', 'Swagger UI']);
 		expect(element.textContent).toContain('ALPHA');
 	});
 

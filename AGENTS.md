@@ -26,7 +26,6 @@ npm run e2e                 # Playwright tests (starts the dev server; needs `np
 - `npm run lint` currently reports 0 errors and a few dozen warnings. Don't add errors; you don't need to fix existing warnings unless asked.
 - All unit tests are expected to pass. Run `npm test` after changes, in addition to `npm run build`.
 - The production build uses the esbuild-based `@angular/build:application` builder. Node built-ins aren't polyfilled automatically. `util`, `process` and `buffer` are explicit dependencies for swagger-parser (see `src/polyfills.ts`).
-- The print preview at `src/assets/swadoc/` is a separate package with its own `package.json`. Only run `npm install` inside it if you're working on swadoc.
 
 ## Architecture
 
@@ -39,8 +38,7 @@ src/app/
     definitions/             definitions (OAS2) / components (OAS3)
     source/                  raw YAML editor (Ace) with validation
     swaggerui/               embedded Swagger UI preview
-    swadoc/                  print preview (wraps src/assets/swadoc)
-    print/                   older print view (route disabled)
+    swadoc/                  print preview: renders the API as a printable document (print CSS hides the app chrome)
   shared/
     services/apis.service.ts central state + logic (see below)
     services/oas2to3.ts      Swagger 2.0 → OpenAPI 3.0 conversion
@@ -105,6 +103,5 @@ On startup the service loads `src/assets/petstore.yaml` as the default API. It t
 - Animations use native `animate.enter` / `animate.leave` with CSS classes (in `src/styles/app.scss`), not `@angular/animations`.
 - `package.json` `overrides` pins `vite` to a patched version, because `@angular/build` pins a vulnerable one. Drop it once `@angular/build` ships a fixed vite.
 - `marked-katex-extension` is listed in `externalDependencies` in `angular.json`. ngx-markdown lazily imports this optional add-on, and without that entry the dev server fails to resolve it. Install it and remove the entry only if math rendering (`katex`) is ever needed.
-- `src/assets/swadoc/` is a separate legacy AngularJS 1.x / bower app that wasn't part of the Angular upgrade.
 - `dist/` and `.angular/cache` are build outputs. Don't edit or commit them.
 - `master` is the main branch.

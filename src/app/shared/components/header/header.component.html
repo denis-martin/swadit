@@ -70,11 +70,7 @@
                             }
 
                             <div class="dropdown-divider"></div>
-                            <!--
-                            <a class="dropdown-item" [routerLink]="['/print']">
-                              <i class="fa fa-fw fa-print"></i> {{ 'Print' | translate }}</a>
-                              -->
-                              @if (!apis.config.menu.hideItems['printPreview'] && apis.isOas2) {
+                              @if (!apis.config.menu.hideItems['printPreview']) {
                                 <a class="dropdown-item" [routerLink]="['/swadoc']" title="Print preview (e.g. for PDF export)">
                                   <i class="fa fa-fw fa-print"></i> {{ 'Print Preview' | translate }}</a>
                                 }

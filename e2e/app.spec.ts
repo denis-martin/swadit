@@ -71,6 +71,9 @@ test('visits all pages without errors (OAS2)', async ({ page }) => {
 	await expect(page.locator('h1')).toHaveText('/pet/{petId}');
 	await page.locator('.card-header', { hasText: 'successful operation' }).first().click();
 	await expect(page.locator('swadit-response-view')).toBeVisible();
+	await clickFileMenuItem(page, 'Print Preview');
+	await expect(page.locator('app-swadoc h1')).toHaveText('Swagger Petstore');
+	await expect(page.locator('app-swadoc .methodheading')).toHaveCount(12);
 	await clickFileMenuItem(page, 'Swagger UI');
 	await expect(page.locator('#swaggerui .info')).toBeVisible();
 	await navigate(page, 'API Info');
@@ -94,6 +97,9 @@ test('visits all pages without errors (OAS3)', async ({ page }) => {
 	}
 	await clickFileMenuItem(page, 'Source');
 	await expect(page.getByText('validation passed')).toBeVisible();
+	await clickFileMenuItem(page, 'Print Preview');
+	await expect(page.locator('app-swadoc h1')).toHaveText('Minimal OAS3');
+	await expect(page.locator('app-swadoc .propertycell', { hasText: 'tags' })).toBeVisible();
 	await clickFileMenuItem(page, 'Swagger UI');
 	await expect(page.locator('#swaggerui .info')).toBeVisible();
 	expect(errors).toEqual([]);

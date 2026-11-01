@@ -1,2 +1,261 @@
+<!--
+Copyright 2017 Denis Martin.  This file is part of swadit.
 
-<iframe src="assets/swadoc/index.html" id="swadocFrame" width="100%"></iframe>
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<div class="swadoc-toolbar no-print">
+  <button type="button" class="btn btn-primary btn-sm" (click)="print()" title="Print or save as PDF">
+    <i class="fa fa-fw fa-print"></i> Print
+  </button>
+  @if (apis.hasLoadingErrors) {
+    <span class="swadoc-warning text-danger">
+      <i class="fa fa-fw fa-exclamation-triangle"></i>
+      The API is not valid, so the document may be incomplete. See File / Source for details.
+    </span>
+  }
+</div>
+
+<div class="swadoc">
+
+  <h1>{{info.title}}</h1>
+  @if (info.version) {
+    <p>Version: {{info.version}}</p>
+  }
+  @if (info.contact; as contact) {
+    @if (contact.name || contact.email || contact.url) {
+      <p>Contact:
+        @if (contact.email) {
+          <a href="mailto:{{contact.email}}">{{contact.name || contact.email}}</a>
+        } @else {
+          {{contact.name}}
+        }
+        @if (contact.url) {
+          (<a [href]="contact.url">{{contact.url}}</a>)
+        }
+      </p>
+    }
+  }
+  @if (info.license?.name) {
+    <p>License:
+      @if (info.license.url) {
+        <a [href]="info.license.url">{{info.license.name}}</a>
+      } @else {
+        {{info.license.name}}
+      }
+    </p>
+  }
+  @if (info.termsOfService) {
+    <p>Terms of service: <a [href]="info.termsOfService">{{info.termsOfService}}</a></p>
+  }
+  @if (baseUrls.length > 0) {
+    <p>Base URL:
+      @for (url of baseUrls; track url; let last = $last) {
+        <span class="type">{{url}}</span>@if (!last) {, }
+      }
+    </p>
+  }
+
+  @if (info.description) {
+    <h2>Introduction</h2>
+    <markdown [data]="info.description"></markdown>
+  }
+
+  <h2 class="pathlistheading" id="swadoc-pathlist">Paths</h2>
+  <p>This API supports {{paths.length}} paths:</p>
+  <table class="pathlist">
+    <tbody>
+      @for (p of paths; track p.path) {
+        <tr>
+          <td><a [href]="docUrl + '#' + p.anchor" (click)="scrollTo(p.anchor)">{{p.path}}</a></td>
+          <td class="pathlist-methods">
+            @for (op of p.operations; track op.method) {
+              <span class="methodkey" [class]="op.deprecated ? 'deprecated' : 'methodhighlight-' + op.method">{{op.method}}</span>
+            }
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @for (p of paths; track p.path) {
+    <div class="pathsection">
+      <h3 class="pathheading" [id]="p.anchor">
+        {{p.path}}
+        <a class="pathlistlink" [href]="docUrl + '#swadoc-pathlist'" (click)="scrollTo('swadoc-pathlist')" title="Back to the list of paths">&#9776;&nbsp;</a>
+      </h3>
+      <p>
+        This path supports the following methods:
+        @for (op of p.operations; track op.method) {
+          <span class="methodkey" [class]="op.deprecated ? 'deprecated' : 'methodhighlight-' + op.method">{{op.method}}</span>
+        }
+      </p>
+
+      @for (op of p.operations; track op.method) {
+        <div class="operation">
+          <h4 class="methodheading" [class]="op.deprecated ? 'deprecated' : 'methodhighlight-' + op.method">
+            <span class="methodkey" [class]="'methodhighlight-' + op.method">{{op.method}}</span> {{p.path}}
+            @if (op.deprecated) {
+              <span class="deprecated-note">(deprecated)</span>
+            }
+          </h4>
+          @if (op.summary) {
+            <markdown [data]="op.summary"></markdown>
+          }
+
+          @if (op.description) {
+            <h5>Description</h5>
+            <markdown [data]="op.description"></markdown>
+          }
+
+          @if (op.parameters.length > 0) {
+            <h5>Parameters</h5>
+            <table>
+              <colgroup>
+                <col style="width:25%">
+                <col style="width:25%">
+                <col style="width:50%">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (param of op.parameters; track $index) {
+                  <tr>
+                    <td>
+                      <span [class.deprecated]="param.deprecated">{{param.name}}</span><br>
+                      <span class="paramproperties">in {{param.in}}@if (param.required) {, required}@if (param.deprecated) {, deprecated}</span>
+                    </td>
+                    <td class="type">{{param.type}}</td>
+                    <td>
+                      @if (param.description) {
+                        <markdown [data]="param.description"></markdown>
+                      }
+                      <ng-container *ngTemplateOutlet="values; context: { $implicit: param.schema }"></ng-container>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+
+          @if (op.body; as body) {
+            <h5>Request Body
+              @for (mediaType of body.mediaTypes; track mediaType) {
+                <span class="mediatype">({{mediaType}})</span>
+              }
+            </h5>
+            @if (body.description) {
+              <markdown [data]="body.description"></markdown>
+            }
+            <ng-container *ngTemplateOutlet="schemaView; context: { $implicit: body.schema, kind: 'Request' }"></ng-container>
+          }
+
+          @if (op.responses.length > 0) {
+            <h5>Responses</h5>
+            @for (resp of op.responses; track resp.code) {
+              <div class="responsebox">
+                <h6 class="responseheading">{{resp.code}}: {{resp.description}}
+                  @for (mediaType of resp.mediaTypes; track mediaType) {
+                    <span class="mediatype">({{mediaType}})</span>
+                  }
+                </h6>
+                <ng-container *ngTemplateOutlet="schemaView; context: { $implicit: resp.schema, kind: 'Response' }"></ng-container>
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- schema of a request or response body: type, description, property table and example -->
+<ng-template #schemaView let-schema let-kind="kind">
+  @if (schema) {
+    <p>Schema: <span class="type">{{schema.type}}</span></p>
+    @if (schema.description) {
+      <markdown [data]="schema.description"></markdown>
+    }
+    @if (schema.properties.length > 0) {
+      <table>
+        <colgroup>
+          <col style="width:30%">
+          <col style="width:20%">
+          <col style="width:50%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of schema.properties; track $index) {
+            <tr>
+              <td class="propertycell">
+                <div class="propertywrap">
+                  <span class="indent" [style.width.cm]="p.level * 0.5"></span>
+                  <div>
+                    @if (p.level > 0) {
+                      <span>&#9493;</span>
+                    }
+                    <span [class.deprecated]="p.schema.deprecated">{{p.name}}</span>
+                    @if (p.notes) {
+                      <br><span class="paramproperties">{{p.notes}}</span>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td class="type">{{p.type}}</td>
+              <td>
+                @if (p.schema.description) {
+                  <markdown [data]="p.schema.description"></markdown>
+                }
+                <ng-container *ngTemplateOutlet="values; context: { $implicit: p.schema }"></ng-container>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+    @if (schema.example) {
+      <p>{{kind}} Body Example:</p>
+      <markdown [data]="schema.example | language: 'json'"></markdown>
+    }
+  }
+</ng-template>
+
+<!-- default, example and allowed values of a parameter or property -->
+<ng-template #values let-schema>
+  @if (getEnum(schema); as allowed) {
+    <p>Allowed values:
+      @for (value of allowed; track $index; let last = $last) {
+        <span class="value">{{formatValue(value)}}</span>@if (!last) {, }
+      }
+    </p>
+  }
+  @if (schema.default !== undefined) {
+    <p>Default: <span class="value">{{formatValue(schema.default)}}</span></p>
+  }
+  @if (schema.example !== undefined) {
+    <p>Example: <span class="value">{{formatValue(schema.example)}}</span></p>
+  }
+</ng-template>

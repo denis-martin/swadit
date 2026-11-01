@@ -22,14 +22,7 @@ Althought Swadit is only run within a browser, you'll need [Node](https://nodejs
 npm install
 ```
 
-Since the print preview (swadoc) is a standalone Node package, you'll need to install its dependencies separately:
-```
-cd src/assets/swadoc
-npm install
-cd ../../..
-```
-
-Finally, compile the typescript sources to javascript:
+Then compile the typescript sources to javascript:
 ```
 npm run build
 ```
