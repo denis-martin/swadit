@@ -33,7 +33,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
             href="javascript:void(0)" (click)="method=m">
             <span style="text-transform: uppercase">{{m}}</span>
             @if (apis.current['paths'][path][m]['deprecated']) {
-              <span class="badge badge-warning">deprecated</span>
+              <span class="badge text-bg-warning">deprecated</span>
             }
           </a>
         </li>
@@ -113,7 +113,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                 </div>
               </div>
               @if (uncollapsedParameter[local.values.obj['name']]) {
-                <div class="card-block">
+                <div class="card-body">
                   <p class="headerType">This parameter applies to all operations on this path.</p>
                   @if (param['$ref']) {
                     <p class="headerType">Defined in {{param['$ref']}}:</p>
@@ -156,7 +156,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
               </div>
             </div>
             @if (uncollapsedParameter[local.values.obj['name']]) {
-              <div class="card-block">
+              <div class="card-body">
                 @if (param['$ref']) {
                   <p class="headerType">Defined in {{param['$ref']}}:</p>
                 }
@@ -191,7 +191,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
             </div>
           </div>
           @if (uncollapsedParameter['x-swadit-requestBody']) {
-            <div class="card-block">
+            <div class="card-body">
               @for (contentType of apis.keys(local.values.obj['content']); track contentType) {
                 <div>
                   <p>{{ contentType }}: @if (local.values.obj['content'][contentType]['schema'] && local.values.obj['content'][contentType]['schema']['$ref']) {
@@ -282,7 +282,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           </div>
         </div>
         @if (uncollapsedResponse[resp]) {
-          <div class="card-block">
+          <div class="card-body">
             @if (apis.current['paths'][path][method]['responses'][resp]['$ref']) {
               <p class="headerType">
                 Defined in {{apis.current['paths'][path][method]['responses'][resp]['$ref']}}:

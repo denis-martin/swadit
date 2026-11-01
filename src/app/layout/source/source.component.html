@@ -17,10 +17,10 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 
 <div class="editor-header">
   @if (!apis.config.readOnly) {
-    <button class="btn btn-primary mr-2" (click)="apply()">Apply</button>
+    <button class="btn btn-primary me-2" (click)="apply()">Apply</button>
   }
-  <button class="btn btn-success mr-2" (click)="validate()">Validate</button>
-  <button class="btn btn-warning mr-2" (click)="revert()">Revert</button>
+  <button class="btn btn-success me-2" (click)="validate()">Validate</button>
+  <button class="btn btn-warning me-2" (click)="revert()">Revert</button>
   <div class="mt-1" style="float: right">
     @if (applied===true) {
       <span style="color: #5cb85c">

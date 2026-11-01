@@ -26,7 +26,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       <div class="col-md-2">
         <label for="methodKey">Operation</label>
         <select id="methodKey" name="methodKey" [(ngModel)]="methodKey" required
-          class="form-control" style="text-transform: uppercase">
+          class="form-select" style="text-transform: uppercase">
           @for (methodKey of apis.methodKeys; track methodKey) {
             <option
               style="text-transform: uppercase">
@@ -36,7 +36,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         </select>
       </div>
       <div class="col-md-10">
-        <div class="form-group">
+        <div class="mb-3">
           <label for="pathKey">Path</label>
           <input type="text" id="pathKey" name="pathKey" [(ngModel)]="pathKey" required
             class="form-control" placeholder="Enter path" title="Path">
@@ -91,11 +91,11 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     @if (pathKey_orig) {
       <button class="btn btn-danger" type="button"
         (click)="deletePath()" title="Delete path"
-        [ngClass]="{ 'mr-auto': !methodKey_orig }">
+        [ngClass]="{ 'me-auto': !methodKey_orig }">
       Delete Path</button>
     }
     @if (methodKey_orig) {
-      <button class="btn btn-danger mr-auto" type="button"
+      <button class="btn btn-danger me-auto" type="button"
         (click)="deleteMethod()" title="Delete method">
       Delete Method</button>
     }

@@ -23,7 +23,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   }
   <div class="modal-body" id="modal-body">
     @if (!pathMode) {
-      <div class="form-group">
+      <div class="mb-3">
         <label for="responseKey">Name of response definition</label>
         <input type="text" id="responseKey" name="responseKey" [(ngModel)]="key" required
           class="form-control" placeholder="Enter name for response" title="Name of response">
@@ -32,11 +32,11 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     @if (pathMode) {
       <div>
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label for="responseKey">Response code</label>
             <select id="responseKey" name="responseKey" [ngModel]="key" required
               (ngModelChange)="statusCodeChanged($event)"
-              class="form-control" title="Response code">
+              class="form-select" title="Response code">
               @for (code of keys(httpStatusCodes); track code) {
                 <option value="{{code}}">
                   {{code}} &ndash; {{httpStatusCodes[code]}}
@@ -45,10 +45,10 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
               <option>default</option>
             </select>
           </div>
-          <div class="form-group col-md-6">
+          <div class="mb-3 col-md-6">
             <label for="refKey">Reference</label>
             <select id="refKey" name="refKey"
-              [(ngModel)]="obj['$ref']" class="form-control" title="Reference to #/responses">
+              [(ngModel)]="obj['$ref']" class="form-select" title="Reference to #/responses">
               <option [ngValue]="null || undefined">(none)</option>
               @for (def of keys(apis.current['responses']); track def) {
                 <option value="#/responses/{{def}}">
@@ -61,7 +61,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       </div>
     }
     @if (!obj['$ref']) {
-      <div class="form-group">
+      <div class="mb-3">
         <swadit-object-editor
           [schema]="apis.schemas.response" [(obj)]="obj" [title]="false">
         </swadit-object-editor>
@@ -70,7 +70,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   </div>
   <div class="modal-footer">
     @if (key_orig) {
-      <button class="btn btn-danger mr-auto" type="button" (click)="deleteResponse()" title="Delete response">
+      <button class="btn btn-danger me-auto" type="button" (click)="deleteResponse()" title="Delete response">
       Delete</button>
     }
     @if (errorStr) {

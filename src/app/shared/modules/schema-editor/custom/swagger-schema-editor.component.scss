@@ -39,6 +39,8 @@
 select.schema-control:not([size]):not([multiple]) {
 	max-width: 15em;
 	height: 1.95em;
+	padding-right: 1.6em;
+	background-position: right 0.3em center;
 }
 
 .schemaDescription {
@@ -67,7 +69,7 @@ td.label-text {
 	padding-left: 3px;
 }
 
-.input-group-addon {
+.input-group-text {
 	font-size: 1em;
 	padding: 0.3em 0.5em;
 }

@@ -18,9 +18,9 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 @for (item of obj; track trackByIndex(index, item); let index = $index) {
   <div>
     @for (p of keys(item); track trackByIndex(indexp, p); let indexp = $index) {
-      <div class="form-group">
+      <div class="mb-2">
         <div class="input-group input-group-overlapping-border">
-          <span class="input-group-addon clickable" (click)="collapsed[p] = !collapsed[p]">
+          <span class="input-group-text clickable" (click)="collapsed[p] = !collapsed[p]">
             @if (!collapsed[p]) {
               <i class="fa fa-caret-down"></i>
             }
@@ -31,7 +31,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           @if (isSecurityDefinition(p)) {
             <select
               id="{{id}}" [ngModel]="p" [ngModelOptions]="{standalone: true}" (ngModelChange)="changeProperty($event, index, p)"
-              class="form-control {{schema['x-swadit-input-class'] || ''}}"
+              class="form-select {{schema['x-swadit-input-class'] || ''}}"
               title="{{schema['description']}}">
               @for (o of keys(securityDefinitions); track o) {
                 <option>{{o}}</option>
@@ -44,7 +44,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
               placeholder="{{schema['description']}}"
               title="{{schema['description']}}">
           }
-          <span class="input-group-addon clickable" (click)="deleteItem($event, index)">
+          <span class="input-group-text clickable" (click)="deleteItem($event, index)">
             <i class="fa fa-trash"></i>
           </span>
         </div>
@@ -57,17 +57,17 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     }
   </div>
 }
-<div class="form-group">
+<div class="mb-2">
   <div class="input-group">
     <select
       id="{{id}}" [(ngModel)]="propertyToAdd" [ngModelOptions]="{standalone: true}"
-      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      class="form-select {{schema['x-swadit-input-class'] || ''}}"
       title="{{schema['description']}}">
       @for (o of keys(securityDefinitions); track o) {
         <option>{{o}}</option>
       }
     </select>
-    <span class="input-group-addon clickable" (click)="addProperty($event)">
+    <span class="input-group-text clickable" (click)="addProperty($event)">
       <i class="fa fa-plus"></i>
     </span>
   </div>

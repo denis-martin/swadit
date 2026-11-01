@@ -11,8 +11,8 @@
     }
     @if (dialogType=='fileAdd') {
       <p class="form-check">
-        <input type="checkbox" [(ngModel)]="addSource" name="addSource" id="addSource">
-        <label for="addSource">Add source file name to path descriptions</label>
+        <input type="checkbox" class="form-check-input" [(ngModel)]="addSource" name="addSource" id="addSource">
+        <label class="form-check-label" for="addSource">Add source file name to path descriptions</label>
       </p>
     }
     @if (dialogType=='fileDownload') {
