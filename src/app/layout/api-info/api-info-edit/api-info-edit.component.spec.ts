@@ -15,6 +15,30 @@ describe('ApiInfoEditComponent', () => {
 		expect(element.textContent).toContain('Title');
 	});
 
+	it('shows only the root properties not covered by other tabs in the General tab (OAS2)', () => {
+		const { fixture, element } = render();
+		const tab = Array.from<HTMLElement>(element.querySelectorAll('a.nav-link')).find(a => a.textContent.trim() == 'General');
+		tab.click();
+		fixture.detectChanges();
+		const pane = element.querySelector('#' + tab.getAttribute('aria-controls'));
+		const labels = Array.from<HTMLElement>(pane.querySelectorAll('.tab-content > swadit-object-editor > div > div > div > div > label'))
+			.map(l => l.textContent.trim());
+		expect(labels).toEqual(['Schemes', 'Host', 'Base Path', 'Consumes', 'Produces']);
+	});
+
+	it('applies changes from the General tab (OAS2)', async () => {
+		const { component, apis } = render();
+		component.api.host = 'example.com';
+		component.api.basePath = '';
+		component.api.schemes = [];
+		component.ok();
+		expect(apis.current.host).toBe('example.com');
+		expect(apis.current.basePath).toBeUndefined();
+		expect(apis.current.schemes).toBeUndefined();
+		expect(apis.current.consumes).toBeUndefined();
+		await expect(apis.validate(apis.current)).resolves.toBeTruthy();
+	});
+
 	it('does not change the API if nothing has been changed (OAS2)', () => {
 		const { component, apis } = render();
 		const orig = _cloneDeep(apis.current);

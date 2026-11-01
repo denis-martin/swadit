@@ -16,7 +16,7 @@ describe('SidebarComponent', () => {
 	it('lists the paths sorted', () => {
 		const { element, apis } = render();
 		expect(pathLinks(element)).toEqual(Object.keys(apis.current.paths).sort());
-		expect(element.querySelector('a[href="/path/%2Fpet"]')).toBeTruthy();
+		expect(element.querySelector('a[href="/path?name=%2Fpet"]')).toBeTruthy();
 	});
 
 	it('filters the paths', () => {

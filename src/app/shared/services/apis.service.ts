@@ -24,7 +24,7 @@ import { Subject } from 'rxjs';
 import { OpenAPI } from 'openapi-types';
 import SwaggerParser from '@apidevtools/swagger-parser';
 import * as YAML from 'js-yaml';
-import { clone as _clone, cloneDeep as _cloneDeep, merge as _merge, remove as _remove } from "lodash-es";
+import { clone as _clone, cloneDeep as _cloneDeep, merge as _merge, pick as _pick, remove as _remove } from "lodash-es";
 
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
 import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
@@ -102,6 +102,11 @@ export class ApisService
 	{
 		"oas2.0": {
 			root: Oas20Schema['default'],
+			// root properties that are not edited elsewhere (API info "General" tab)
+			general: {
+				type: 'object',
+				properties: _pick(Oas20Schema['default']['properties'], ['schemes', 'host', 'basePath', 'consumes', 'produces'])
+			},
 			info: Oas20SchemaInfo['default'],
 			contact: Oas20SchemaContact['default'],
 			license: Oas20SchemaLicense['default'],

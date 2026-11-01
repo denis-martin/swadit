@@ -32,7 +32,7 @@ describe('PathsComponent', () => {
 	it('opens a path on double click', () => {
 		const { element } = render();
 		element.querySelector('.path').dispatchEvent(new Event('dblclick'));
-		expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/path', '/pet']);
+		expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/path'], { queryParams: { name: '/pet' } });
 	});
 
 	it('hides editing functions for OAS3', () => {

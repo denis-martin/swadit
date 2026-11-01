@@ -63,15 +63,15 @@ export class ApiInfoEditComponent implements OnInit
 			if (!this.api['security']) {
 				this.api['security'] = [];
 			}
+			Object.keys(this.apis.schemas.general['properties']).forEach(p => {
+				const propertySchema = this.apis.resolveObj(this.apis.schemas.general['properties'][p], this.apis.schemas.root);
+				if (propertySchema['type'] == 'object' && !this.api[p]) {
+					this.api[p] = {};
+				} else if (propertySchema['type'] == 'array' && !this.api[p]) {
+					this.api[p] = [];
+				}
+			});
 		}
-		Object.keys(this.apis.schemas.root['properties']).forEach(p => {
-			const propertySchema = this.apis.resolveObj(this.apis.schemas.root['properties'][p], this.apis.schemas.root);
-			if (propertySchema['type'] == 'object' && !this.api[p]) {
-				this.api[p] = {};
-			} else if (propertySchema['type'] == 'array' && !this.api[p]) {
-				this.api[p] = [];
-			}
-		});
 	}
 
 	ngOnInit() 
@@ -88,11 +88,13 @@ export class ApiInfoEditComponent implements OnInit
 		this.apis.current['info'] = api['info'];
 		this.apis.current['externalDocs'] = api['externalDocs'];
 		this.apis.current['tags'] = api['tags'];
-		this.apis.current['securityDefinitions'] = api['securityDefinitions'];
-		this.apis.current['security'] = api['security'];
-		Object.keys(this.apis.schemas.root['properties']).forEach(p => {
-			this.apis.current[p] = api[p];
-		});
+		if (this.apis.isOas2) {
+			this.apis.current['securityDefinitions'] = api['securityDefinitions'];
+			this.apis.current['security'] = api['security'];
+			Object.keys(this.apis.schemas.general['properties']).forEach(p => {
+				this.apis.current[p] = api[p];
+			});
+		}
 
 		// clean up
 		this.apis.cleanUp(this.apis.schemas.contact, this.apis.current['info']['contact']);
@@ -103,25 +105,25 @@ export class ApiInfoEditComponent implements OnInit
 		if (this.apis.isOas2) {
 			this.apis.cleanUp(this.apis.schemas.securityDefinitions, this.apis.current['securityDefinitions']);
 			this.apis.cleanUp(this.apis.schemas.security, this.apis.current['security']);
+			this.apis.cleanUp(this.apis.schemas.general, this.apis.current);
 		}
-		this.apis.cleanUp(this.apis.schemas.root, this.apis.current);
 
-		// In OAS2, we have incomplete schemas, therefore we need to clean up some more
+		// remove empty objects created by the constructor (in OAS2, we also have incomplete schemas)
+		const cur = this.apis.current;
+		const isEmpty = (v: any) => v == null || Object.keys(v).length == 0;
+		if (isEmpty(cur['info']['contact'])) {
+			delete cur['info']['contact'];
+		}
+		if (isEmpty(cur['info']['license'])) {
+			delete cur['info']['license'];
+		}
+		if (isEmpty(cur['externalDocs'])) {
+			delete cur['externalDocs'];
+		}
+		if (isEmpty(cur['tags'])) {
+			delete cur['tags'];
+		}
 		if (this.apis.isOas2) {
-			const cur = this.apis.current;
-			const isEmpty = (v: any) => v == null || Object.keys(v).length == 0;
-			if (isEmpty(cur['info']['contact'])) {
-				delete cur['info']['contact'];
-			}
-			if (isEmpty(cur['info']['license'])) {
-				delete cur['info']['license'];
-			}
-			if (isEmpty(cur['externalDocs'])) {
-				delete cur['externalDocs'];
-			}
-			if (isEmpty(cur['tags'])) {
-				delete cur['tags'];
-			}
 			if (isEmpty(cur['securityDefinitions'])) {
 				delete cur['securityDefinitions'];
 			}

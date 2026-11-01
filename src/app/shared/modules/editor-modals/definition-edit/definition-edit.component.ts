@@ -32,7 +32,7 @@ import { ApisService } from '../../../services';
 export class DefinitionEditComponent implements OnInit 
 {
 	static readonly modalOptions: NgbModalOptions = {
-		size: "lg"
+		size: "xl"
 	}
 
 	key: string = null;
