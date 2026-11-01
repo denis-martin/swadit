@@ -14,8 +14,9 @@ const routes: Routes = [
 			{ path: 'api-info', loadChildren: () => import('./api-info/api-info.module').then(m => m.ApiInfoModule) },
 			{ path: 'definitions', loadChildren: () => import('./definitions/definitions.module').then(m => m.DefinitionsModule) },
 			{ path: 'paths', loadChildren: () => import('./paths/paths.module').then(m => m.PathsModule) },
-			{ path: 'path/:path', loadChildren: () => import('./path/path.module').then(m => m.PathModule) },
-			{ path: 'path/:path/:method', loadChildren: () => import('./path/path.module').then(m => m.PathModule) },
+			// path name (and optional method) are passed as query parameters (/path?name=%2Fpet&method=get),
+			// because some web servers reject or decode %2F in the URL path
+			{ path: 'path', loadChildren: () => import('./path/path.module').then(m => m.PathModule) },
 		]
 	}
 ];

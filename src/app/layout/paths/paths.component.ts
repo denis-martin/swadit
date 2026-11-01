@@ -113,6 +113,6 @@ export class PathsComponent implements OnInit
 
 	routeToPath(path: string)
 	{
-		this.router.navigate(['/path', path]);
+		this.router.navigate(['/path'], { queryParams: { name: path } });
 	}
 }

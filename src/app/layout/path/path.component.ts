@@ -50,9 +50,9 @@ export class PathComponent implements OnInit {
 	{
 		this.apis.activePath = this.path;
 		
-		this.routeSubscription = this.route.params.subscribe(params => {
-			this.path = params['path'];
-			this.method = params['method'];
+		this.routeSubscription = this.route.queryParamMap.subscribe(params => {
+			this.path = params.get('name');
+			this.method = params.get('method');
 			if (!this.method) {
 				const methods = this.getMethods();
 				//console.log(this.apis.current['paths'], this.path, methods);
