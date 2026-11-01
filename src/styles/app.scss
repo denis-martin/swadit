@@ -74,8 +74,14 @@ h6 {
 	font-size: 85%;
 	color: #bbb;
 	text-align: right;
-	vertical-align: top;
-	padding: 2pt 4px 0 4px;
+	vertical-align: baseline;
+	padding: 0 4px;
+}
+
+// align labels with the first line of text (or form control) of the cells next to them
+// (including nested tables, since rows without baseline-aligned cells have their baseline at the bottom)
+tr:has(> .label-text) td {
+	vertical-align: baseline;
 }
 
 .list-unstyled {
