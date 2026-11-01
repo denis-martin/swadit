@@ -1,19 +1,19 @@
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, convertToParamMap } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, map } from 'rxjs';
 
 import { PathModule } from './path.module';
 import { PathComponent } from './path.component';
 import { loadFixture, renderComponent, setCurrentApi } from 'testing/test-helpers';
 
 describe('PathComponent', () => {
-	let params: BehaviorSubject<any>;
+	let queryParams: BehaviorSubject<any>;
 	const render = (path: string, method?: string, api?: any) => {
-		params = new BehaviorSubject({ path, method });
+		queryParams = new BehaviorSubject(method ? { name: path, method } : { name: path });
 		return renderComponent(PathComponent, {
 			imports: [PathModule],
-			providers: [ { provide: ActivatedRoute, useValue: { params } } ],
+			providers: [ { provide: ActivatedRoute, useValue: { queryParamMap: queryParams.pipe(map(convertToParamMap)) } } ],
 			api
 		});
 	};
@@ -33,7 +33,7 @@ describe('PathComponent', () => {
 	it('shows the operation given in the route', () => {
 		const { component, fixture, element } = render('/pet', 'put');
 		expect(component.method).toBe('put');
-		params.next({ path: '/store/order' });
+		queryParams.next({ name: '/store/order' });
 		fixture.detectChanges();
 		expect(component.method).toBe('post');
 		expect(element.querySelector('h1').textContent).toBe('/store/order');
@@ -108,7 +108,7 @@ describe('PathComponent', () => {
 	it('leaves the page if the path does not exist in a newly loaded API', () => {
 		const { apis, component } = render('/pet');
 		const router = TestBed.inject(Router);
-		vi.spyOn(router, 'url', 'get').mockReturnValue('/path/%2Fpet');
+		vi.spyOn(router, 'url', 'get').mockReturnValue('/path?name=%2Fpet');
 		setCurrentApi(apis, loadFixture('minimalOas3Yaml'));
 		expect(component.path).toBe('');
 		expect(router.navigate).toHaveBeenCalledWith(['/api-info']);
