@@ -1,0 +1,38 @@
+{
+	"title": "Editor schema for OpenAPI 3.0 responses (headers and links are kept as they are).",
+	"id": "https://spec.openapis.org/oas/3.0/schema/2020-02-25#/definitions/Response",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"required": [ "description" ],
+	"x-swadit-editor-grid": [
+		[ "description" ],
+		[ "content" ]
+	],
+	"x-swadit-editor-grid-cols": {
+		"description": 12,
+		"content": 12
+	},
+	"properties": {
+		"description": {
+			"type": "string",
+			"description": "A short description of the response. CommonMark syntax MAY be used for rich text representation.",
+			"x-swadit-markdown": true,
+			"x-swadit-input-multiline": 5,
+			"x-swadit-input-class": "monospace"
+		},
+		"content": {
+			"type": "object",
+			"description": "Content by media type",
+			"additionalProperties": {
+				"type": "object",
+				"description": "Media type, e.g. application/json",
+				"properties": {
+					"schema": {
+						"$ref": "#/definitions/Schema",
+						"x-swadit-swagger-schema": true
+					}
+				}
+			}
+		}
+	}
+}

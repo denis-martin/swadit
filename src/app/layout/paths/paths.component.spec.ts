@@ -10,8 +10,8 @@ describe('PathsComponent', () => {
 	const render = (api?: any) => renderComponent(PathsComponent, { imports: [PathsModule], api });
 	const paths = (element: HTMLElement) => Array.from(element.querySelectorAll('.path')).map(e => e.textContent.split(/\s+/).filter(s => s)[0]);
 
-	it('lists the paths with their methods', () => {
-		const { element } = render();
+	it.each([ 'petstoreOas2Yaml', 'petstoreOas3Yaml' ] as const)('lists the paths with their methods (%s)', (api) => {
+		const { element } = render(loadFixture(api));
 		expect(paths(element)).toEqual(['/pet', '/pet/findByStatus', '/pet/findByTags', '/pet/{petId}', '/pet/{petId}/uploadImage',
 			'/store/inventory', '/store/order', '/store/order/{orderId}']);
 		const methods = element.querySelectorAll('.path')[0].querySelectorAll('.methodKey');
@@ -35,14 +35,22 @@ describe('PathsComponent', () => {
 		expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/path'], { queryParams: { name: '/pet' } });
 	});
 
-	it('hides editing functions for OAS3', () => {
-		const { element } = render(loadFixture('minimalOas3Yaml'));
+	it.each([ 'petstoreOas2Yaml', 'minimalOas3Yaml' ] as const)('shows editing functions (%s)', (api) => {
+		const { element } = render(loadFixture(api));
+		expect(element.querySelector('.edit-section')).toBeTruthy();
+		expect(Array.from(element.querySelectorAll('button')).map(b => b.textContent.trim())).toContain('Modify...');
+	});
+
+	it('hides editing functions in read-only mode', () => {
+		const { fixture, apis, element } = render();
+		apis.config.readOnly = true as any;
+		fixture.detectChanges();
 		expect(element.querySelector('.edit-section')).toBeNull();
-		expect(paths(element)).toEqual(['/items/{id}']);
+		expect(Array.from(element.querySelectorAll('button')).map(b => b.textContent.trim())).not.toContain('Delete');
 	});
 
 	it('deprecates the operations of the selected paths', async () => {
-		const api = loadFixture('petstoreYaml');
+		const api = loadFixture('petstoreOas3Yaml');
 		// non-operation keys first
 		api.paths['/pet'] = { 'x-ext': 'value', parameters: [], ...api.paths['/pet'] };
 		const { component, apis } = render(api);

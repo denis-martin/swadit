@@ -56,11 +56,13 @@ export class PathEditComponent implements OnInit
 		if (!this.obj_orig) this.obj_orig = {};
 
 		this.obj = _cloneDeep(this.obj_orig);
-		if (!this.obj['consumes']) {
-			this.obj['consumes'] = [];
-		}
-		if (!this.obj['produces']) {
-			this.obj['produces'] = [];
+		if (this.apis.isOas2) {
+			if (!this.obj['consumes']) {
+				this.obj['consumes'] = [];
+			}
+			if (!this.obj['produces']) {
+				this.obj['produces'] = [];
+			}
 		}
 		if (!this.obj['tags']) {
 			this.obj['tags'] = [];

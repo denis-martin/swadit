@@ -11,7 +11,7 @@ describe('ResponseViewComponent', () => {
 			schema: { '$ref': '#/definitions/Tag' },
 			examples: { 'application/json': { id: 1 } },
 			headers: { 'X-Rate': { type: 'integer' } }
-		});
+		}, loadFixture('petstoreOas2Yaml'));
 		expect(element.textContent).toContain('#/definitions/Tag');
 		expect(element.textContent).toContain('application/json:');
 		expect(element.textContent).toContain('Headers:');
@@ -23,6 +23,18 @@ describe('ResponseViewComponent', () => {
 		const { element } = render(api.paths['/items/{id}'].get.responses['200'], api);
 		expect(element.textContent).toContain('Response as application/json');
 		expect(element.textContent).toContain('#/components/schemas/Item');
+		expect(element.querySelector('swadit-swagger-schema-view')).toBeTruthy();
+	});
+
+	it('shows the headers (OAS3)', () => {
+		const { fixture, element } = render({
+			description: 'ok',
+			content: { 'application/json': { schema: { '$ref': '#/components/schemas/Tag' } } },
+			headers: { 'X-Rate': { schema: { type: 'integer' } } }
+		});
+		expect(element.textContent).toContain('Headers:');
+		const markdown = fixture.debugElement.queryAll((d: any) => d.name == 'markdown').map((d: any) => d.componentInstance.data);
+		expect(markdown.join()).toContain('X-Rate');
 	});
 
 	it('shows media types without schema and their examples (OAS3)', () => {

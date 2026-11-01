@@ -71,14 +71,14 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           </div>
         </ng-template>
       </li>
-      @if (apis.current['securityDefinitions'] || obj['security']) {
+      @if (apis.getComponents('securitySchemes') || obj['security']) {
         <li ngbNavItem>
           <a ngbNavLink>Security</a>
           <ng-template ngbNavContent>
             <div class="tab-content">
               <label for="security">Security</label>
               <swadit-security-editor [schema]="apis.schemas.security" [(obj)]="obj['security']" [id]="'security'"
-                [securityDefinitions]="apis.current['securityDefinitions']">
+                [securityDefinitions]="apis.getComponents('securitySchemes')">
               </swadit-security-editor>
             </div>
           </ng-template>

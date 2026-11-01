@@ -96,3 +96,10 @@ $topnav-background-color: #222;
     height: 1.5em;
     margin-top: -0.2em;
 }
+
+/* major spec version behind the API title */
+.spec-version {
+    color: #aaa;
+    font-size: 70%;
+    margin-left: 0.4em;
+}

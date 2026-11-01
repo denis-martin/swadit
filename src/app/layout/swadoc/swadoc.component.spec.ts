@@ -5,11 +5,13 @@ import { loadFixture, renderComponent } from 'testing/test-helpers';
 describe('SwadocComponent', () => {
 	const render = (api?: any) => renderComponent(SwadocComponent, { imports: [SwadocModule], api });
 
+	const versions = [ 'petstoreOas2Yaml', 'petstoreOas3Yaml' ] as const;
+
 	const operation = (component: SwadocComponent, path: string, method: string) =>
 		component.paths.find(p => p.path == path).operations.find(o => o.method == method);
 
-	it('renders the API info and the sorted list of paths', () => {
-		const { component, element } = render();
+	it.each(versions)('renders the API info and the sorted list of paths (%s)', (api) => {
+		const { component, element } = render(loadFixture(api));
 		expect(element.querySelector('.swadoc h1').textContent).toContain('Swagger Petstore');
 		expect(element.textContent).toContain('Contact: demo@froschbach.io');
 		expect(element.textContent).toContain('License: Apache 2.0');
@@ -23,16 +25,16 @@ describe('SwadocComponent', () => {
 		expect(element.querySelector('.pathheading').id).toBe('swadoc-pet');
 	});
 
-	it('shows the parameters of an operation (OAS2)', () => {
-		const { component, element } = render();
+	it.each(versions)('shows the parameters of an operation (%s)', (api) => {
+		const { component, element } = render(loadFixture(api));
 		const op = operation(component, '/pet/findByStatus', 'get');
 		expect(op.parameters).toEqual([expect.objectContaining({ name: 'status', in: 'query', required: true, type: 'array (string)' })]);
 		expect(component.getEnum(op.parameters[0].schema)).toEqual(['available', 'pending', 'sold']);
 		expect(element.textContent).toContain('Allowed values: "available", "pending", "sold"');
 	});
 
-	it('shows the request body with nested properties and an example (OAS2)', () => {
-		const { component, element } = render();
+	it.each(versions)('shows the request body with nested properties and an example (%s)', (api) => {
+		const { component, element } = render(loadFixture(api));
 		const body = operation(component, '/pet', 'post').body;
 		expect(body.mediaTypes).toEqual(['application/json', 'application/xml']);
 		expect(body.description).toBe('Pet object that needs to be added to the store');
@@ -53,8 +55,8 @@ describe('SwadocComponent', () => {
 		expect(element.textContent).toContain('Request Body Example:');
 	});
 
-	it('shows the responses (OAS2)', () => {
-		const { component } = render();
+	it.each(versions)('shows the responses (%s)', (api) => {
+		const { component } = render(loadFixture(api));
 		const responses = operation(component, '/pet/findByStatus', 'get').responses;
 		expect(responses.map(r => [r.code, r.description])).toEqual([['200', 'successful operation'], ['400', 'Invalid status value']]);
 		expect(responses[0].schema.type).toBe('array (Pet)');
@@ -64,7 +66,7 @@ describe('SwadocComponent', () => {
 		expect(responses[1].mediaTypes).toEqual([]);
 	});
 
-	it('supports OpenAPI 3.0', () => {
+	it('shows servers, parameters, request bodies and responses (OAS3)', () => {
 		const api = loadFixture('minimalOas3Yaml');
 		api.servers = [ { url: 'https://example.com/api' } ];
 		api.paths['/items/{id}'].put = {
@@ -95,9 +97,12 @@ describe('SwadocComponent', () => {
 		expect(element.querySelectorAll('.methodheading').length).toBe(2);
 	});
 
-	it('does not expand recursive schemas endlessly', () => {
-		const api = loadFixture('petstoreYaml');
-		api.definitions.Category.properties.parent = { $ref: '#/definitions/Category' };
+	it.each([
+		[ 'OAS2', 'petstoreOas2Yaml', (api: any) => api.definitions, '#/definitions/Category' ],
+		[ 'OAS3', 'petstoreOas3Yaml', (api: any) => api.components.schemas, '#/components/schemas/Category' ]
+	] as const)('does not expand recursive schemas endlessly (%s)', (version, fixture, schemas, ref) => {
+		const api = loadFixture(fixture);
+		schemas(api).Category.properties.parent = { $ref: ref };
 		const { component } = render(api);
 		const props = operation(component, '/pet', 'post').body.schema.properties;
 		expect(props.filter(p => p.name == 'parent').map(p => [p.level, p.type])).toEqual([[1, 'Category']]);

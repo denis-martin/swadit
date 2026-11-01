@@ -174,65 +174,98 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   </div>
 }
 
-<!-- [OAS2] .security -->
-@if (apis.isOas2 && (apis.current['securityDefinitions'] || apis.current['security'])) {
+<!-- [OAS3] .servers -->
+@if (apis.isOas3 && apis.current['servers']) {
+  <div class="api-info api-info-element">
+    <h2>Servers</h2>
+    <table class="tag-table">
+      <tbody>
+        @for (server of apis.current['servers']; track server) {
+          <tr>
+            <td style="font-weight: bold">{{server['url']}}</td>
+            <td>
+              @if (server['description']) {
+                <div>{{server['description']}}</div>
+              }
+              @for (v of keys(server['variables']); track v) {
+                <div>
+                  <span class="label-text">{{'{'}}{{v}}{{'}'}}</span>
+                  default: {{server['variables'][v]['default']}}
+                  @if (server['variables'][v]['enum']) {
+                    <span class="headerType"> ({{server['variables'][v]['enum'].join(' | ')}})</span>
+                  }
+                  @if (server['variables'][v]['description']) {
+                    <span> &ndash; {{server['variables'][v]['description']}}</span>
+                  }
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<!-- .security (OAS2: .securityDefinitions, OAS3: .components.securitySchemes) -->
+@if (apis.getComponents('securitySchemes') || apis.current['security']) {
   <div class="api-info api-info-element">
     <h2>Security</h2>
-    @for (def of keys(apis.current['securityDefinitions']); track def) {
+    @for (key of keys(apis.getComponents('securitySchemes')); track key) {
+      @let def = apis.resolveObj(apis.getComponents('securitySchemes')[key]) || {};
       <div>
-        <p>Security definition: <b>{{def}}</b></p>
+        <p>{{ apis.isOas3 ? 'Security scheme' : 'Security definition' }}: <b>{{key}}</b></p>
         <table>
           <tbody>
             <tr>
               <td class="label-text">type</td>
-              <td>{{apis.current['securityDefinitions'][def]['type']}}</td>
+              <td>{{def['type']}}</td>
             </tr>
-            @if (apis.current['securityDefinitions'][def]['description']) {
+            @if (def['description']) {
               <tr>
                 <td class="label-text">description</td>
-                <td><markdown [data]="apis.current['securityDefinitions'][def]['description']"></markdown></td>
+                <td><markdown [data]="def['description']"></markdown></td>
               </tr>
             }
-            @if (apis.current['securityDefinitions'][def]['name']) {
-              <tr>
-                <td class="label-text">name</td>
-                <td>{{apis.current['securityDefinitions'][def]['name']}}</td>
-              </tr>
+            @for (p of securitySchemeProperties; track p.key) {
+              @if (def[p.key]) {
+                <tr>
+                  <td class="label-text">{{p.label}}</td>
+                  <td>{{def[p.key]}}</td>
+                </tr>
+              }
             }
-            @if (apis.current['securityDefinitions'][def]['in']) {
-              <tr>
-                <td class="label-text">in</td>
-                <td>{{apis.current['securityDefinitions'][def]['in']}}</td>
-              </tr>
-            }
-            @if (apis.current['securityDefinitions'][def]['flow']) {
-              <tr>
-                <td class="label-text">flow</td>
-                <td>{{apis.current['securityDefinitions'][def]['flow']}}</td>
-              </tr>
-            }
-            @if (apis.current['securityDefinitions'][def]['authorizationUrl']) {
-              <tr>
-                <td class="label-text">auth URL</td>
-                <td>{{apis.current['securityDefinitions'][def]['authorizationUrl']}}</td>
-              </tr>
-            }
-            @if (apis.current['securityDefinitions'][def]['tokenUrl']) {
-              <tr>
-                <td class="label-text">token URL</td>
-                <td>{{apis.current['securityDefinitions'][def]['tokenUrl']}}</td>
-              </tr>
-            }
-            @if (apis.current['securityDefinitions'][def]['scopes']) {
+            <!-- OAS2 -->
+            @if (def['scopes']) {
               <tr>
                 <td class="label-text">scopes</td>
                 <td>
+                  <ng-container *ngTemplateOutlet="scopesTable; context: { scopes: def['scopes'] }"></ng-container>
+                </td>
+              </tr>
+            }
+            <!-- OAS3 -->
+            @for (flow of keys(def['flows']); track flow) {
+              <tr>
+                <td class="label-text">flow</td>
+                <td>
+                  <b>{{flow}}</b>
                   <table>
                     <tbody>
-                      @for (scope of keys(apis.current['securityDefinitions'][def]['scopes']); track scope) {
+                      @for (p of oauthFlowProperties; track p.key) {
+                        @if (def['flows'][flow][p.key]) {
+                          <tr>
+                            <td class="label-text">{{p.label}}</td>
+                            <td>{{def['flows'][flow][p.key]}}</td>
+                          </tr>
+                        }
+                      }
+                      @if (keys(def['flows'][flow]['scopes']).length > 0) {
                         <tr>
-                          <td style="font-weight: bold">{{scope}}</td>
-                          <td>{{apis.current['securityDefinitions'][def]['scopes'][scope]}}</td>
+                          <td class="label-text">scopes</td>
+                          <td>
+                            <ng-container *ngTemplateOutlet="scopesTable; context: { scopes: def['flows'][flow]['scopes'] }"></ng-container>
+                          </td>
                         </tr>
                       }
                     </tbody>
@@ -268,6 +301,19 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     }
   </div>
 }
+
+<ng-template #scopesTable let-scopes="scopes">
+  <table>
+    <tbody>
+      @for (scope of keys(scopes); track scope) {
+        <tr>
+          <td style="font-weight: bold">{{scope}}</td>
+          <td>{{scopes[scope]}}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</ng-template>
 
 @if (apis.hasExtensions(apis.current) || apis.hasExtensions(apis.current['info'])) {
   <div class="api-info api-info-element">

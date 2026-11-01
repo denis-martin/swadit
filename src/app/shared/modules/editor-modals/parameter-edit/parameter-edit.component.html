@@ -31,10 +31,10 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         <div class="mb-3">
           <label for="refKey">Reference</label>
           <select id="refKey" name="refKey"
-            [(ngModel)]="obj['$ref']" class="form-select" title="Reference to #/parameters">
+            [(ngModel)]="obj['$ref']" class="form-select" title="Reference to a parameter definition">
             <option [ngValue]="null || undefined">(none)</option>
-            @for (def of apis.keys(apis.current['parameters']); track def) {
-              <option value="#/parameters/{{def}}">
+            @for (def of apis.keys(apis.getComponents('parameters')); track def) {
+              <option value="{{apis.componentRef('parameters', def)}}">
                 {{def}}
               </option>
             }
@@ -54,13 +54,17 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           @if (!pathMode) {
             <label for="parameterSchema">Parameter definition</label>
           }
-          @if (obj['in'] != 'body') {
+          @if (apis.isOas3) {
+            <swadit-object-editor
+              [id]="'parameterSchema'"
+              [schema]="apis.schemas.parameter" [(obj)]="obj" [title]="false">
+            </swadit-object-editor>
+          } @else if (obj['in'] != 'body') {
             <swadit-object-editor
               [id]="'parameterSchema'"
               [schema]="apis.schemas.parameterNonBody" [(obj)]="obj" [title]="false">
             </swadit-object-editor>
-          }
-          @if (obj['in'] == 'body') {
+          } @else {
             <swadit-object-editor
               [id]="'parameterSchema'"
               [schema]="apis.schemas.parameterBody" [(obj)]="obj" [title]="false">

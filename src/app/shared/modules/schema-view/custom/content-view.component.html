@@ -1,0 +1,64 @@
+<!--
+Copyright 2017 Denis Martin.  This file is part of swadit.
+
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+@for (contentType of apis.keys(content); track contentType) {
+  @let media = mediaType(contentType);
+  <div class="mediaType">
+    <p>
+      {{ label }}{{ contentType }}:
+      @if (media['schema'] && media['schema']['$ref']) {
+        <span class="headerType">{{ media['schema']['$ref'] }}</span>
+      }
+    </p>
+    @if (media['schema']) {
+      <swadit-swagger-schema-view [obj]="apis.resolveObj(media['schema'])">
+      </swadit-swagger-schema-view>
+    }
+    @if (media['example'] != null) {
+      <div>
+        <p>Example:</p>
+        <markdown [data]="apis.toJson(media['example']) | language: 'json'"></markdown>
+      </div>
+    }
+    @if (media['examples']) {
+      <div>
+        <p>Examples:</p>
+        @for (k of apis.keys(media['examples']); track k) {
+          <div>
+            <label>{{k}}:</label>
+            @if (media['examples'][k] && media['examples'][k]['$ref']) {
+              <span class="headerType"> {{ media['examples'][k]['$ref'] }}</span>
+            }
+            <markdown [data]="apis.toJson(apis.exampleValue(media['examples'][k])) | language: 'json'"></markdown>
+          </div>
+        }
+      </div>
+    }
+    @if (media['schema']) {
+      <div>
+        <p class="clickable" (click)="toggleGeneratedExample(contentType)">
+          Example (generated)@if (showGeneratedExample(contentType)) {<span>:</span>} @else {<span>...</span>}
+        </p>
+        @if (showGeneratedExample(contentType)) {
+          <markdown
+            [data]="generateExample(media['schema']) | language: 'json'">
+          </markdown>
+        }
+      </div>
+    }
+  </div>
+}

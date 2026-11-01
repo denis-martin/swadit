@@ -92,9 +92,14 @@ export class SecurityEditorComponent implements OnInit
 		if (!this.securityDefinitions || !this.securityDefinitions[secdef]) {
 			return this.securityScope;
 		}
+		const def = this.securityDefinitions[secdef];
+		// OAS2: scopes of the definition, OAS3: scopes of all OAuth flows of the scheme
+		const scopes = this.keys(def['scopes']);
+		for (const flow of Object.values<any>(def['flows'] || {})) {
+			this.keys(flow && flow['scopes']).filter(scope => !scopes.includes(scope)).forEach(scope => scopes.push(scope));
+		}
 		const s = _cloneDeep(this.securityScope);
-		s['items']['enum'] = this.securityDefinitions[secdef]['scopes'] ? 
-			this.keys(this.securityDefinitions[secdef]['scopes']) : [];
+		s['items']['enum'] = scopes;
 		return s;
 	}
 

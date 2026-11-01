@@ -65,14 +65,17 @@ export class DefinitionEditComponent implements OnInit
 		this.key = this.key.trim();
 
 		if (this.key != this.key_orig && 
-			this.apis.current['definitions'] && 
-			this.apis.current['definitions'][this.key]) 
+			this.apis.getComponents('schemas') && 
+			this.apis.getComponents('schemas')[this.key]) 
 		{
 			this.errorStr = "Key name already exists.";
 			return;
 		}
 
-		if (!this.obj['type'] && !this.obj['$ref'] && !Array.isArray(this.obj['allOf'])) {
+		// OAS3 composites (oneOf, anyOf, not) can only be edited in the source view, but are kept
+		const composites = ['allOf', 'oneOf', 'anyOf'].filter(c => Array.isArray(this.obj[c]));
+		// schemas with properties but without type are (implicit) object schemas
+		if (!this.obj['type'] && !this.obj['$ref'] && composites.length == 0 && !this.obj['not'] && !this.obj['properties']) {
 			this.errorStr = "Please enter a type or $ref.";
 			return;
 		}
@@ -85,12 +88,9 @@ export class DefinitionEditComponent implements OnInit
 		console.log("definition-edit", o);
 
 		if (!this.key_orig) {
-			if (!this.apis.current['definitions']) {
-				this.apis.current['definitions'] = {};
-			}
-			this.apis.current['definitions'][this.key] = this.obj_orig;
+			this.apis.getOrCreateComponents('schemas')[this.key] = this.obj_orig;
 		} else if (this.key != this.key_orig) {
-			this.apis.renameComponent('definitions', this.key_orig, this.key);
+			this.apis.renameComponent('schemas', this.key_orig, this.key);
 		}
 
 		this.errorStr = "";
@@ -101,7 +101,7 @@ export class DefinitionEditComponent implements OnInit
 	{
 		console.log("DefinitionEditComponent.deleteDefinition()");
 		if (!this.key_orig) return;
-		delete this.apis.current['definitions'][this.key_orig];
+		delete this.apis.getComponents('schemas')[this.key_orig];
 		this.activeModal.close('ok');
 	}
 }

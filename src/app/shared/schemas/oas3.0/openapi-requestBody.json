@@ -1,0 +1,44 @@
+{
+	"title": "Editor schema for OpenAPI 3.0 request bodies.",
+	"id": "https://spec.openapis.org/oas/3.0/schema/2020-02-25#/definitions/RequestBody",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"required": [ "content" ],
+	"x-swadit-editor-grid": [
+		[ "description", "required" ],
+		[ "content" ]
+	],
+	"x-swadit-editor-grid-cols": {
+		"description": 10,
+		"required": 2,
+		"content": 12
+	},
+	"properties": {
+		"description": {
+			"type": "string",
+			"description": "A brief description of the request body. CommonMark syntax MAY be used for rich text representation.",
+			"x-swadit-markdown": true,
+			"x-swadit-input-multiline": 3,
+			"x-swadit-input-class": "monospace"
+		},
+		"required": {
+			"type": "boolean",
+			"description": "Determines if the request body is required in the request.",
+			"default": false
+		},
+		"content": {
+			"type": "object",
+			"description": "Content by media type",
+			"additionalProperties": {
+				"type": "object",
+				"description": "Media type, e.g. application/json",
+				"properties": {
+					"schema": {
+						"$ref": "#/definitions/Schema",
+						"x-swadit-swagger-schema": true
+					}
+				}
+			}
+		}
+	}
+}

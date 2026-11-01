@@ -27,6 +27,8 @@ import { SwaggerSchemaViewComponent } from './custom/swagger-schema-view.compone
 import { ResponseViewComponent } from './custom/response-view.component';
 import { ParameterViewComponent } from './custom/parameter-view.component';
 import { ExtensionsViewComponent } from './custom/extensions-view.component';
+import { ContentViewComponent } from './custom/content-view.component';
+import { RequestBodyViewComponent } from './custom/request-body-view.component';
 
 @NgModule({
 	imports: [
@@ -40,7 +42,9 @@ import { ExtensionsViewComponent } from './custom/extensions-view.component';
 		SwaggerSchemaViewComponent,
 		ResponseViewComponent,
 		ParameterViewComponent,
-		ExtensionsViewComponent
+		ExtensionsViewComponent,
+		ContentViewComponent,
+		RequestBodyViewComponent
 	],
 	exports: [
 		SchemaViewComponent,
@@ -48,7 +52,9 @@ import { ExtensionsViewComponent } from './custom/extensions-view.component';
 		SwaggerSchemaViewComponent,
 		ResponseViewComponent,
 		ParameterViewComponent,
-		ExtensionsViewComponent
+		ExtensionsViewComponent,
+		ContentViewComponent,
+		RequestBodyViewComponent
 	]
 })
 export class SchemaViewModule { }

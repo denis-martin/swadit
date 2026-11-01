@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-@if (!apis.config.readOnly && apis.isOas2) {
+@if (!apis.config.readOnly) {
   <div class="edit-section" (click)="addPath($event)" title="Add item">
     <i class="fa fa-plus"></i>
   </div>
@@ -52,10 +52,10 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         <button type="button" class="btn btn-outline-secondary btn-sm" (click)="apis.inverseSelectedPaths()">Invers</button>
         <button type="button" class="btn btn-outline-secondary btn-sm" disabled title="not yet implemented">By...</button>
       </div>
-      @if (!apis.config.readOnly && apis.isOas2) {
+      @if (!apis.config.readOnly) {
         <button type="button" class="btn btn-outline-secondary btn-sm ms-1" (click)="apis.deleteSelectedPaths()">Delete</button>
       }
-      @if (!apis.config.readOnly && apis.isOas2) {
+      @if (!apis.config.readOnly) {
         <button type="button" class="btn btn-outline-secondary btn-sm ms-1" (click)="modify($event)"
         [disabled]="apis.getLength(apis.selectedPaths) == 0">Modify...</button>
       }

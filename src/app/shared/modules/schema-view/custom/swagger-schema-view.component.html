@@ -31,6 +31,40 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           </td>
         </tr>
       }
+      <!-- OAS3 composites -->
+      @for (composite of ['oneOf', 'anyOf']; track composite) {
+        @if (obj[composite]) {
+          <tr>
+            <td class="label-text">{{ composite == 'oneOf' ? 'one of' : 'any of' }}</td>
+            <td style="padding: 0">
+              @for (compositeObj of obj[composite]; track compositeObj) {
+                <div>
+                  @if (compositeObj['$ref']) {
+                    <span class="headerType">{{compositeObj['$ref']}}</span>
+                  }
+                  <swadit-swagger-schema-view [obj]="apis.resolveObj(compositeObj)">
+                  </swadit-swagger-schema-view>
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      }
+      @if (obj['not']) {
+        <tr>
+          <td class="label-text">not</td>
+          <td style="padding: 0">
+            <swadit-swagger-schema-view [obj]="apis.resolveObj(obj['not'])">
+            </swadit-swagger-schema-view>
+          </td>
+        </tr>
+      }
+      @if (obj['discriminator'] && obj['discriminator']['propertyName']) {
+        <tr>
+          <td class="label-text">discriminator</td>
+          <td>{{obj['discriminator']['propertyName']}}</td>
+        </tr>
+      }
       @if (obj['type'] && ((obj['type'] != 'object' && obj['type'] != 'array') || (obj['type'] == 'object' && !obj['properties']) || (obj['type'] == 'array' && !obj['items']))) {
         <tr>
           <td class="label-text">type</td>
@@ -102,6 +136,12 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         <tr>
           <td class="label-text">format</td>
           <td>{{obj['format']}}</td>
+        </tr>
+      }
+      @if (obj['nullable']) {
+        <tr>
+          <td class="label-text">nullable</td>
+          <td>yes</td>
         </tr>
       }
       @if (obj['enum']) {

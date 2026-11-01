@@ -1,0 +1,153 @@
+openapi: 3.0.3
+info:
+  title: Features OAS3
+  version: '1.0'
+servers:
+  - url: https://{env}.example.com/v1
+    description: Main server
+    variables:
+      env:
+        default: api
+        enum:
+          - api
+          - staging
+        description: Environment
+  - url: /local
+security:
+  - oauth:
+      - read
+  - {}
+paths:
+  /items:
+    get:
+      operationId: listItems
+      parameters:
+        - name: filter
+          in: query
+          schema:
+            type: string
+            nullable: true
+          examples:
+            simple:
+              value: name
+      responses:
+        '200':
+          description: ok
+          headers:
+            X-Rate-Limit:
+              $ref: '#/components/headers/RateLimit'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Item'
+              examples:
+                one:
+                  $ref: '#/components/examples/Item'
+    post:
+      operationId: createItem
+      requestBody:
+        $ref: '#/components/requestBodies/Item'
+      responses:
+        '201':
+          description: created
+          links:
+            self:
+              $ref: '#/components/links/Self'
+      callbacks:
+        onCreated:
+          $ref: '#/components/callbacks/Created'
+  /items/{id}:
+    put:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: The new item
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        default:
+          description: done
+      security:
+        - basic: []
+components:
+  schemas:
+    Item:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+        value:
+          oneOf:
+            - type: string
+            - type: integer
+          nullable: true
+    Pet:
+      properties:
+        name:
+          type: string
+      discriminator:
+        propertyName: name
+  requestBodies:
+    Item:
+      description: An item
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Item'
+  headers:
+    RateLimit:
+      description: Requests per hour
+      schema:
+        type: integer
+  examples:
+    Item:
+      summary: An example item
+      value:
+        id: abc
+  links:
+    Self:
+      operationId: listItems
+  callbacks:
+    Created:
+      '{$request.body#/callbackUrl}':
+        post:
+          responses:
+            '200':
+              description: ok
+  securitySchemes:
+    key:
+      type: apiKey
+      name: X-Key
+      in: header
+    basic:
+      type: http
+      scheme: basic
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    oauth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://example.com/auth
+          scopes:
+            read: read access
+        clientCredentials:
+          tokenUrl: https://example.com/token
+          scopes:
+            write: write access
+    oidc:
+      type: openIdConnect
+      openIdConnectUrl: https://example.com/.well-known/openid-configuration

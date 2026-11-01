@@ -40,6 +40,7 @@ export class ResponseEditComponent implements OnInit
 	httpStatusCodes = httpStatusCodes;
 
 	pathMode: boolean = false;
+	/** the operation of the response (path mode only, otherwise the response is a component) */
 	parent: {};
 
 	key: string = null;
@@ -72,7 +73,8 @@ export class ResponseEditComponent implements OnInit
 		}
 		this.key = this.key.trim();
 
-		if (this.key != this.key_orig && this.parent['responses'] && this.parent['responses'][this.key]) 
+		const responses = this.responses();
+		if (this.key != this.key_orig && responses && responses[this.key]) 
 		{
 			if (this.pathMode) {
 				this.errorStr = "Response code already exists.";
@@ -95,7 +97,13 @@ export class ResponseEditComponent implements OnInit
 
 		const o = _cloneDeep(this.obj);
 		this.apis.cleanUp(this.apis.schemas.response, o);
-		this.apis.cleanUpSwaggerSchema(o['schema']);
+		if (this.apis.isOas3) {
+			for (const mediaType of Object.values<any>(o['content'] || {})) {
+				this.apis.cleanUpSwaggerSchema(mediaType && mediaType['schema']);
+			}
+		} else {
+			this.apis.cleanUpSwaggerSchema(o['schema']);
+		}
 
 		Object.keys(this.obj_orig).forEach(k => delete this.obj_orig[k]);
 		if (this.obj['$ref']) {
@@ -106,10 +114,14 @@ export class ResponseEditComponent implements OnInit
 		console.log("response-edit", this.obj_orig);
 
 		if (!this.key_orig) {
-			if (!this.parent['responses']) {
-				this.parent['responses'] = {};
+			if (this.pathMode) {
+				if (!this.parent['responses']) {
+					this.parent['responses'] = {};
+				}
+				this.parent['responses'][this.key] = this.obj_orig;
+			} else {
+				this.apis.getOrCreateComponents('responses')[this.key] = this.obj_orig;
 			}
-			this.parent['responses'][this.key] = this.obj_orig;
 		} else if (this.key != this.key_orig) {
 			if (this.pathMode) {
 				this.apis.renameObjectKey(this.parent['responses'], this.key_orig, this.key);
@@ -125,8 +137,14 @@ export class ResponseEditComponent implements OnInit
 	deleteResponse()
 	{
 		if (!this.key_orig) return;
-		delete this.parent['responses'][this.key_orig];
+		delete this.responses()[this.key_orig];
 		this.activeModal.close('ok');
+	}
+
+	/** the responses of the operation (path mode) or the response components */
+	responses(): any
+	{
+		return this.pathMode ? this.parent['responses'] : this.apis.getComponents('responses');
 	}
 
 	keys(obj)

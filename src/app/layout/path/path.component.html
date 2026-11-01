@@ -15,7 +15,7 @@ You should have received a copy of the GNU General Public License
 along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
-@if (!apis.config.readOnly && apis.isOas2) {
+@if (!apis.config.readOnly) {
   <div class="edit-section" (click)="editPath($event, path, method)">
     <i class="fa fa-pencil"></i>
   </div>
@@ -38,7 +38,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           </a>
         </li>
       }
-      @if (!apis.config.readOnly && apis.isOas2) {
+      @if (!apis.config.readOnly) {
         <li class="nav-item">
           <a class="nav-link" [ngClass]="{ 'active': !method }"
             href="javascript:void(0)" (click)="editPath($event, path)">
@@ -73,7 +73,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         <!-- parameters -->
         <h2 class="clickable" (click)="collapsedParameters = !collapsedParameters">
           Parameters
-          @if (!apis.config.readOnly && apis.isOas2) {
+          @if (!apis.config.readOnly) {
             <span class="edit-subsection" (click)="editParameter($event)" title="Add parameter">
               <i class="fa fa-plus"></i>
             </span>
@@ -96,15 +96,15 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                     @if (local.values.obj['in']) {
                       <span class="headerType"> in {{local.values.obj['in']}}</span>
                     }
-                    @if (local.values.obj['type']) {
-                      <span class="headerType"> ({{local.values.obj['type']}})</span>
+                    @if (paramType(local.values.obj)) {
+                      <span class="headerType"> ({{paramType(local.values.obj)}})</span>
                     }
                     @if (local.values.obj['description']) {
                       <span> {{local.values.obj['description']}}</span>
                     }
                   </div>
                   <div class="col-md-1">
-                    @if (!apis.config.readOnly && apis.isOas2) {
+                    @if (!apis.config.readOnly) {
                       <div class="edit-card" (click)="editParameter($event, param, true)">
                         <i class="fa fa-fw fa-pencil"></i>
                       </div>
@@ -139,15 +139,15 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                   @if (local.values.obj['in']) {
                     <span class="headerType"> in {{local.values.obj['in']}}</span>
                   }
-                  @if (local.values.obj['type']) {
-                    <span class="headerType"> ({{local.values.obj['type']}})</span>
+                  @if (paramType(local.values.obj)) {
+                    <span class="headerType"> ({{paramType(local.values.obj)}})</span>
                   }
                   @if (local.values.obj['description']) {
                     <span> {{local.values.obj['description']}}</span>
                   }
                 </div>
                 <div class="col-md-1">
-                  @if (!apis.config.readOnly && apis.isOas2) {
+                  @if (!apis.config.readOnly) {
                     <div class="edit-card" (click)="editParameter($event, param)">
                       <i class="fa fa-fw fa-pencil"></i>
                     </div>
@@ -168,85 +168,52 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         }
         @if (apis.isOas3 && apis.current['paths'][path][method]['requestBody']) {
           <div
-            swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['requestBody'])}" #local="swLet"
+            swLet [values]="{obj: apis.resolveObj(apis.current['paths'][path][method]['requestBody']) || {}}" #local="swLet"
             class="card mb-1">
             <div class="card-header clickable"
               (click)="uncollapsedParameter['x-swadit-requestBody'] = !uncollapsedParameter['x-swadit-requestBody']">
               <div class="row">
                 <div class="col-md-11 preview">
                   Request Body@if (local.values.obj['required']) {
-                  <span style="color: red">*</span>
-                }
-                @if (local.values.obj['description']) {
-                  <span> {{local.values.obj['description']}}</span>
-                }
-              </div>
-              <div class="col-md-1">
-                <!--
-                <div class="edit-card" (click)="editParameter($event, param)" *ngIf="!apis.config.readOnly && apis.isOas2">
-                  <i class="fa fa-fw fa-pencil"></i>
-                </div>
-                -->
-              </div>
-            </div>
-          </div>
-          @if (uncollapsedParameter['x-swadit-requestBody']) {
-            <div class="card-body">
-              @for (contentType of apis.keys(local.values.obj['content']); track contentType) {
-                <div>
-                  <p>{{ contentType }}: @if (local.values.obj['content'][contentType]['schema'] && local.values.obj['content'][contentType]['schema']['$ref']) {
-                    <span class="headerType">{{ local.values.obj['content'][contentType]['schema']['$ref'] }}</span>
-                  }</p>
-                  @if (local.values.obj['content'][contentType]['schema']) {
-                    <swadit-swagger-schema-view [obj]="apis.resolveObj(local.values.obj['content'][contentType]['schema'])">
-                    </swadit-swagger-schema-view>
+                    <span style="color: red">*</span>
                   }
-                  @if (local.values.obj['content'][contentType]['example'] != null) {
-                    <div>
-                      <p>Example:</p>
-                      <p><markdown [data]="apis.toJson(local.values.obj['content'][contentType]['example']) | language: 'json'"></markdown></p>
+                  @if (apis.getLength(local.values.obj['content']) > 0) {
+                    <span class="headerType"> ({{apis.keys(local.values.obj['content']).join(', ')}})</span>
+                  }
+                  @if (local.values.obj['description']) {
+                    <span> {{local.values.obj['description']}}</span>
+                  }
+                </div>
+                <div class="col-md-1">
+                  @if (!apis.config.readOnly) {
+                    <div class="edit-card" (click)="editRequestBody($event)">
+                      <i class="fa fa-fw fa-pencil"></i>
                     </div>
                   }
-                  @if (local.values.obj['content'][contentType]['examples']) {
-                    <div>
-                      <p>Examples:</p>
-                      @for (k of apis.keys(local.values.obj['content'][contentType]['examples']); track k) {
-                        <div>
-                          <p><label>{{k}}:</label><br>
-                          <markdown [data]="apis.toJson(local.values.obj['content'][contentType]['examples'][k]) | language: 'json'"></markdown>
-                        </p>
-                      </div>
-                    }
-                  </div>
-                }
-                @if (local.values.obj['content'][contentType]['schema']) {
-                  <div>
-                    <p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
-                      Example (generated)@if (showGeneratedExample) {
-                      <span>:</span>
-                      }@if (!showGeneratedExample) {
-                      <span>...</span>
-                    }
-                  </p>
-                  @if (showGeneratedExample) {
-                    <markdown
-                      [data]="generateExample(local.values.obj['content'][contentType]['schema']) | language: 'json'">
-                    </markdown>
-                  }
                 </div>
-              }
+              </div>
             </div>
-          }
-        </div>
-      }
-    </div>
-  }
+            @if (uncollapsedParameter['x-swadit-requestBody']) {
+              <div class="card-body">
+                @if (apis.current['paths'][path][method]['requestBody']['$ref']) {
+                  <p class="headerType">Defined in {{apis.current['paths'][path][method]['requestBody']['$ref']}}:</p>
+                }
+                <swadit-request-body-view [obj]="local.values.obj">
+                </swadit-request-body-view>
+              </div>
+            }
+          </div>
+        } @else if (apis.isOas3 && !apis.config.readOnly && requestBodyMethods.includes(method)) {
+          <div class="api-info-element">
+            <a href="javascript:void(0)" (click)="editRequestBody($event)">Add a request body...</a>
+          </div>
+        }
 </div>
 }
 <!-- responses -->
 <h2 class="clickable" (click)="collapsedResponses = !collapsedResponses">
   Responses
-  @if (!apis.config.readOnly && apis.isOas2) {
+  @if (!apis.config.readOnly) {
     <span class="edit-subsection" (click)="editResponse($event, path, method)" title="Add response">
       <i class="fa fa-plus"></i>
     </span>
@@ -262,18 +229,16 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           <div class="row">
             <div class="col-md-11 preview">
               {{resp}}
-              @if (local.values.obj['schema'] && local.values.obj['schema']['type']) {
-                <span class="headerType"> ({{local.values.obj['schema']['type']}})</span>
-              }
-              @if (local.values.obj['schema'] && local.values.obj['schema']['$ref']) {
-                <span class="headerType"> ({{local.values.obj['schema']['$ref']}})</span>
+              @let schema = responseSchema(local.values.obj);
+              @if (schema && (schema['type'] || schema['$ref'])) {
+                <span class="headerType"> ({{schema['type'] || schema['$ref']}})</span>
               }
               @if (local.values.obj['description']) {
                 <span> {{local.values.obj['description']}}</span>
               }
             </div>
             <div class="col-md-1">
-              @if (!apis.config.readOnly && apis.isOas2) {
+              @if (!apis.config.readOnly) {
                 <div class="edit-card" (click)="editResponse($event, path, method, resp)">
                   <i class="fa fa-fw fa-pencil"></i>
                 </div>

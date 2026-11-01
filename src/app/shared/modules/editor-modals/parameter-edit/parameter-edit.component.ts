@@ -57,6 +57,15 @@ export class ParameterEditComponent implements OnInit
 		this.obj = _cloneDeep(this.obj_orig);
 	}
 
+	/** the schema of the edited parameter (OAS2: body and non-body parameters differ) */
+	parameterSchema(): any
+	{
+		if (this.apis.isOas3) {
+			return this.apis.schemas.parameter;
+		}
+		return this.obj['in'] == 'body' ? this.apis.schemas.parameterBody : this.apis.schemas.parameterNonBody;
+	}
+
 	ok() 
 	{
 		console.log("ParameterEditComponent.ok()");
@@ -69,8 +78,8 @@ export class ParameterEditComponent implements OnInit
 			this.key = this.key.trim();
 
 			if (this.key != this.key_orig && 
-				this.apis.current['parameters'] && 
-				this.apis.current['parameters'][this.key]) 
+				this.apis.getComponents('parameters') && 
+				this.apis.getComponents('parameters')[this.key]) 
 			{
 				this.errorStr = "Key name already exists.";
 				return;
@@ -78,29 +87,23 @@ export class ParameterEditComponent implements OnInit
 		}
 
 		if (!this.obj['$ref']) {
-			if (this.obj['in'] == 'body') {
-				const missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterBody, this.obj);
-				if (missing.length > 0) {
-					this.errorStr = "Missing required properties: ";
-					missing.forEach(p => {
-						this.errorStr += p + " ";
-					});
-					return;
-				}
-
-			} else {
-				const missing = this.apis.missingRequiredProperties(this.apis.schemas.parameterNonBody, this.obj);
-				if (missing.length > 0) {
-					this.errorStr = "Missing required properties: ";
-					missing.forEach(p => {
-						this.errorStr += p + " ";
-					});
-					return;
-				}
+			const missing = this.apis.missingRequiredProperties(this.parameterSchema(), this.obj);
+			if (missing.length > 0) {
+				this.errorStr = "Missing required properties: ";
+				missing.forEach(p => {
+					this.errorStr += p + " ";
+				});
+				return;
 			}
 
 			if (this.obj['in'] == 'path' && !this.obj['required']) {
 				this.errorStr = "Path parameter must be 'required'.";
+				return;
+			}
+
+			// OAS3: either a schema or a content (which can be edited in the source view) is required
+			if (this.apis.isOas3 && this.apis.getLength(this.obj['schema']) == 0 && !this.obj['content']) {
+				this.errorStr = "Please enter a schema.";
 				return;
 			}
 		}
@@ -108,15 +111,17 @@ export class ParameterEditComponent implements OnInit
 		let o;
 		if (!this.obj['$ref']) {
 			o = _cloneDeep(this.obj);
-			const schema = o['in'] == "body" ? this.apis.schemas.parameterBody : this.apis.schemas.parameterNonBody;
-			// remove the properties of the other kind of parameter (e.g. if 'in' has been changed)
-			Object.keys(o).forEach(k => {
-				if (!k.startsWith('x-') && !schema['properties'][k]) {
-					delete o[k];
-				}
-			});
+			const schema = this.parameterSchema();
+			if (this.apis.isOas2) {
+				// remove the properties of the other kind of parameter (e.g. if 'in' has been changed)
+				Object.keys(o).forEach(k => {
+					if (!k.startsWith('x-') && !schema['properties'][k]) {
+						delete o[k];
+					}
+				});
+			}
 			this.apis.cleanUp(schema, o);
-			if (o['in'] == "body") {
+			if (this.apis.isOas3 || o['in'] == "body") {
 				this.apis.cleanUpSwaggerSchema(o['schema']);
 			}
 		} else {
@@ -130,10 +135,7 @@ export class ParameterEditComponent implements OnInit
 
 		if (!this.pathMode) {
 			if (!this.key_orig) {
-				if (!this.apis.current['parameters']) {
-					this.apis.current['parameters'] = {};
-				}
-				this.apis.current['parameters'][this.key] = this.obj_orig;
+				this.apis.getOrCreateComponents('parameters')[this.key] = this.obj_orig;
 			} else if (this.key != this.key_orig) {
 				this.apis.renameComponent('parameters', this.key_orig, this.key);
 			}
@@ -149,7 +151,7 @@ export class ParameterEditComponent implements OnInit
 
 		if (!this.pathMode) {
 			if (!this.key_orig) return;
-			delete this.apis.current['parameters'][this.key_orig];
+			delete this.apis.getComponents('parameters')[this.key_orig];
 		}
 		this.activeModal.close({ obj: this.obj_orig, delete: true });
 	}

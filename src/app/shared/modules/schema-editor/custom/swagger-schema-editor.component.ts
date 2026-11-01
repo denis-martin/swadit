@@ -83,6 +83,21 @@ export class SwaggerSchemaEditorComponent implements OnInit
 		return this.keys(this.apis.getComponents('schemas')).map(name => ({ ref: prefix + name, name: name }));
 	}
 
+	/** OAS3 composites, which are not supported by the editor */
+	oas3Composites(): string[]
+	{
+		return ['oneOf', 'anyOf', 'not'].filter(k => this.obj && this.obj[k]);
+	}
+
+	setNullable(nullable: boolean): void
+	{
+		if (nullable) {
+			this.obj['nullable'] = true;
+		} else {
+			delete this.obj['nullable'];
+		}
+	}
+
 	keys(obj): string[]
 	{
 		if (!obj) return [];

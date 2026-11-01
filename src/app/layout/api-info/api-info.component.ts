@@ -35,6 +35,27 @@ export class ApiInfoComponent implements OnInit
 	closeResult: string;
 	editModal: NgbModalRef;
 
+	/** simple properties of security schemes (OAS2 security definitions) and their labels */
+	readonly securitySchemeProperties = [
+		{ key: 'name', label: 'name' },
+		{ key: 'in', label: 'in' },
+		// OAS2
+		{ key: 'flow', label: 'flow' },
+		{ key: 'authorizationUrl', label: 'auth URL' },
+		{ key: 'tokenUrl', label: 'token URL' },
+		// OAS3
+		{ key: 'scheme', label: 'scheme' },
+		{ key: 'bearerFormat', label: 'bearer format' },
+		{ key: 'openIdConnectUrl', label: 'OpenID Connect URL' }
+	];
+
+	/** OAS3: the URLs of an OAuth flow and their labels */
+	readonly oauthFlowProperties = [
+		{ key: 'authorizationUrl', label: 'auth URL' },
+		{ key: 'tokenUrl', label: 'token URL' },
+		{ key: 'refreshUrl', label: 'refresh URL' }
+	];
+
 	constructor(public apis: ApisService, private modalService: NgbModal) 
 	{
 	}

@@ -70,6 +70,17 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           </ng-template>
         </li>
       }
+      <!-- .servers [OAS3] -->
+      @if (apis.isOas3) {
+        <li ngbNavItem>
+          <a ngbNavLink>Servers</a>
+          <ng-template ngbNavContent>
+            <div class="tab-content">
+              <swadit-array-editor [schema]="apis.schemas.servers" [(obj)]="api['servers']"></swadit-array-editor>
+            </div>
+          </ng-template>
+        </li>
+      }
       <!-- .tags -->
       <li ngbNavItem>
         <a ngbNavLink>Tags</a>
@@ -89,6 +100,22 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
               <p>Default Security Requirements:</p>
               <swadit-security-editor [schema]="apis.schemas.security" [(obj)]="api['security']"
                 [securityDefinitions]="api['securityDefinitions']">
+              </swadit-security-editor>
+            </div>
+          </ng-template>
+        </li>
+      }
+      <!-- .components.securitySchemes, .security [OAS3] -->
+      @if (apis.isOas3) {
+        <li ngbNavItem>
+          <a ngbNavLink>Security</a>
+          <ng-template ngbNavContent>
+            <div class="tab-content">
+              <p>Security Schemes:</p>
+              <swadit-object-editor [schema]="apis.schemas.securitySchemes" [(obj)]="securitySchemes"></swadit-object-editor>
+              <p>Default Security Requirements:</p>
+              <swadit-security-editor [schema]="apis.schemas.security" [(obj)]="api['security']"
+                [securityDefinitions]="securitySchemes">
               </swadit-security-editor>
             </div>
           </ng-template>
