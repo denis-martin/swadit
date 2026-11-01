@@ -18,12 +18,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+import { MarkdownModule } from 'ngx-markdown';
+
 import { SwadocRoutingModule } from './swadoc-routing.module';
 import { SwadocComponent } from './swadoc.component';
 
 @NgModule({
   imports: [
     CommonModule,
+    MarkdownModule.forChild(),
     SwadocRoutingModule
   ],
   declarations: [SwadocComponent]

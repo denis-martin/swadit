@@ -1,5 +1,278 @@
-#swadocFrame {
-	height: calc(100vh - 95px);
-	border: 1px solid lightgrey;
-	box-shadow: 5px 5px 8px #888888;
+/*
+ * Copyright 2017 Denis Martin.  This file is part of swadit.
+ *
+ * swadit is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * swadit is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// The component is not encapsulated (see swadoc.component.ts), so all rules are scoped to app-swadoc.
+// These styles are only active while the print preview is shown.
+
+app-swadoc {
+	display: block;
+
+	.swadoc-toolbar {
+		margin-bottom: 10px;
+	}
+
+	.swadoc-warning {
+		margin-left: 1rem;
+	}
+
+	// the "paper"
+	.swadoc {
+		width: 210mm; // A4, same margins as @page below
+		max-width: 100%;
+		padding: 1.5cm 1.5cm 2cm 1.5cm;
+		background: white;
+		color: black;
+		border: 1px solid lightgrey;
+		box-shadow: 5px 5px 8px #888888;
+		font-family: serif;
+		font-size: 10.5pt;
+		line-height: 1.3;
+		overflow: hidden;
+
+		h1, h2, h3, h4, h5, h6 {
+			font-family: sans-serif;
+			font-weight: bold;
+			margin-top: 1em;
+			margin-bottom: 0.5em;
+		}
+
+		h1 { font-size: 180%; margin-top: 0; }
+		h2 { font-size: 150%; }
+		h3 { font-size: 120%; }
+		h4 { font-size: 100%; }
+		h5 { font-size: 90%; }
+		h6 { font-size: 90%; font-weight: normal; }
+
+		p {
+			margin: 0 0 0.5em 0;
+		}
+
+		a {
+			color: inherit;
+		}
+
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			margin-bottom: 0.8em;
+		}
+
+		table, th, td {
+			border: 1px solid lightgray;
+		}
+
+		th, td {
+			padding: 4px;
+			text-align: left;
+			vertical-align: top;
+		}
+
+		td p, td markdown > :last-child {
+			margin-bottom: 4px;
+		}
+
+		markdown {
+			display: block;
+		}
+
+		pre {
+			font-size: 80%;
+			border: 1px solid lightgray;
+			padding: 0.1cm;
+			margin: 0 0 0.8em 0;
+			white-space: pre-wrap;
+			word-break: break-word;
+		}
+
+		// tone down the Prism theme for printing
+		pre[class*="language-"] {
+			background: none;
+			box-shadow: none;
+			overflow: visible;
+
+			&::before, &::after {
+				display: none;
+			}
+
+			> code {
+				border-left: none;
+				box-shadow: none;
+				background: none;
+				padding: 0;
+				white-space: pre-wrap;
+			}
+		}
+	}
+
+	.pathlist {
+		font-family: sans-serif;
+
+		a {
+			text-decoration: none;
+		}
+
+		td.pathlist-methods {
+			text-align: right;
+			white-space: nowrap;
+			width: 1%;
+		}
+
+		.methodkey {
+			font-size: 75%;
+		}
+	}
+
+	.pathheading, .methodheading {
+		border: 1px solid lightgray;
+		background-color: lightgray;
+		border-radius: 4px;
+		padding: 3px;
+	}
+
+	.pathheading {
+		margin-top: 1cm;
+	}
+
+	.methodheading {
+		margin-top: 0.8cm;
+	}
+
+	.pathlistlink {
+		float: right;
+		font-size: 80%;
+		text-decoration: none;
+	}
+
+	.methodkey {
+		display: inline-block;
+		text-transform: uppercase;
+		border: 1px solid darkgray;
+		border-radius: 4px;
+		padding: 0 2px;
+		margin-right: 2px;
+		font-family: monospace;
+		font-weight: bold;
+	}
+
+	h4 .methodkey {
+		font-size: 110%;
+	}
+
+	.methodhighlight-get { border-color: #cdf; background-color: #cdf; }
+	.methodhighlight-post { border-color: #cfc; background-color: #cfc; }
+	.methodhighlight-put { border-color: #fc8; background-color: #fc8; }
+	.methodhighlight-patch { border-color: #fe9; background-color: #fe9; }
+	.methodhighlight-delete { border-color: #fcc; background-color: #fcc; }
+	.methodhighlight-options,
+	.methodhighlight-head,
+	.methodhighlight-trace { border-color: #ddd; background-color: #ddd; }
+
+	.deprecated {
+		text-decoration: line-through;
+	}
+
+	.methodkey.deprecated {
+		border-color: lightgray;
+		background-color: transparent;
+	}
+
+	.deprecated-note {
+		font-weight: normal;
+		font-size: 90%;
+	}
+
+	.paramproperties, .mediatype {
+		font-family: sans-serif;
+		font-size: 80%;
+		font-weight: normal;
+	}
+
+	.mediatype {
+		margin-left: 0.3em;
+	}
+
+	.type, .value {
+		font-family: monospace;
+		font-size: 90%;
+	}
+
+	.propertycell {
+		white-space: nowrap;
+	}
+
+	.propertywrap {
+		display: flex;
+	}
+
+	.indent {
+		flex: none;
+	}
+
+	.responsebox {
+		padding: 0.1cm;
+	}
+
+	.responseheading {
+		margin-top: 0;
+	}
+}
+
+@media print {
+	@page {
+		size: A4;
+		margin: 1.5cm 1.5cm 2cm 1.5cm;
+	}
+
+	// hide the application around the document
+	app-header, app-sidebar, .no-print {
+		display: none !important;
+	}
+
+	.main-container {
+		margin: 0 !important;
+		padding: 0 !important;
+		overflow: visible !important;
+	}
+
+	app-swadoc {
+		.swadoc {
+			width: 100%;
+			padding: 0;
+			border: none;
+			box-shadow: none;
+			overflow: visible;
+
+			h1, h2, h3, h4, h5, h6 {
+				break-after: avoid;
+			}
+
+			tr, pre {
+				break-inside: avoid;
+			}
+		}
+
+		.pathlistheading, .pathheading {
+			break-before: page;
+		}
+
+		// print the method colors
+		.methodkey, .pathheading, .methodheading {
+			-webkit-print-color-adjust: exact;
+			print-color-adjust: exact;
+		}
+	}
 }

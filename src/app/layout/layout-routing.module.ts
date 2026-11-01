@@ -7,7 +7,6 @@ const routes: Routes = [
 		path: '', component: LayoutComponent,
 		children: [
 			{ path: 'source', loadChildren: () => import('./source/source.module').then(m => m.SourceModule) },
-			//{ path: 'print', loadChildren: './print/print.module#PrintModule' },
 			{ path: 'swadoc', loadChildren: () => import('./swadoc/swadoc.module').then(m => m.SwadocModule) },
 			{ path: 'swaggerui', loadChildren: () => import('./swaggerui/swaggerui.module').then(m => m.SwaggerUiModule) },
 			
