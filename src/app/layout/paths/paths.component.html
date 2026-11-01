@@ -24,13 +24,13 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   <div class="row">
     <div class="col-md-6">
       <div class="input-group">
-        <span class="input-group-addon">
+        <span class="input-group-text">
           <i class="fa fa-filter"></i>
         </span>
         <input type="text" [(ngModel)]="filterText" name="filterText" class="form-control"
           placeholder="Filter by path name" title="Filter by path name">
         @if (filterText) {
-          <span class="input-group-addon clickable" (click)="filterText=''">
+          <span class="input-group-text clickable" (click)="filterText=''">
             <i class="fa fa-times"></i>
           </span>
         }
@@ -39,24 +39,24 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     <div class="col-md-6">
       <div class="checkbox">
         <input type="checkbox" [(ngModel)]="sortItems" name="sortItems" id="sortItems" title="Display sorted">
-        <label for="sortItems" class="ml-1 mb-0" style="margin-top: 0.4rem">Display sorted</label>
+        <label for="sortItems" class="ms-1 mb-0" style="margin-top: 0.4rem">Display sorted</label>
       </div>
     </div>
   </div>
   <div class="row" style="margin-top: 1em">
     <div class="col-md-12">
-      <label class="mr-1">Select Paths ({{apis.getLength(apis.selectedPaths)}} selected):</label>
+      <label class="me-1">Select Paths ({{apis.getLength(apis.selectedPaths)}} selected):</label>
       <div class="btn-group">
-        <button type="button" class="btn btn-secondary btn-sm" (click)="apis.selectAllPaths()">All</button>
-        <button type="button" class="btn btn-secondary btn-sm" (click)="apis.deselectAllPaths()">None</button>
-        <button type="button" class="btn btn-secondary btn-sm" (click)="apis.inverseSelectedPaths()">Invers</button>
-        <button type="button" class="btn btn-secondary btn-sm" disabled title="not yet implemented">By...</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="apis.selectAllPaths()">All</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="apis.deselectAllPaths()">None</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="apis.inverseSelectedPaths()">Invers</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" disabled title="not yet implemented">By...</button>
       </div>
       @if (!apis.config.readOnly && apis.isOas2) {
-        <button type="button" class="btn btn-secondary btn-sm" (click)="apis.deleteSelectedPaths()">Delete</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm ms-1" (click)="apis.deleteSelectedPaths()">Delete</button>
       }
       @if (!apis.config.readOnly && apis.isOas2) {
-        <button type="button" class="btn btn-secondary btn-sm" (click)="modify($event)"
+        <button type="button" class="btn btn-outline-secondary btn-sm ms-1" (click)="modify($event)"
         [disabled]="apis.getLength(apis.selectedPaths) == 0">Modify...</button>
       }
     </div>

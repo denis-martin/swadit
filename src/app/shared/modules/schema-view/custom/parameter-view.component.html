@@ -96,10 +96,10 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
               <swadit-schema-view
                 [schema]="apis.schemas.definitions['Schema']" [obj]="obj['content'][contentType]['schema']">
               </swadit-schema-view>
-              @if (obj['content']['example']) {
+              @if (obj['content'][contentType]['example']) {
                 <div>
                   <p>Example:</p>
-                  <markdown [data]="apis.toJson(obj['content']['example']) | language: 'json'"></markdown>
+                  <markdown [data]="apis.toJson(obj['content'][contentType]['example']) | language: 'json'"></markdown>
                 </div>
               }
               <!-- TODO: examples -->

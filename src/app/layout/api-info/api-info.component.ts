@@ -70,6 +70,7 @@ export class ApiInfoComponent implements OnInit
 	
 	keys(obj: Object)
 	{
+		if (!obj) return [];
 		return Object.keys(obj);
 	}
 }

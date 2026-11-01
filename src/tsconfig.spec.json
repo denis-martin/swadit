@@ -2,6 +2,15 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/spec",
+    "module": "preserve",
+    "paths": {
+      "app/*": [
+        "./app/*"
+      ],
+      "testing/*": [
+        "./testing/*"
+      ]
+    },
     "types": [
       "node",
       "vitest/globals"

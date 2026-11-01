@@ -24,7 +24,7 @@ function convertRefDeep(src: any)
 function copyExtensions(target: any, src: any): void
 {
 	for (const k in src) {
-		if (src[k].startsWith('x-')) {
+		if (k.startsWith('x-')) {
 			target[k] = _cloneDeep(src[k]);
 		}
 	}
@@ -33,92 +33,153 @@ function copyExtensions(target: any, src: any): void
 function getMediaTypes(type: string, oas2root: any, path: string, method: string): string[]
 {
 	let result: string[];
-	if (path && method && (type in oas2root['paths'][path][method])) {
+	if (oas2root && path && method && (type in oas2root['paths'][path][method])) {
 		result = _cloneDeep(oas2root['paths'][path][method][type]);
-	} else if (type in oas2root) {
+	} else if (oas2root && type in oas2root) {
 		result = _cloneDeep(oas2root[type]);
 	}
 	return result;
 }
 
-function convertParameterObject(src: any, api: any, path: string, method: string): any
+/** Resolves a parameter reference (#/parameters/...) of the Swagger 2.0 document. */
+function resolveParameter(src: any, api: any): any
 {
-	const copyFields = ['name', 'in', 'description', 'required', 'allowEmptyValue'];
-	const copySchemaFields = ['type', 'format', 'items', 
-		'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength',
-		'pattern', 'maxItems', 'minItems', 'uniqueItems', 'enum', 'multipleOf'
-	]
-	const target = {};
-	if (src['in'] == 'query' || src['in'] == 'header' || src['in'] == 'path') {
-		target['parameter'] = {};
-		for (const field of copyFields) {
-			if (field in src) {
-				target['parameter'][field] = src[field];
-			}
-		}
-		if ('type' in src) {
-			target['parameter']['schema'] = {}
-			for (const field of copySchemaFields) {
-				if (field in src) {
-					target['parameter']['schema'][field] = src[field];
-				}
-			}
-		}
-		// TODO: x-tensions, collectionFormat
-	} else { // formData or body
-		target['requestBody'] = {
-			'content': {}
-		}
-		if (src['in'] != 'formData') {
-			if ('required' in src) target['requestBody']['required'] = src['required'];
-			if ('description' in src) target['requestBody']['description'] = src['description'];
-		}
-		if (src['in'] == 'body' && 'schema' in src) { // 'body'
-			let mediaTypes = getMediaTypes('consumes', api, path, method);
-			if (!mediaTypes) mediaTypes = [ '*/*' ];
-			for (const mt of mediaTypes) {
-				target['requestBody']['content'][mt] = {
-					'schema': convertSchemaObject(src['schema'])
-				}
-			}
-		} else if (src['in'] == 'formData') {
-			let mediaTypes = getMediaTypes('consumes', api, path, method);
-			if (!mediaTypes) mediaTypes = [ '*/*' ];
-			for (const mt of mediaTypes) {
-				target['requestBody']['content'][mt] = {
-					'schema': {}
-				}
-				if (src['type'] == 'file' && !mt.includes('multipart')) {
-					target['requestBody']['content'][mt]['schema']['type'] = 'string';
-					target['requestBody']['content'][mt]['schema']['format'] = 'binary';
-					
-				} else {
-					target['requestBody']['content'][mt]['schema']['type'] = 'object';
-					target['requestBody']['content'][mt]['schema']['properties'] = {};
-					target['requestBody']['content'][mt]['schema']['properties'][src['name']] = {};
-					if (src['type'] == 'file') {
-						target['requestBody']['content'][mt]['schema']['properties'][src['name']]['type'] = 'string';
-						target['requestBody']['content'][mt]['schema']['properties'][src['name']]['format'] = 'binary';
-					} else {
-						for (const field of copySchemaFields) {
-							if (field in src) {
-								target['requestBody']['content'][mt]['schema']['properties'][src['name']][field] = src[field];
-							}
-						}
-					}
-					if ('description' in src) {
-						target['requestBody']['content'][mt]['schema']['properties'][src['name']]['description'] = src['description'];
-					}
-					if (src['required']) {
-						target['requestBody']['content'][mt]['schema']['required'] = [ src['name'] ];
-					}
-				}
-			}
-		}
-		// TODO formData, type file
+	if (src && src['$ref'] && api && api['parameters']) {
+		const name = src['$ref'].replace('#/parameters/', '');
+		return api['parameters'][name];
 	}
-	convertRefDeep(target);
+	return src;
+}
+
+function isBodyParameter(src: any, api: any): boolean
+{
+	const param = resolveParameter(src, api);
+	return param != null && (param['in'] == 'body' || param['in'] == 'formData');
+}
+
+const copySchemaFields = ['type', 'format', 'items', 'default',
+	'maximum', 'exclusiveMaximum', 'minimum', 'exclusiveMinimum', 'maxLength', 'minLength',
+	'pattern', 'maxItems', 'minItems', 'uniqueItems', 'enum', 'multipleOf'
+];
+
+function convertSimpleSchema(src: any): any
+{
+	const schema = {};
+	for (const field of copySchemaFields) {
+		if (field in src) {
+			schema[field] = _cloneDeep(src[field]);
+		}
+	}
+	if (schema['items']) {
+		// items of non-body parameters/headers may have a collectionFormat themselves, which has no OAS3 equivalent
+		schema['items'] = convertSimpleSchema(schema['items']);
+	}
+	if (src['type'] == 'file') {
+		schema['type'] = 'string';
+		schema['format'] = 'binary';
+	}
+	return schema;
+}
+
+/** Converts a non-body (query, header, path) parameter or a header object. */
+function convertParameterObject(src: any): any
+{
+	if ('$ref' in src) {
+		return { '$ref': convertRef(src['$ref']) };
+	}
+	const copyFields = ['name', 'in', 'description', 'required', 'allowEmptyValue'];
+	const target = {};
+	for (const field of copyFields) {
+		if (field in src) {
+			target[field] = src[field];
+		}
+	}
+	if (src['type'] == 'array') {
+		const collectionFormat = src['collectionFormat'] || 'csv';
+		if (src['in'] == 'query') {
+			if (collectionFormat == 'csv') {
+				target['style'] = 'form';
+				target['explode'] = false;
+			} else if (collectionFormat == 'multi') {
+				target['style'] = 'form';
+				target['explode'] = true;
+			} else if (collectionFormat == 'ssv') {
+				target['style'] = 'spaceDelimited';
+			} else if (collectionFormat == 'pipes') {
+				target['style'] = 'pipeDelimited';
+			} else {
+				console.warn("collectionFormat cannot be converted", src);
+			}
+		} else if (collectionFormat != 'csv') {
+			console.warn("collectionFormat cannot be converted", src);
+		}
+	}
+	if ('type' in src) {
+		target['schema'] = convertSimpleSchema(src);
+	}
+	copyExtensions(target, src);
 	return target;
+}
+
+/** Converts the body/formData parameters of an operation to a request body. */
+function convertRequestBody(params: any[], api: any, path: string, method: string): any
+{
+	// a referenced body parameter becomes a referenced request body
+	if (params.length == 1 && params[0]['$ref']) {
+		const param = resolveParameter(params[0], api);
+		if (param && param['in'] == 'body') {
+			return { '$ref': params[0]['$ref'].replace('#/parameters', '#/components/requestBodies') };
+		}
+	}
+	params = params.map(p => resolveParameter(p, api));
+
+	const target = { 'content': {} };
+	const body = params.find(p => p['in'] == 'body');
+	if (body) {
+		if ('description' in body) target['description'] = body['description'];
+		if ('required' in body) target['required'] = body['required'];
+		let mediaTypes = getMediaTypes('consumes', api, path, method);
+		if (!mediaTypes) mediaTypes = [ '*/*' ];
+		for (const mt of mediaTypes) {
+			target['content'][mt] = {
+				'schema': convertSchemaObject(body['schema'] || {})
+			};
+		}
+		copyExtensions(target, body);
+		return target;
+	}
+
+	// formData parameters are merged into the properties of one object schema
+	const schema = { 'type': 'object', 'properties': {} };
+	for (const param of params) {
+		const property = convertSimpleSchema(param);
+		if ('description' in param) {
+			property['description'] = param['description'];
+		}
+		schema['properties'][param['name']] = property;
+		if (param['required']) {
+			if (!schema['required']) {
+				schema['required'] = [];
+			}
+			schema['required'].push(param['name']);
+			target['required'] = true;
+		}
+	}
+	const formMediaTypes = ['application/x-www-form-urlencoded', 'multipart/form-data'];
+	let mediaTypes = (getMediaTypes('consumes', api, path, method) || []).filter(mt => formMediaTypes.includes(mt));
+	if (mediaTypes.length == 0) {
+		mediaTypes = params.some(p => p['type'] == 'file') ? ['multipart/form-data'] : ['application/x-www-form-urlencoded'];
+	}
+	for (const mt of mediaTypes) {
+		target['content'][mt] = { 'schema': _cloneDeep(schema) };
+	}
+	return target;
+}
+
+function parameterId(src: any, api: any): string
+{
+	const param = resolveParameter(src, api) || {};
+	return param['in'] + ":" + param['name'];
 }
 
 function convertOperationObject(src: any, api: any, path: string, method: string): any
@@ -128,68 +189,41 @@ function convertOperationObject(src: any, api: any, path: string, method: string
 		if (k == 'summary' || k == 'description' || k == 'operationId' || k == 'deprecated') {
 			target[k] = src[k];
 
-		} else if (k == 'tags' || k == 'externalDocs' /*|| k == 'security'*/) {
+		} else if (k == 'tags' || k == 'externalDocs' || k == 'security') {
 			target[k] = _cloneDeep(src[k]);
 
 		} else if (k == 'parameters') {
 			for (const param of src[k]) {
-				const paramObj = convertParameterObject(param, api, path, method);
-				if ('parameter' in paramObj) {
+				if (!isBodyParameter(param, api)) {
 					if (!(k in target)) {
 						target[k] = [];
 					}
-					target[k].push(paramObj['parameter']);
-				} else if ('requestBody' in paramObj) {
-					if (target['requestBody']) {
-						let required = false;
-						for (const mt in target['requestBody']['content']) {
-							if (mt in paramObj['requestBody']['content']) {
-								console.log(target['requestBody']['content'], paramObj['requestBody']['content']);
-								if (('schema' in target['requestBody']['content'][mt]) && ('schema' in paramObj['requestBody']['content'][mt])) {
-									// merge request body parameters
-									if (target['requestBody']['content'][mt]['schema']['type'] == paramObj['requestBody']['content'][mt]['schema']['type'] && target['requestBody']['content'][mt]['schema']['type'] == 'object') {
-										if ('properties' in target['requestBody']['content'][mt]['schema'] && 'properties' in paramObj['requestBody']['content'][mt]['schema']) {
-											for (const p in paramObj['requestBody']['content'][mt]['schema']['properties']) {
-												target['requestBody']['content'][mt]['schema']['properties'][p] = paramObj['requestBody']['content'][mt]['schema']['properties'][p];
-												console.warn("Merging", path, method, target['requestBody'], p);
-											}
-											if ('required' in paramObj['requestBody']['content'][mt]['schema'] && paramObj['requestBody']['content'][mt]['schema']['required'].length > 0) {
-												required = true;
-												if (!('required' in target['requestBody']['content'][mt]['schema'])) {
-													target['requestBody']['content'][mt]['schema']['required'] = [];
-													for (const p of paramObj['requestBody']['content'][mt]['schema']['required']) {
-														target['requestBody']['content'][mt]['schema']['required'].push(p);
-													}
-												}
-											}
-										} else {
-											console.warn("Cannot merge properties of requestBodies", path, method, target['requestBody'], paramObj['requestBody']);
-										}
-									} else {
-										console.warn("Cannot merge requestBodies", path, method, target['requestBody'], paramObj['requestBody']);
-									}
-								}
-							} else {
-								target['requestBody']['content'][mt] = paramObj['requestBody']['content'][mt];
-							}
-						}
-						if (required) {
-							target['requestBody']['required'] = true;
-						}
-					} else {
-						target['requestBody'] = paramObj['requestBody'];
-					}
+					target[k].push(convertParameterObject(param));
 				}
 			}
+
 		} else if (k == 'responses') {
 			target[k] = {};
 			for (const resp in src[k]) {
 				target[k][resp] = convertResponseObject(src[k][resp], api, path, method);
 			}
+
+		} else if (k.startsWith('x-')) {
+			target[k] = _cloneDeep(src[k]);
 		}
 		// TODO
-		// oas2 consumes, produces, schemes
+		// oas2 schemes
 		// oas3 callbacks, servers
+	}
+
+	// body and formData parameters (including the ones on path level) become the request body
+	const operationParams: any[] = src['parameters'] || [];
+	const operationParamIds = operationParams.map(p => parameterId(p, api));
+	const pathParams: any[] = (api['paths'][path]['parameters'] || [])
+		.filter(p => !operationParamIds.includes(parameterId(p, api)));
+	const bodyParams = pathParams.concat(operationParams).filter(p => isBodyParameter(p, api));
+	if (bodyParams.length > 0) {
+		target['requestBody'] = convertRequestBody(bodyParams, api, path, method);
 	}
 
 	convertRefDeep(target);
@@ -200,27 +234,31 @@ function convertSchemaObject(src: any): any
 {
 	const target = _cloneDeep(src);
 	for (const k in target) {
-		if (k == '$ref') {
+		if (k == '$ref' && typeof target[k] == 'string') {
 			target[k] = convertRef(target[k]);
-		} else if (k == 'discriminator' ) {
+		} else if (k == 'discriminator' && typeof target[k] == 'string') {
 			target[k] = {
 				'propertyName': target[k]
 			}
+		} else if (k == 'x-nullable' && typeof target[k] == 'boolean') {
+			target['nullable'] = target[k];
+			delete target[k];
 		} else if (typeof target[k] == 'object') {
 			target[k] = convertSchemaObject(target[k]);
 		}
+	}
+	if (target['type'] == 'file') {
+		target['type'] = 'string';
+		target['format'] = 'binary';
 	}
 	return target;
 }
 
 function convertHeaderObject(src: any): any
 {
-	// TODO
-	let target = _cloneDeep(src);
-	target['in'] = 'header';
-	target = convertParameterObject(target, null, null, null)['parameter'];
-	delete target['in'];
-	convertRefDeep(target);
+	const target = convertParameterObject(src);
+	delete target['style'];
+	delete target['explode'];
 	return target;
 }
 
@@ -240,30 +278,31 @@ function convertResponseObject(src: any, api: any, path: string, method: string)
 		}
 	}
 
-	let mediaTypes = getMediaTypes('produces', api, path, method);
-	if (!mediaTypes) mediaTypes = [ '*/*' ];
-	for (const mt of mediaTypes) {
-		if ('schema' in src) {
-			if (!('content' in target)) target['content'] = {};
+	if ('schema' in src) {
+		let mediaTypes = getMediaTypes('produces', api, path, method);
+		if (!mediaTypes) mediaTypes = [ '*/*' ];
+		target['content'] = {};
+		for (const mt of mediaTypes) {
 			target['content'][mt] = {
 				'schema': convertSchemaObject(src['schema'])
 			};
 		}
-		if ('examples' in src) {
-			if (!('content' in target)) {
-				target['content'] = {};
-				target['content'][mt] = {}
+	}
+	// oas2 examples are keyed by media type
+	if ('examples' in src) {
+		if (!('content' in target)) {
+			target['content'] = {};
+		}
+		for (const mt in src['examples']) {
+			if (!(mt in target['content'])) {
+				target['content'][mt] = 'schema' in src ? { 'schema': convertSchemaObject(src['schema']) } : {};
 			}
-			target['content'][mt]['examples'] = {};
-			for (const exmt in src['examples']) {
-				target['content'][mt]['examples'][exmt] = {
-					'value': src['examples'][exmt]
-				}
-			}
+			target['content'][mt]['example'] = _cloneDeep(src['examples'][mt]);
 		}
 	}
 
 	// oas3 links: n/a
+	copyExtensions(target, src);
 	convertRefDeep(target);
 	return target;
 }
@@ -274,12 +313,15 @@ function convertSecuritySchemeObject(src: any): any
 	if ('$ref' in src) {
 		target['$ref'] = convertRef(src['$ref']);
 	} else {
+		if ('description' in src) {
+			target['description'] = src['description'];
+		}
 		if (src['type'] == 'basic') {
 			target['type'] = 'http';
 			target['scheme'] = 'basic';
 
 		} else if (src['type'] == 'apiKey') {
-			target['type'] = 'http';
+			target['type'] = 'apiKey';
 			target['name'] = src['name'];
 			target['in'] = src['in'];
 
@@ -322,6 +364,18 @@ function convertSecuritySchemeObject(src: any): any
 	return target;
 }
 
+function convertServers(src: any): any[]
+{
+	const basePath = src['basePath'] || '';
+	if (src['host']) {
+		const schemes: string[] = src['schemes'] && src['schemes'].length > 0 ? src['schemes'] : [ 'https' ];
+		return schemes.map(scheme => ({ 'url': scheme + '://' + src['host'] + basePath }));
+	} else if (basePath) {
+		return [ { 'url': basePath } ];
+	}
+	return null;
+}
+
 export async function convertOas2to3(src: any): Promise<any>
 {
 	const target = {};
@@ -329,7 +383,11 @@ export async function convertOas2to3(src: any): Promise<any>
 	target['openapi'] = '3.0.3';
 	// info
 	target['info'] = _cloneDeep(src['info']);
-	// servers: NYI
+	// servers
+	const servers = convertServers(src);
+	if (servers) {
+		target['servers'] = servers;
+	}
 	// paths
 	target['paths'] = {};
 	for (const path in src['paths']) {
@@ -338,22 +396,20 @@ export async function convertOas2to3(src: any): Promise<any>
 			if (method == '$ref') {
 				target['paths'][path][method] = convertRef(src['paths'][path][method]);
 			} else if (method == 'parameters') {
-				target['paths'][path]['parameters'] = [];
-				for (const param of target['paths'][path]['parameters']) {
-					const paramObj = convertParameterObject(param, src, path, null);
-					if ('parameter' in paramObj) {
-						target['paths'][path]['parameters'].push(paramObj['parameter']);
-					} else if ('requestBody' in paramObj) {
-						// TODO
-					}
+				// body and formData parameters are moved to the request bodies of the operations
+				const params = src['paths'][path]['parameters'].filter(p => !isBodyParameter(p, src));
+				if (params.length > 0) {
+					target['paths'][path]['parameters'] = params.map(p => convertParameterObject(p));
 				}
+			} else if (method.startsWith('x-')) {
+				target['paths'][path][method] = _cloneDeep(src['paths'][path][method]);
 			} else {
 				target['paths'][path][method] = convertOperationObject(src['paths'][path][method], src, path, method);
 			}
 		}
 	}
 	// components
-	if (src['definitions'] || src['parameters'] || src['responses']) {
+	if (src['definitions'] || src['parameters'] || src['responses'] || src['securityDefinitions']) {
 		target['components'] = {}
 		if (src['definitions']) {
 			// components.schemas
@@ -363,17 +419,19 @@ export async function convertOas2to3(src: any): Promise<any>
 			}
 		}
 		if (src['parameters']) {
-			// components.parameters
-			target['components']['parameters'] = {};
+			// components.parameters and components.requestBodies
 			for (const parameter in src['parameters']) {
-				const paramObj = convertParameterObject(src['parameters'][parameter], src, null, null);
-				if ('parameter' in paramObj) {
-					target['components']['parameters'][parameter] = paramObj['parameter'];
-				} else {
+				if (isBodyParameter(src['parameters'][parameter], src)) {
 					if (!('requestBodies' in target['components'])) {
 						target['components']['requestBodies'] = {};
 					}
-					target['components']['requestBodies'][parameter] = paramObj['requestBody'];
+					target['components']['requestBodies'][parameter] =
+						convertRequestBody([ src['parameters'][parameter] ], src, null, null);
+				} else {
+					if (!('parameters' in target['components'])) {
+						target['components']['parameters'] = {};
+					}
+					target['components']['parameters'][parameter] = convertParameterObject(src['parameters'][parameter]);
 				}
 			}
 		}
@@ -384,11 +442,18 @@ export async function convertOas2to3(src: any): Promise<any>
 				target['components']['responses'][response] = convertResponseObject(src['responses'][response], src, null, null);
 			}
 		}
+		if (src['securityDefinitions']) {
+			// components.securitySchemes
+			target['components']['securitySchemes'] = {};
+			for (const scheme in src['securityDefinitions']) {
+				target['components']['securitySchemes'][scheme] = convertSecuritySchemeObject(src['securityDefinitions'][scheme]);
+			}
+		}
 	}
-	// security: NYI (depends on securityDefinitions)
-	// if (src['security']) {
-	// 	target['security'] = _cloneDeep(src['security']);
-	// }
+	// security
+	if (src['security']) {
+		target['security'] = _cloneDeep(src['security']);
+	}
 	// tags
 	if (src['tags']) {
 		target['tags'] = _cloneDeep(src['tags']);
@@ -398,11 +463,7 @@ export async function convertOas2to3(src: any): Promise<any>
 		target['externalDocs'] = _cloneDeep(src['externalDocs']);
 	}
 	// x-tensions
-	for (const key in src) {
-		if (key.startsWith('x-')) {
-			target[key] = _cloneDeep(src[key]);
-		}
-	}
+	copyExtensions(target, src);
 	// done
 	return { target: target };
 }

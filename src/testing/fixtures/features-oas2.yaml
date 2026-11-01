@@ -1,0 +1,129 @@
+swagger: '2.0'
+info:
+  title: Features
+  version: '1.0'
+x-root-ext: root
+host: api.example.com
+basePath: /v1
+schemes:
+  - https
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+  key:
+    type: apiKey
+    name: X-Key
+    in: header
+    x-key-ext: 1
+  oauth:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: https://example.com/auth
+    tokenUrl: https://example.com/token
+    scopes:
+      read: read access
+security:
+  - key: []
+parameters:
+  Limit:
+    name: limit
+    in: query
+    type: integer
+  ItemBody:
+    name: body
+    in: body
+    required: true
+    schema:
+      $ref: '#/definitions/Item'
+responses:
+  NotFound:
+    description: not found
+definitions:
+  Item:
+    type: object
+    discriminator: kind
+    required:
+      - kind
+    properties:
+      kind:
+        type: string
+      discriminator:
+        type: string
+paths:
+  /items:
+    get:
+      operationId: listItems
+      x-op-ext: op
+      security:
+        - oauth:
+            - read
+      parameters:
+        - $ref: '#/parameters/Limit'
+        - name: ids
+          in: query
+          type: array
+          items:
+            type: string
+          collectionFormat: csv
+        - name: tags
+          in: query
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+      responses:
+        '200':
+          description: ok
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Item'
+          examples:
+            application/json:
+              - kind: a
+        '404':
+          $ref: '#/responses/NotFound'
+    post:
+      operationId: createItem
+      parameters:
+        - $ref: '#/parameters/ItemBody'
+      responses:
+        '201':
+          description: created
+  /items/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+    put:
+      operationId: uploadItem
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: name
+          in: formData
+          required: true
+          type: string
+        - name: size
+          in: formData
+          required: true
+          type: integer
+      responses:
+        '204':
+          description: no content
+  /plain:
+    get:
+      produces:
+        - text/plain
+        - text/html
+      responses:
+        '200':
+          description: ok
+          examples:
+            text/plain: hello

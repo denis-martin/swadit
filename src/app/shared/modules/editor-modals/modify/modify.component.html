@@ -4,11 +4,11 @@
 	</div>
 	<div class="modal-body" id="modal-body">
 		<input type="checkbox" id="deprecationSet" name="deprecationSet" 
-			[(ngModel)]="params.deprecationSet" (change)="deprecate(true)" class="mr-1">
+			[(ngModel)]="params.deprecationSet" (change)="deprecate(true)" class="me-1">
 		<label for="deprecationSet">Set deprecation flag</label>
 		<br>
 		<input type="checkbox" id="deprecationRemove" name="deprecationRemove" 
-			[(ngModel)]="params.deprecationRemove" (change)="deprecate(false)" class="mr-1">
+			[(ngModel)]="params.deprecationRemove" (change)="deprecate(false)" class="me-1">
 		<label for="deprecationRemove">Remove deprecation flag</label>
 	</div>
 	<div class="modal-footer">

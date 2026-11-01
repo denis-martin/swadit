@@ -22,12 +22,12 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   </div>
   -->
   <div class="modal-body" id="modal-body">
-    <div class="form-group">
+    <div class="mb-3">
       <label for="definitionKey">Name of schema definition</label>
       <input type="text" id="definitionKey" name="definitionKey" [(ngModel)]="key" required
         class="form-control" placeholder="Enter name for definition" title="Name of definition">
     </div>
-    <div class="form-group">
+    <div class="mb-3">
       <label for="definitionSchema">Schema definition</label>
       <swadit-swagger-schema-editor [schema]="apis.schemas['schema']" [(obj)]="obj" [id]="'definitionSchema'">
       </swadit-swagger-schema-editor>
@@ -35,7 +35,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   </div>
   <div class="modal-footer">
     @if (key_orig) {
-      <button class="btn btn-danger mr-auto" type="button" (click)="deleteDefinition()" title="Delete definition">
+      <button class="btn btn-danger me-auto" type="button" (click)="deleteDefinition()" title="Delete definition">
       Delete</button>
     }
     @if (errorStr) {

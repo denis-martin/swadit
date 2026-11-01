@@ -24,7 +24,7 @@ import { Subject } from 'rxjs';
 import { OpenAPI } from 'openapi-types';
 import SwaggerParser from '@apidevtools/swagger-parser';
 import * as YAML from 'js-yaml';
-import { clone as _clone, cloneDeep as _cloneDeep, pull as _pull, remove as _remove } from "lodash-es";
+import { clone as _clone, cloneDeep as _cloneDeep, merge as _merge, remove as _remove } from "lodash-es";
 
 import { FileModalComponent } from '../components/file-modal/file-modal.component';
 import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
@@ -71,6 +71,7 @@ class MenuConfig
 		"open": false,
 		"add": false,
 		"download": false,
+		"convertOas2to3": false,
 		"source": false,
 		"printPreview": false,
 		"swaggerUi": false
@@ -188,6 +189,8 @@ export class ApisService
 	blobUrl: string;
 
 	methodKeys = ["get", "post", "put", "delete", "options", "head", "patch" ];
+	// all keys of a path item that are operations ("trace" is OAS3 only)
+	private readonly operationKeys = [ ...this.methodKeys, "trace" ];
 
 	constructor(private modalService: NgbModal, private router: Router, private http: HttpClient) 
 	{
@@ -201,16 +204,23 @@ export class ApisService
 		this.http.get("assets/config.yaml", { observe: 'response', responseType: 'text' })
 			.subscribe(resp => {
 				if (resp.status == 200) {
-					//this.config = YAML.load(resp.body);
-					const config = YAML.load(resp.body);
-					for (const k of Object.keys(config)) {
-						this.config[k] = config[k];
+					let config: any;
+					try {
+						config = YAML.load(resp.body);
+					} catch (ex) {
+						console.error("Invalid config", ex);
+						return;
 					}
-					console.info("Config loaded");
+					if (config && typeof config == 'object') {
+						// deep merge, so that defaults of nested settings are kept
+						_merge(this.config, config);
+						console.info("Config loaded");
+					} else {
+						console.error("Invalid config", config);
+					}
 				} else {
 					console.error("Unexpected status code", resp);
 				}
-				//this.config = resp.body;
 			}, error => {
 				if (error.status != 404) {
 					console.error("Unexpected error code", error);
@@ -218,22 +228,14 @@ export class ApisService
 			});
 	}
 
-	openFile(pathName: string, fobj: File): void
+	/** Reads a file either from the server (pathName) or from a file chosen by the user (fobj). */
+	private readFile(pathName: string, fobj: File, onLoad: (text: string) => void): void
 	{
-		//Swadit.thinking = "Loading file...";
-		const apis = this;
 		if (pathName) {
 			this.http.get(pathName, { observe: 'response', responseType: 'text' })
 				.subscribe(resp => {
 					if (resp.status == 200) {
-						apis.lastLoaded = resp.body;
-						try {
-							SwaggerParser.parse(<OpenAPI.Document> YAML.load(resp.body), swaggerParserOptions)
-								.then(api => { apis.swaggerLoaded(api); })
-								.catch(err => { apis.swaggerLoadingError(err); });
-						} catch (ex) {
-							apis.swaggerLoadingError(ex, pathName);
-						}
+						onLoad(resp.body);
 					} else {
 						console.error("Unexpected status code", resp);
 					}
@@ -244,76 +246,103 @@ export class ApisService
 				});
 		} else {
 			const reader = new FileReader();
-			reader.onloadend = function(e) {
-				apis.lastLoaded = reader.result.toString();
-				try {
-					SwaggerParser.parse(<OpenAPI.Document> YAML.load(reader.result.toString()), swaggerParserOptions)
-						.then(api => { apis.swaggerLoaded(api, fobj.name); })
-						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
-				} catch (ex) {
-					apis.swaggerLoadingError(ex, fobj.name);
-				}
-			}
+			reader.onload = () => onLoad(reader.result.toString());
 			reader.readAsText(fobj);
 		}
+	}
+
+	/** Parses YAML/JSON text into an API document (without dereferencing). */
+	private parseApi(text: string): Promise<any>
+	{
+		return new Promise((resolve, reject) => {
+			SwaggerParser.parse(<OpenAPI.Document> YAML.load(text), swaggerParserOptions)
+				.then(resolve, reject);
+		});
+	}
+
+	openFile(pathName: string, fobj: File = null): void
+	{
+		const fileName = fobj ? fobj.name : null;
+		this.readFile(pathName, fobj, text => {
+			this.lastLoaded = text;
+			this.parseApi(text)
+				.then(api => { this.swaggerLoaded(api, fileName); })
+				.catch(err => { this.swaggerLoadingError(err, fileName); });
+		});
 	}
 
 	addFile(pathName: string, fobj: any = null, addSource = false): void
 	{
 		console.log("addFile", pathName, fobj, addSource);
-		const apis = this;
-		if (pathName) {
-			this.http.get(pathName, { observe: 'response', responseType: 'text' })
-				.subscribe(resp => {
-					if (resp.status == 200) {
-						apis.lastLoaded = resp.body;
-						try {
-							SwaggerParser.parse(<OpenAPI.Document> YAML.load(resp.body), swaggerParserOptions)
-								.then(api => { apis.mergeSwagger(api, null, addSource); })
-								.catch(err => { apis.swaggerLoadingError(err); });
-						} catch (ex) {
-							apis.swaggerLoadingError(ex, pathName);
-						}
-					} else {
-						console.error("Unexpected status code", resp);
-					}
-				}, error => {
-					if (error.status != 404) {
-						console.error("Unexpected error code", error);
-					}
-				});
+		const fileName = fobj ? fobj.name : pathName;
+		this.readFile(pathName, fobj, text => {
+			this.parseApi(text)
+				.then(api => { this.mergeSwagger(api, fobj ? fobj.name : null, addSource); })
+				.catch(err => { this.fileAddingError(err, fileName, addSource); });
+		});
+	}
+
+	/** Informs the user about a file that could not be added and continues with the next one. */
+	private fileAddingError(err: any, fileName: string, addSource: boolean): void
+	{
+		console.log("error adding file: ", fileName, err);
+		ConfirmComponent.open(this.modalService, 
+			"Cannot add " + (fileName || "file") + ": " + (err && err.message ? err.message : err), 
+			"Ok", null);
+		this.addNextFile(addSource);
+	}
+
+	private addNextFile(addSource: boolean): void
+	{
+		this.filesToAddIndex++;
+		if (this.filesToAddIndex < this.filesToAdd.length) {
+			this.addFile(null, this.filesToAdd[this.filesToAddIndex], addSource);
 		} else {
-			const reader = new FileReader();
-			reader.onload = function(e) {
-				apis.lastLoaded = reader.result.toString();
-				try {
-					SwaggerParser.parse(<OpenAPI.Document> YAML.load(reader.result.toString()), swaggerParserOptions)
-						.then(api => { apis.mergeSwagger(api, fobj.name, addSource); })
-						.catch(err => { apis.swaggerLoadingError(err, fobj.name); });
-				} catch (ex) {
-					apis.swaggerLoadingError(ex, fobj.name);
-				}
-			}
-			reader.readAsText(fobj);
+			this.filesToAdd = [];
 		}
 	}
 
-	swaggerLoaded(api: any, fileName: string = null): void
+	/**
+	 * Replaces the current API document and updates everything that depends on it
+	 * (spec version flags, path selection). Does not fire eventApiChanged.
+	 */
+	private setCurrent(api: any, fileName: string = null): void
 	{
-		console.log("swaggerLoaded");
 		this.current = api;
 		this.currentFileName = fileName ? fileName : "swagger.yaml";
+		this.selectedPaths = {};
+		this.updateSpecVersion();
+	}
 
+	private updateSpecVersion(): void
+	{
 		if ('swagger' in this.current) {
-			this.specVersion = this.current['swagger'];
+			this.specVersion = String(this.current['swagger']);
 		} else if ('openapi' in this.current) {
-			this.specVersion = this.current['openapi'];
+			this.specVersion = String(this.current['openapi']);
 		} else {
 			this.specVersion = "";
 		}
 
 		this.isOas2 = this.specVersion.startsWith('2.0');
 		this.isOas3 = this.specVersion.startsWith('3.0');
+	}
+
+	/**
+	 * Replaces the current API with an already validated, modified version of it
+	 * (e.g. from the source editor).
+	 */
+	replaceCurrent(api: any): void
+	{
+		this.hasLoadingErrors = false;
+		this.setCurrent(api, this.currentFileName);
+		this._eventApiChanged.next(this.currentFileName);
+	}
+
+	swaggerLoaded(api: any, fileName: string = null): void
+	{
+		console.log("swaggerLoaded");
+		this.setCurrent(api, fileName);
 
 		// if ('openapi' in api) {
 		// 	ConfirmComponent.open(this.modalService, 
@@ -322,14 +351,18 @@ export class ApisService
 		// 		"Ok", null);
 		// }
 
+		const loaded = this.current;
 		const apiClone: any = _cloneDeep(this.current);
 		SwaggerParser.validate(apiClone, swaggerParserOptions)
 			.then((api) => {
+				// ignore the result if another API has been loaded in the meantime
+				if (this.current !== loaded) return;
 				console.log("This API is a valid Swagger file.");
 				this.hasLoadingErrors = false;
 				this._eventApiChanged.next(this.currentFileName);
 			})
 			.catch((err) => {
+				if (this.current !== loaded) return;
 				console.log("Swagger validation error: ", err.message);
 				this.hasLoadingErrors = true;
 				this._eventApiChanged.next(this.currentFileName);
@@ -343,15 +376,14 @@ export class ApisService
 	{
 		console.log("error loading yaml: ", err);
 		this.hasLoadingErrors = true;
-		this.current = { 
+		this.setCurrent({ 
 			swagger: "2.0",
 			info: { 
 				title: "Loading Error",
 				version: "1.0"
 			},
 			paths: {}
-		}
-		this.currentFileName = fileName ? fileName : "swagger.yaml";
+		}, fileName);
 		this._eventApiChanged.next(this.currentFileName);
 		this.router.navigate(['/source']);
 	}
@@ -359,122 +391,70 @@ export class ApisService
 	mergeSwagger(api, sourceName: string = null, addSource = false): void
 	{
 		console.log("mergeSwagger", api, sourceName, addSource);
-		const apis = this;
 
-		const addedPath = [];
-		const replacedPath = [];
-		const addedParameters = [];
-		const replacedParameters = [];
-		const addedDefinitions = [];
-		const replacedDefinitions = [];
-		const addedResponses = [];
-		const replacedResponses = [];
-		
-		if (api.hasOwnProperty('paths')) {
-			Object.keys(api.paths).forEach(function(element) {
-				if (apis.current['paths'].hasOwnProperty(element)) {
-					// replace path
-					console.log("Replacing " + element);
-					apis.current['paths'][element] = api.paths[element];
-					replacedPath.push(element);
+		if (('openapi' in api) != this.isOas3) {
+			this.fileAddingError(
+				"The file uses a different specification version (" + (api['openapi'] || "Swagger " + api['swagger']) + 
+				") than the current API (" + (this.isOas3 ? "OpenAPI " : "Swagger ") + this.specVersion + ").", 
+				sourceName, addSource);
+			return;
+		}
 
+		const merge = (target: any, source: any, name: string) => {
+			const added = [];
+			const replaced = [];
+			for (const k of Object.keys(source)) {
+				if (target.hasOwnProperty(k)) {
+					replaced.push(k);
 				} else {
-					// add new path
-					console.log("Adding " + element);
-					apis.current['paths'][element] = api.paths[element];
-					addedPath.push(element);
+					added.push(k);
 				}
+				target[k] = source[k];
+			}
+			console.log("Replaced " + name, replaced);
+			console.log("Added " + name, added);
+		};
+
+		if (api['paths']) {
+			if (!this.current['paths']) {
+				this.current['paths'] = {};
+			}
+			merge(this.current['paths'], api['paths'], "paths");
+			for (const path of Object.keys(api['paths'])) {
 				if (addSource && sourceName) {
-					for (const k of Object.keys(apis.current['paths'][element])) {
-						if (k != "parameters") {
-							if (!apis.current['paths'][element][k].description) {
-								apis.current['paths'][element][k].description = "";
-							}
-							apis.current['paths'][element][k].description = "Source: " + sourceName + "\n\n" + 
-								apis.current['paths'][element][k].description;
-						}
+					for (const method of this.getMethods(path, api)) {
+						method['obj']['description'] = "Source: " + sourceName + "\n\n" + 
+							(method['obj']['description'] || "");
 					}
 				}
-				apis.selectedPaths[element] = true;
-			});
-			console.log("Replaced paths", replacedPath);
-			console.log("Added paths", addedPath);
-		}
-
-		if (api.hasOwnProperty('parameters')) {
-			if (!apis.current['parameters']) {
-				apis.current['parameters'] = {};
+				this.selectedPaths[path] = true;
 			}
-			Object.keys(api.parameters).forEach(function(element) {
-				if (apis.current['parameters'].hasOwnProperty(element)) {
-					// replace parameter
-					console.log("Replacing " + element);
-					apis.current['parameters'][element] = api.parameters[element];
-					replacedParameters.push(element);
-
-				} else {
-					// add new parameter
-					console.log("Adding " + element);
-					apis.current['parameters'][element] = api.parameters[element];
-					addedParameters.push(element);
-				}
-			});
-			console.log("Replaced parameters", replacedParameters);
-			console.log("Added parameters", addedParameters);
 		}
 
-		if (api.hasOwnProperty('definitions')) {
-			if (!apis.current['definitions']) {
-				apis.current['definitions'] = {};
+		if (this.isOas3) {
+			if (api['components']) {
+				if (!this.current['components']) {
+					this.current['components'] = {};
+				}
+				for (const type of Object.keys(api['components'])) {
+					if (!this.current['components'][type]) {
+						this.current['components'][type] = {};
+					}
+					merge(this.current['components'][type], api['components'][type], type);
+				}
 			}
-			Object.keys(api.definitions).forEach(function(element) {
-				if (apis.current['definitions'].hasOwnProperty(element)) {
-					// replace definitions
-					console.log("Replacing " + element);
-					apis.current['definitions'][element] = api.definitions[element];
-					replacedDefinitions.push(element);
-
-				} else {
-					// add new definitions
-					console.log("Adding " + element);
-					apis.current['definitions'][element] = api.definitions[element];
-					addedDefinitions.push(element);
-				}
-			});
-			console.log("Replaced definitions", replacedDefinitions);
-			console.log("Added definitions", addedDefinitions);
-		}
-
-		if (api.hasOwnProperty('responses')) {
-			if (!apis.current['responses']) {
-				apis.current['responses'] = {};
-			}
-			Object.keys(api.responses).forEach(function(element) {
-				if (apis.current['responses'].hasOwnProperty(element)) {
-					// replace response
-					console.log("Replacing " + element);
-					apis.current['responses'][element] = api.responses[element];
-					replacedResponses.push(element);
-
-				} else {
-					// add new response
-					console.log("Adding " + element);
-					apis.current['responses'][element] = api.responses[element];
-					addedResponses.push(element);
-				}
-			});
-			console.log("Replaced responses", replacedResponses);
-			console.log("Added responses", addedResponses);
-		}
-		
-		this.filesToAddIndex++;
-		if (this.filesToAddIndex < this.filesToAdd.length) {
-			this.addFile(null, this.filesToAdd[this.filesToAddIndex], addSource);
-			
 		} else {
-			this.filesToAdd = [];
-
+			for (const type of ['definitions', 'parameters', 'responses', 'securityDefinitions']) {
+				if (api[type]) {
+					if (!this.current[type]) {
+						this.current[type] = {};
+					}
+					merge(this.current[type], api[type], type);
+				}
+			}
 		}
+
+		this.addNextFile(addSource);
 	}
 
 	toYaml(obj: Object): string
@@ -606,7 +586,7 @@ export class ApisService
 	{
 		const content = YAML.dump(this.current);
 		this.blob = new Blob([ content ], { type : 'text/plain' });
-		if (this.blobUrl != '') {
+		if (this.blobUrl) {
 			window.URL.revokeObjectURL(this.blobUrl);
 		}
 		this.blobUrl = window.URL.createObjectURL(this.blob);
@@ -615,15 +595,15 @@ export class ApisService
 
 	newFile(): void
 	{
-		this.current = { 
+		this.hasLoadingErrors = false;
+		this.setCurrent({ 
 			swagger: "2.0",
 			info: { 
 				title: "My new API",
 				version: "1.0"
 			},
 			paths: {}
-		}
-		this.currentFileName = "swagger.yaml";
+		});
 		this._eventApiChanged.next(this.currentFileName);
 	}
 
@@ -719,7 +699,7 @@ export class ApisService
 			});
 		}
 		if (sorted) {
-			return filteredList.sort((a, b) => {
+			return [...filteredList].sort((a, b) => {
 				a = a.toLowerCase();
 				b = b.toLowerCase();
 				if (a == b) return 0;
@@ -746,10 +726,18 @@ export class ApisService
 			}
 		}
 
+		// JSON pointer segments may be percent-encoded (URI fragment) and use ~1 for '/' and ~0 for '~'
+		const decode = (p: string): string => {
+			try {
+				p = decodeURIComponent(p);
+			} catch (e) { /* use as is */ }
+			return p.replace(/~1/g, '/').replace(/~0/g, '~');
+		};
+
 		const lookup = (src: any, r: string): any => {
 			r.split('/').forEach(p => {
 				if (p != "#") {
-					src = src[p];
+					src = src[decode(p)];
 				}
 			});
 			return src;
@@ -820,6 +808,8 @@ export class ApisService
 
 	renameObjectKey(obj: any, key: string, newKey: string): any
 	{
+		// do not overwrite another key
+		if (key == newKey || obj.hasOwnProperty(newKey)) return obj;
 		const newObj = _clone(obj);
 		Object.keys(obj).forEach(k => delete obj[k]);
 		Object.keys(newObj).forEach(k => {
@@ -830,6 +820,42 @@ export class ApisService
 			}
 		});
 		return obj;
+	}
+
+	/**
+	 * Renames a component (e.g. a definition) and updates all references to it.
+	 * The type is a key of the components (OAS3) or of the root object (OAS2), see getComponents().
+	 */
+	renameComponent(type: string, key: string, newKey: string): void
+	{
+		const components = this.getComponents(type);
+		if (!components || !components.hasOwnProperty(key) || key == newKey) return;
+		this.renameObjectKey(components, key, newKey);
+
+		let base: string;
+		if (this.isOas3) {
+			base = "#/components/" + type + "/";
+		} else {
+			base = "#/" + (type == 'schemas' ? 'definitions' : type) + "/";
+		}
+		const escape = (k: string) => k.replace(/~/g, '~0').replace(/\//g, '~1');
+		this.replaceRefs(this.current, base + escape(key), base + escape(newKey));
+	}
+
+	private replaceRefs(obj: any, ref: string, newRef: string): void
+	{
+		if (!obj || typeof obj != 'object') return;
+		for (const k of Object.keys(obj)) {
+			if (k == '$ref' && typeof obj[k] == 'string') {
+				if (obj[k] == ref) {
+					obj[k] = newRef;
+				} else if (obj[k].startsWith(ref + '/')) {
+					obj[k] = newRef + obj[k].substring(ref.length);
+				}
+			} else {
+				this.replaceRefs(obj[k], ref, newRef);
+			}
+		}
 	}
 
 	keys(obj: Object): string[]
@@ -851,7 +877,7 @@ export class ApisService
 		const missingFields = [];
 		if (schema['required']) {
 			schema['required'].forEach(p => {
-				if (!obj[p]) {
+				if (obj[p] === undefined || obj[p] === null || obj[p] === "") {
 					missingFields.push(p);
 				}
 			});
@@ -916,11 +942,11 @@ export class ApisService
 	{
 		let res: any = undefined;
 		if (schema['$ref']) {
-			if (refStack['$ref']) {
+			if (refStack[schema['$ref']]) {
 				// recursion detected
 				return null;
 			} else {
-				refStack['$ref'] = true;
+				refStack[schema['$ref']] = true;
 			}
 		}
 		schema = this.resolveObj(schema);
@@ -929,33 +955,33 @@ export class ApisService
 		}
 		if (!noReadOnly || !schema.readOnly) {
 			if (schema.type == "string") {
-				if (schema.example) {
+				if (schema.example !== undefined) {
 					res = schema.example;
-				} else if (schema.default) {
+				} else if (schema.default !== undefined) {
 					res = schema.default;
 				} else {
 					res = "string";
 				}
 			} else if (schema.type == "boolean") {
-				if (schema.example) {
+				if (schema.example !== undefined) {
 					res = schema.example;
-				} else if (schema.default) {
+				} else if (schema.default !== undefined) {
 					res = schema.default;
 				} else {
 					res = false;
 				}
 			} else if (schema.type == "number" || schema.type == "integer") {
-				if (schema.example) {
+				if (schema.example !== undefined) {
 					res = schema.example;
-				} else if (schema.default) {
+				} else if (schema.default !== undefined) {
 					res = schema.default;
 				} else {
 					res = 0;
 				}
 			} else if (schema.type == "array") {
-				if (schema.example && !forceGeneration) {
+				if (schema.example !== undefined && !forceGeneration) {
 					res = schema.example;
-				} else if (schema.default && !forceGeneration) {
+				} else if (schema.default !== undefined && !forceGeneration) {
 					res = schema.default;
 				} else {
 					const r = this.generateExample(schema.items, refStack, noReadOnly);
@@ -964,9 +990,9 @@ export class ApisService
 					}
 				}
 			} else if (schema.type == "object") {
-				if (schema.example && !forceGeneration) {
+				if (schema.example !== undefined && !forceGeneration) {
 					res = schema.example;
-				} else if (schema.default && !forceGeneration) {
+				} else if (schema.default !== undefined && !forceGeneration) {
 					res = schema.default;
 				} else {
 					res = {};
@@ -1033,8 +1059,7 @@ export class ApisService
 			api = this.current;
 		}
 		if (!api['paths']) return [];
-		const methodKeys = this.keys(api['paths'][path]);
-		_pull(methodKeys, "parameters");
+		const methodKeys = this.keys(api['paths'][path]).filter(k => this.operationKeys.includes(k));
 		const methods: Array<object> = [];
 		methodKeys.forEach(m => methods.push({ 
 			key: m,
@@ -1043,21 +1068,29 @@ export class ApisService
 		return methods;
 	}
 
+	/**
+	 * Returns the parameters of an operation, including the path level parameters. Operation
+	 * parameters override path parameters with the same name and location. Referenced
+	 * parameters are returned as is (i.e. as $ref objects).
+	 */
 	getParameters(api: any, path: string, method: string, includeBody: boolean = true): Array<object>
 	{
 		if (!api || !api['paths']) return [];
 		if (!api['paths'][path]) return [];
 		if (!api['paths'][path][method]) return [];
 
-		let parameters: Array<object> = [];
-		if (api['paths'][path]['parameters']) {
-			parameters = parameters.concat(api['paths'][path]['parameters']);
-		}
-		if (api['paths'][path][method]['parameters']) {
-			parameters = parameters.concat(api['paths'][path][method]['parameters']);
-		}
+		const resolve = (p: any): any => this.resolveObj(p, api) || {};
+		const paramId = (p: any): string => resolve(p)['in'] + ":" + resolve(p)['name'];
+
+		const pathParameters: Array<object> = api['paths'][path]['parameters'] || [];
+		const operationParameters: Array<object> = api['paths'][path][method]['parameters'] || [];
+		const operationParameterIds = operationParameters.map(paramId);
+
+		const parameters = pathParameters
+			.filter(p => !operationParameterIds.includes(paramId(p)))
+			.concat(operationParameters);
 		if (!includeBody) {
-			_remove(parameters, p => { return p['in'] == 'body'; });
+			_remove(parameters, p => resolve(p)['in'] == 'body');
 		}
 		return parameters;
 	}
@@ -1068,22 +1101,9 @@ export class ApisService
 		if (!api['paths'][path]) return null;
 		if (!api['paths'][path][method]) return null;
 
-		let body: object = null;
-		if (api['paths'][path]['parameters']) {
-			api['paths'][path]['parameters'].forEach(p => {
-				if (p['in'] == 'body') {
-					body = p;
-				}
-			});
-		}
-		if (api['paths'][path][method]['parameters']) {
-			api['paths'][path][method]['parameters'].forEach(p => {
-				if (p['in'] == 'body') {
-					body = p;
-				}
-			});
-		}
-		return body;
+		const body = this.getParameters(api, path, method)
+			.find(p => (this.resolveObj(p, api) || {})['in'] == 'body');
+		return body ? body : null;
 	}
 
 	getConsumes(api: any, path: string, method: string): any
@@ -1117,17 +1137,17 @@ export class ApisService
 	getComponents(type: string): any
 	{
 		if (this.isOas2) {
-			if (type in this.current || type == 'schemas') {
-				if (type == 'definitions' ||
-					type == 'responses' ||
-					type == 'parameters')
-				{
-					return this.current[type];
-				} 
-				else if (type == 'schemas') 
-				{
-					return this.current['definitions'];
-				}
+			// OAS3 component types and their OAS2 counterparts
+			const oas2Types = {
+				'schemas': 'definitions',
+				'definitions': 'definitions',
+				'parameters': 'parameters',
+				'responses': 'responses',
+				'securitySchemes': 'securityDefinitions',
+				'securityDefinitions': 'securityDefinitions'
+			};
+			if (oas2Types[type] && this.current[oas2Types[type]]) {
+				return this.current[oas2Types[type]];
 			}
 		} else if (this.isOas3) {
 			if ('components' in this.current && type in this.current['components']) {
@@ -1171,18 +1191,7 @@ export class ApisService
 		}
 		convertOas2to3(this.current)
 			.then((result) => {
-				this.current = result.target;
-
-				if ('swagger' in this.current) {
-					this.specVersion = this.current['swagger'];
-				} else if ('openapi' in this.current) {
-					this.specVersion = this.current['openapi'];
-				} else {
-					this.specVersion = "";
-				}
-		
-				this.isOas2 = this.specVersion.startsWith('2.0');
-				this.isOas3 = this.specVersion.startsWith('3.0');
+				this.setCurrent(result.target, this.currentFileName);
 		
 				if ('openapi' in this.current) {
 					ConfirmComponent.open(this.modalService, 

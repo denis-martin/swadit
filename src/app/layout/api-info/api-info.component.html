@@ -249,13 +249,18 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         <h3>Default Security Requirements</h3>
         @for (req of apis.current['security']; track req) {
           <div>
-            <p style="font-weight: bold">{{keys(req)[0]}}</p>
-            @if (req[keys(req)[0]].length>0) {
-              <ul>
-                @for (scope of req[keys(req)[0]]; track scope) {
-                  <li>{{scope}}</li>
-                }
-              </ul>
+            <!-- all schemes of a requirement are required, an empty requirement makes security optional -->
+            @for (scheme of keys(req); track scheme) {
+              <p style="font-weight: bold">{{scheme}}</p>
+              @if (req[scheme].length>0) {
+                <ul>
+                  @for (scope of req[scheme]; track scope) {
+                    <li>{{scope}}</li>
+                  }
+                </ul>
+              }
+            } @empty {
+              <p>(none)</p>
             }
           </div>
         }

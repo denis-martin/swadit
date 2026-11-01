@@ -302,13 +302,13 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         </h3>
         <p>
           This path supports the following methods:
-          @for (method of apis.getMethods(path, api); track method) {
+          @for (method of apis.getMethods(path, api); track method.key) {
             <span>
               <span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">{{method.key}}</span>
             </span>
           }
         </p>
-        @for (method of apis.getMethods(path, api); track method) {
+        @for (method of apis.getMethods(path, api); track method.key) {
           <div>
             <h4 class="methodheading" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
               <span class="methodkey" [ngClass]="method.obj.deprecated ? 'deprecated' : 'methodhighlight-'+method.key">
@@ -331,7 +331,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
                     <th>Description</th>
                   </thead>
                   <tbody>
-                    @for (param of apis.getParameters(path, method.key, false); track param) {
+                    @for (param of apis.getParameters(api, path, method.key, false); track param) {
                       <tr>
                         <td>
                           {{param.name}}<br>

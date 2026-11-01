@@ -108,11 +108,16 @@ export class ParameterEditComponent implements OnInit
 		let o;
 		if (!this.obj['$ref']) {
 			o = _cloneDeep(this.obj);
+			const schema = o['in'] == "body" ? this.apis.schemas.parameterBody : this.apis.schemas.parameterNonBody;
+			// remove the properties of the other kind of parameter (e.g. if 'in' has been changed)
+			Object.keys(o).forEach(k => {
+				if (!k.startsWith('x-') && !schema['properties'][k]) {
+					delete o[k];
+				}
+			});
+			this.apis.cleanUp(schema, o);
 			if (o['in'] == "body") {
-				this.apis.cleanUp(this.apis.schemas.parameterBody, o);
 				this.apis.cleanUpSwaggerSchema(o['schema']);
-			} else {
-				this.apis.cleanUp(this.apis.schemas.parameterNonBody, o);
 			}
 		} else {
 			o = {};
@@ -130,7 +135,7 @@ export class ParameterEditComponent implements OnInit
 				}
 				this.apis.current['parameters'][this.key] = this.obj_orig;
 			} else if (this.key != this.key_orig) {
-				this.apis.renameObjectKey(this.apis.current['parameters'], this.key_orig, this.key);
+				this.apis.renameComponent('parameters', this.key_orig, this.key);
 			}
 		}
 

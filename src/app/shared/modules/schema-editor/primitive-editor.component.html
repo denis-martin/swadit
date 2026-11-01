@@ -40,7 +40,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   @if (schema['type']=='string' && schema['enum'] && isInEnum(obj)) {
     <select
       id="{{id}}" [(ngModel)]="obj" [ngModelOptions]="{standalone: true}"
-      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      class="form-select {{schema['x-swadit-input-class'] || ''}}"
       title="{{schema['description']}}">
       @for (o of schema['enum']; track o) {
         <option>{{o}}</option>
@@ -60,7 +60,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   @if (schema['type']=='boolean') {
     <select
       id="{{id}}" [(ngModel)]="obj" [ngModelOptions]="{standalone: true}"
-      class="form-control {{schema['x-swadit-input-class'] || ''}}"
+      class="form-select {{schema['x-swadit-input-class'] || ''}}"
       title="{{schema['description']}}">
       @if (schema['default'] == undefined) {
         <option [ngValue]="undefined">(not set)</option>

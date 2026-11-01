@@ -22,10 +22,6 @@ label {
     cursor: pointer;
 }
 
-.form-group {
-    margin-bottom: 0.5rem;
-}
-
 .monospace {
     font-family: monospace;
 }
@@ -60,7 +56,7 @@ label {
     margin-bottom: -1px;
 }
 
-.input-group-overlapping-border input, .input-group-overlapping-border .input-group-addon {
+.input-group-overlapping-border input, .input-group-overlapping-border .input-group-text {
     border-color: #d9d9d9;
 }
 
@@ -68,6 +64,9 @@ label {
     border-color: #5cb3fd;
 }
 
-.form-control {
-    width: 100%;
+/* inside a (flex) input group, take the remaining width like .form-control does */
+.input-group > .input-wrap {
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
 }

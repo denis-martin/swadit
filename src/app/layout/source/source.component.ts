@@ -16,6 +16,7 @@
  */
 
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ApisService } from '../../shared/services';
 
@@ -29,16 +30,26 @@ import { ApisService } from '../../shared/services';
 export class SourceComponent implements OnInit 
 {
 	text: string = "";
-	options: any = { printMargin: true };
+	// no Ace worker: the API is validated by swadit (and the worker scripts are not deployed)
+	options: any = { printMargin: true, useWorker: false };
 	message: string = null;
 	validationPassed: boolean = null;
 	applied: boolean = null;
 	skipReset: boolean = false;
+	// the API is changed by this component (keep the text as it is)
+	private applying: boolean = false;
+	// the API shown and whether the user has changed its text
+	private shownApi: any = null;
+	private modified: boolean = false;
 
 	constructor(public apis: ApisService)
 	{
-		this.apis.eventApiChanged.subscribe(param => {
-			this.revert();
+		this.apis.eventApiChanged.pipe(takeUntilDestroyed()).subscribe(param => {
+			// the event is also sent when the validation of a loaded API is done; keep the changes of the user then
+			const sameApiModified = this.apis.current === this.shownApi && this.modified;
+			if (!this.applying && !sameApiModified) {
+				this.revert();
+			}
 		});
 	}
 
@@ -49,7 +60,7 @@ export class SourceComponent implements OnInit
 
 	onChange(text)
 	{
-		//console.log(text);
+		this.modified = true;
 		if (!this.skipReset) {
 			this.validationPassed = null;
 			this.applied = null;
@@ -61,6 +72,8 @@ export class SourceComponent implements OnInit
 	revert()
 	{
 		if (this.apis.current) {
+			this.shownApi = this.apis.current;
+			this.modified = false;
 			this.text = this.apis.hasLoadingErrors ? this.apis.lastLoaded : this.apis.toYaml(this.apis.current);
 			this.skipReset = true;
 			this.validate();
@@ -77,8 +90,10 @@ export class SourceComponent implements OnInit
 				self.message = null;
 				self.validationPassed = true;
 				self.applied = true;
-				self.apis.hasLoadingErrors = false;
-				self.apis.current = api;
+				// updates the spec version and notifies the other components
+				self.applying = true;
+				self.apis.replaceCurrent(api);
+				self.applying = false;
 			})
 			.catch(msg => {
 				self.message = msg;

@@ -21,7 +21,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       <div class="input-group" style="margin-bottom:-1px">
         <swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap input-wrap-item'" [schema]="itemsSchema" [(obj)]="obj[index]">
         </swadit-primitive-editor>
-        <span class="input-group-addon" style="border-left: 0; width: 5.1rem;">
+        <span class="input-group-text" style="border-left: 0; width: 5.1rem;">
           <span>
             @if (index>0) {
               <span class="clickable" (click)="moveItemUp($event, index)"><i class="fa fa-arrow-up"></i></span>
@@ -38,7 +38,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       <swadit-primitive-editor class="input-wrap" [wrapClass]="'input-wrap'" [schema]="itemsSchema" [(obj)]="itemToAdd"
         (keydown.enter)="addItem($event)">
       </swadit-primitive-editor>
-      <span class="input-group-addon clickable" style="border-left: 0; width: 5.1rem;" (click)="addItem($event)">
+      <span class="input-group-text clickable" style="border-left: 0; width: 5.1rem;" (click)="addItem($event)">
         <i class="fa fa-plus"></i>
       </span>
     </div>
@@ -54,7 +54,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       <div style="margin-bottom: 0.6rem" class="input-group">
         <swadit-object-editor [schema]="itemsSchema" [(obj)]="obj[index]" class="form-control" style="background-color: #f7f7f9">
         </swadit-object-editor>
-        <div class="input-group-addon">
+        <div class="input-group-text flex-column justify-content-center">
           <span class="clickable" (click)="deleteItem($event, index)"><i class="fa fa-fw fa-trash"></i></span><br>
           @if (index>0) {
             <span class="clickable" (click)="moveItemUp($event, index)"><i class="fa fa-fw fa-arrow-up"></i><br></span>
@@ -69,7 +69,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       <swadit-object-editor [schema]="itemsSchema" [(obj)]="itemToAdd" class="form-control"
         (keydown.enter)="addItem($event)">
       </swadit-object-editor>
-      <div class="input-group-addon clickable" (click)="addItem($event)">
+      <div class="input-group-text clickable" (click)="addItem($event)">
         <i class="fa fa-fw fa-plus"></i>
       </div>
     </div>

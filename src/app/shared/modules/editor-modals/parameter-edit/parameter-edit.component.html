@@ -19,20 +19,19 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
   @if (pathMode) {
     <div class="modal-header">
       <span class="modal-title" id="modal-title">Parameter definition</span>
-      <div class="form-check" style="margin-top: 0.4em">
-        <label class="form-check-label">
-          <input type="checkbox" class="form-check-input" id="allMethods" name="allMethods"
-            [(ngModel)]="allMethods"> for all operations
-          </label>
-        </div>
+      <div class="form-check ms-auto mb-0">
+        <input type="checkbox" class="form-check-input" id="allMethods" name="allMethods"
+          [(ngModel)]="allMethods">
+        <label class="form-check-label" for="allMethods">for all operations</label>
       </div>
+    </div>
     }
     <div class="modal-body" id="modal-body">
       @if (pathMode) {
-        <div class="form-group">
+        <div class="mb-3">
           <label for="refKey">Reference</label>
           <select id="refKey" name="refKey"
-            [(ngModel)]="obj['$ref']" class="form-control" title="Reference to #/parameters">
+            [(ngModel)]="obj['$ref']" class="form-select" title="Reference to #/parameters">
             <option [ngValue]="null || undefined">(none)</option>
             @for (def of apis.keys(apis.current['parameters']); track def) {
               <option value="#/parameters/{{def}}">
@@ -44,14 +43,14 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       }
 
       @if (!pathMode) {
-        <div class="form-group">
+        <div class="mb-3">
           <label for="parameterKey">Name of parameter definition</label>
           <input type="text" id="parameterKey" name="parameterKey" [(ngModel)]="key" required
             class="form-control" placeholder="Enter name for parameter" title="Name of parameter">
         </div>
       }
       @if (!obj['$ref']) {
-        <div class="form-group">
+        <div class="mb-3">
           @if (!pathMode) {
             <label for="parameterSchema">Parameter definition</label>
           }
@@ -73,7 +72,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     <div class="modal-footer">
       @if (key_orig || (pathMode && (obj_orig['name'] || obj_orig['$ref']))) {
         <button
-          class="btn btn-danger mr-auto" type="button" (click)="deleteParameter()" title="Delete parameter">
+          class="btn btn-danger me-auto" type="button" (click)="deleteParameter()" title="Delete parameter">
         Delete</button>
       }
       @if (errorStr) {

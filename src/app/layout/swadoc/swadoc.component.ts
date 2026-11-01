@@ -1,4 +1,5 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ApisService } from '../../shared/services';
 
@@ -15,10 +16,13 @@ export class SwadocComponent implements OnInit {
 	{
 		window['Swadit'] = this.apis;
 
-		this.apis.eventApiChanged.subscribe(param => {
+		this.apis.eventApiChanged.pipe(takeUntilDestroyed()).subscribe(param => {
 			this.apis.createBlobUrl();
 			const swadocFrame = document.getElementById("swadocFrame");
-			swadocFrame['contentWindow']['Swadoc'].openFile(null, this.apis.blob);
+			// the frame may not be loaded yet (it gets the current API on load)
+			if (swadocFrame && swadocFrame['contentWindow'] && swadocFrame['contentWindow']['Swadoc']) {
+				swadocFrame['contentWindow']['Swadoc'].openFile(null, this.apis.blob);
+			}
 		});
 	}
 
