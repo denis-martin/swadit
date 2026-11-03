@@ -42,6 +42,7 @@ src/app/
   shared/
     services/apis.service.ts central state + logic (see below)
     services/oas2to3.ts      Swagger 2.0 → OpenAPI 3.0 conversion
+    services/oas3to2.ts      OpenAPI 3.0 → Swagger 2.0 conversion (lossy; returns warnings for what was lost)
     schemas/                 JSON schemas for OAS 2.0 (split per object), OAS 3.0, draft-04
     modules/schema-editor/   generic JSON-schema-driven form editor (+ custom/ editors)
     modules/schema-view/     generic schema-driven read-only views
@@ -55,17 +56,17 @@ src/app/
 `src/app/shared/services/apis.service.ts` (~1200 lines) holds nearly all application state and logic:
 
 - `current`: the loaded API document (a plain JS object, edited in place by components).
-- `specVersion`, `isOas2`, `isOas3`: version flags. Many features are gated on these. Visual editing is complete for OAS 2.0 and partial for OAS 3.0 (some UI, such as "add", is OAS2-only).
-- `schemas`: returns the JSON schema set for the current spec version. The editors are driven by these schemas.
+- `specVersion`, `isOas2`, `isOas3`: version flags. Many features are gated on these. Visual editing covers OAS 2.0 and OAS 3.0 (3.1 is not supported). In OAS3, the component types headers, examples, links and callbacks are kept but not listed on the Definitions page, which only shows editable types (`getDefCategories`). They and `oneOf`/`anyOf`/`not` schemas can only be edited in the source view.
+- `schemas`: returns the JSON schema set for the current spec version. The editors are driven by these schemas. The full meta-schemas don't suit the generic editors (`oneOf`, missing descriptions), so per-object editor schemas with `x-swadit-*` annotations exist for both versions (`schemas/oas2.0/swagger-*.json`, `schemas/oas3.0/openapi-*.json`). Their `$ref`s resolve against the version's root schema.
 - File I/O: `openFile`, `addFile` / `mergeSwagger`, `newFile`, `downloadFileModal`. Parsing and validation use `@apidevtools/swagger-parser` with file/http `$ref` resolution **disabled**. YAML goes through `js-yaml`.
 - Helpers: `resolveRef`, `resolveObj`, `getComponents`, `getParameters`, `generateExample`, `validate`, and others.
 - `eventApiChanged`: an observable that fires when a new API is loaded. Components subscribe to it to refresh.
 
-When you add a feature, check first whether a helper for it already exists here. Handle both OAS2 and OAS3 shapes, for example `definitions` vs `components.schemas` and `securityDefinitions` vs `components.securitySchemes`. Use `getComponents` / `getDefCategories` rather than hardcoding paths.
+When you add a feature, check first whether a helper for it already exists here. Handle both OAS2 and OAS3 shapes, for example `definitions` vs `components.schemas` and `securityDefinitions` vs `components.securitySchemes`. Use `getComponents` / `getOrCreateComponents` / `componentRef` / `getDefCategories` rather than hardcoding paths or `$ref` prefixes.
 
 ### Runtime configuration
 
-On startup the service loads `src/assets/petstore.yaml` as the default API. It then optionally loads `assets/config.yaml`, which is not committed. `src/assets/config-example.yaml` shows the format: title, menu items to hide, a catalog of preloaded APIs, and `readOnly`. The available keys are defined by the `SwaditConfig` class in `apis.service.ts`.
+OpenAPI 3.0 is the default format: new files (`newFile()`, `newFile('oas2')` for Swagger 2.0) and the empty initial API are OAS3. On startup the service loads `src/assets/petstore.yaml` (OAS3) as the default API. It then optionally loads `assets/config.yaml`, which is not committed. `src/assets/config-example.yaml` shows the format: title, menu items to hide, a catalog of preloaded APIs, and `readOnly`. The available keys are defined by the `SwaditConfig` class in `apis.service.ts`.
 
 ### i18n
 
@@ -75,9 +76,10 @@ On startup the service loads `src/assets/petstore.yaml` as the default API. It t
 
 - Unit tests sit next to the code (`*.spec.ts`), run with Vitest in jsdom via `@angular/build:unit-test`, and use Vitest globals (`vi`, `describe`, ...).
 - Shared helpers are in `src/testing/test-helpers.ts` (import as `testing/test-helpers`; the alias exists only in `src/tsconfig.spec.json`):
-  - `renderComponent(Component, { imports: [FeatureModule], api, props })` configures TestBed with all providers (`ApisService`, HTTP testing, router, translate, markdown, a mocked `NgbActiveModal`), loads an API (default: petstore) and renders the component. It returns `validated`, a promise for the end of the API's async validation.
+  - `renderComponent(Component, { imports: [FeatureModule], api, props })` configures TestBed with all providers (`ApisService`, HTTP testing, router, translate, markdown, a mocked `NgbActiveModal`), loads an API (default: the OpenAPI 3.0 petstore, `petstoreOas3Yaml`) and renders the component. It returns `validated`, a promise for the end of the API's async validation.
   - `createApisService()` / `setCurrentApi()` / `loadFixture()` for service tests. `Router.navigate` is stubbed.
-- Fixtures: `src/assets/petstore.yaml` (OAS2, the default API), `src/testing/fixtures/minimal-oas3.yaml`, and `features-oas2.yaml` (many OAS2 features, used for the OAS2→3 conversion tests). YAML files are imported as text with `with { loader: 'text' }`.
+- Fixtures: `src/assets/petstore.yaml` (`petstoreOas3Yaml`, the default API on startup), `src/testing/fixtures/petstore-oas2.yaml` (`petstoreOas2Yaml`, the same API in Swagger 2.0), `minimal-oas3.yaml`, `features-oas2.yaml` (many OAS2 features, used for the OAS2→3 conversion tests), and `features-oas3.yaml` (servers, all security scheme types, request bodies, all component types). YAML files are imported as text with `with { loader: 'text' }`. `src/testing/fixtures.spec.ts` validates every fixture registered in `test-helpers.ts`.
+- OAS3 is the default format, so tests use OAS3 unless the spec version matters. Version-dependent behaviour is tested for both versions, usually with `it.each` / `describe.each` over `petstoreOas2Yaml` and `petstoreOas3Yaml`. `getComponents` / `componentRef` keep such tests free of version-specific paths. Pass an OAS2 fixture explicitly when a test is about OAS2.
 - Globals from `angular.json` scripts (Ace, Swagger UI) are not available in unit tests; stub them with `vi.stubGlobal` (see `source.component.spec.ts`, `swaggerui.component.spec.ts`).
 - To test two-way bound editors (`[(obj)]`), render a small standalone host component (see `schema-editor/*.spec.ts`).
 - `swaggerLoaded()` fires `eventApiChanged` twice: immediately and again after the async validation. Await `validated` before interacting if a test depends on that.

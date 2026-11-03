@@ -36,6 +36,8 @@ export class ApiInfoEditComponent implements OnInit
 	}
 
 	public api: any;
+	/** OAS3: the edited components.securitySchemes */
+	public securitySchemes: any = {};
 
 	constructor(public activeModal: NgbActiveModal, public apis: ApisService) 
 	{
@@ -71,6 +73,14 @@ export class ApiInfoEditComponent implements OnInit
 					this.api[p] = [];
 				}
 			});
+		} else if (this.apis.isOas3) {
+			if (!this.api['servers']) {
+				this.api['servers'] = [];
+			}
+			if (!this.api['security']) {
+				this.api['security'] = [];
+			}
+			this.securitySchemes = _cloneDeep(this.apis.getComponents('securitySchemes')) || {};
 		}
 	}
 
@@ -94,6 +104,9 @@ export class ApiInfoEditComponent implements OnInit
 			Object.keys(this.apis.schemas.general['properties']).forEach(p => {
 				this.apis.current[p] = api[p];
 			});
+		} else if (this.apis.isOas3) {
+			this.apis.current['servers'] = api['servers'];
+			this.apis.current['security'] = api['security'];
 		}
 
 		// clean up
@@ -106,6 +119,10 @@ export class ApiInfoEditComponent implements OnInit
 			this.apis.cleanUp(this.apis.schemas.securityDefinitions, this.apis.current['securityDefinitions']);
 			this.apis.cleanUp(this.apis.schemas.security, this.apis.current['security']);
 			this.apis.cleanUp(this.apis.schemas.general, this.apis.current);
+		} else if (this.apis.isOas3) {
+			this.apis.cleanUp(this.apis.schemas.servers, this.apis.current['servers']);
+			this.apis.cleanUp(this.apis.schemas.security, this.apis.current['security']);
+			this.applySecuritySchemes();
 		}
 
 		// remove empty objects created by the constructor (in OAS2, we also have incomplete schemas)
@@ -130,6 +147,13 @@ export class ApiInfoEditComponent implements OnInit
 			if (isEmpty(cur['security'])) {
 				delete cur['security'];
 			}
+		} else if (this.apis.isOas3) {
+			if (isEmpty(cur['servers'])) {
+				delete cur['servers'];
+			}
+			if (isEmpty(cur['security'])) {
+				delete cur['security'];
+			}
 		}
 
 		console.log(this.apis.current);
@@ -137,6 +161,24 @@ export class ApiInfoEditComponent implements OnInit
 		// TODO: extension properties
 
 		this.activeModal.close('ok');
+	}
+
+	/** OAS3: replaces components.securitySchemes with the edited (and cleaned up) security schemes */
+	private applySecuritySchemes(): void
+	{
+		const securitySchemes = _cloneDeep(this.securitySchemes);
+		this.apis.cleanUp(this.apis.schemas.securitySchemes, securitySchemes);
+		this.apis.cleanUpSecuritySchemes(securitySchemes);
+		const components = this.apis.current['components'];
+		if (Object.keys(securitySchemes).length > 0) {
+			this.apis.getOrCreateComponents('securitySchemes');
+			this.apis.current['components']['securitySchemes'] = securitySchemes;
+		} else if (components) {
+			delete components['securitySchemes'];
+			if (Object.keys(components).length == 0) {
+				delete this.apis.current['components'];
+			}
+		}
 	}
 	
 }

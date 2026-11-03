@@ -1,6 +1,6 @@
 import { SchemaViewModule } from './schema-view.module';
 import { SchemaViewComponent } from './schema-view.component';
-import { renderComponent } from 'testing/test-helpers';
+import { loadFixture, renderComponent } from 'testing/test-helpers';
 
 describe('SchemaViewComponent', () => {
 	const render = (schema: any, obj: any, skip: string[] = []) =>
@@ -37,9 +37,12 @@ describe('SchemaViewComponent', () => {
 		expect(component.schema['type']).toBe('object');
 	});
 
-	it('renders the spec parameter schema for a petstore parameter', () => {
-		const { apis, fixture, element } = renderComponent(SchemaViewComponent, { imports: [SchemaViewModule], detectChanges: false });
-		Object.assign(fixture.componentInstance, { schema: apis.schemas.parameterNonBody, obj: apis.current.paths['/pet/{petId}'].get.parameters[0] });
+	it.each([
+		[ 'OAS2', 'petstoreOas2Yaml', 'parameterNonBody' ],
+		[ 'OAS3', 'petstoreOas3Yaml', 'parameter' ]
+	] as const)('renders the spec parameter schema for a petstore parameter (%s)', (version, api, schema) => {
+		const { apis, fixture, element } = renderComponent(SchemaViewComponent, { imports: [SchemaViewModule], detectChanges: false, api: loadFixture(api) });
+		Object.assign(fixture.componentInstance, { schema: apis.schemas[schema], obj: apis.current.paths['/pet/{petId}'].get.parameters[0] });
 		fixture.detectChanges();
 		expect(element.textContent).toContain('petId');
 		expect(element.textContent).toContain('int64');

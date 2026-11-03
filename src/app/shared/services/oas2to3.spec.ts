@@ -30,7 +30,7 @@ describe('convertOas2to3', () => {
 	});
 
 	it('converts petstore to a valid OpenAPI 3.0 document', async () => {
-		const result = (await convertOas2to3(loadFixture('petstoreYaml'))).target;
+		const result = (await convertOas2to3(loadFixture('petstoreOas2Yaml'))).target;
 		await expect(SwaggerParser.validate(result, parserOptions)).resolves.toBeTruthy();
 	});
 

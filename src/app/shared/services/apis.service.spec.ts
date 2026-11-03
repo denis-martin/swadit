@@ -23,10 +23,12 @@ describe('ApisService', () => {
 	});
 
 	describe('startup', () => {
-		it('starts with an empty Swagger 2.0 API', () => {
-			expect(apis.isOas2).toBe(true);
-			expect(apis.isOas3).toBe(false);
+		it('starts with an empty OpenAPI 3.0 API', () => {
+			expect(apis.isOas3).toBe(true);
+			expect(apis.isOas2).toBe(false);
+			expect(apis.specLabel).toBe('OAS3');
 			expect(apis.current.paths).toEqual({});
+			expect(apis.currentFileName).toBe('openapi.yaml');
 		});
 
 		it('loads the default API from assets/petstore.yaml', async () => {
@@ -34,10 +36,12 @@ describe('ApisService', () => {
 			TestBed.configureTestingModule({ providers: provideApisServiceTesting() });
 			const service = TestBed.inject(ApisService);
 			const loaded = firstValueFrom(service.eventApiChanged);
-			TestBed.inject(HttpTestingController).expectOne('assets/petstore.yaml').flush(fixtures.petstoreYaml);
+			TestBed.inject(HttpTestingController).expectOne('assets/petstore.yaml').flush(fixtures.petstoreOas3Yaml);
 			await loaded;
 			expect(service.current.info.title).toBe('Swagger Petstore');
-			expect(service.isOas2).toBe(true);
+			expect(service.isOas3).toBe(true);
+			expect(service.currentFileName).toBe('openapi.yaml');
+			expect(Object.keys(service.current.paths)).toHaveLength(8);
 		});
 	});
 
@@ -58,22 +62,55 @@ describe('ApisService', () => {
 			apis.hasLoadingErrors = true;
 			const changed = vi.fn();
 			apis.eventApiChanged.subscribe(changed);
-			apis.newFile();
+			apis.newFile('oas2');
 			expect(apis.current.swagger).toBe('2.0');
 			expect(apis.isOas2).toBe(true);
 			expect(apis.isOas3).toBe(false);
+			expect(apis.specLabel).toBe('OAS2');
 			expect(apis.schemas.operation).toBeTruthy();
 			expect(apis.selectedPaths).toEqual({});
 			expect(apis.hasLoadingErrors).toBe(false);
 			expect(changed).toHaveBeenCalled();
 		});
+
+		it('creates a new valid OpenAPI 3.0 API by default', async () => {
+			apis.newFile('oas2');
+			apis.newFile();
+			expect(apis.current.openapi).toBe('3.0.3');
+			expect(apis.isOas3).toBe(true);
+			expect(apis.currentFileName).toBe('openapi.yaml');
+			// OAS2 properties are not edited
+			expect(apis.schemas.operation.properties.consumes).toBeUndefined();
+			expect(apis.methodKeys).toContain('trace');
+			await expect(apis.validate(apis.current)).resolves.toBeTruthy();
+			apis.newFile('oas2');
+			expect(apis.currentFileName).toBe('swagger.yaml');
+			expect(apis.methodKeys).not.toContain('trace');
+		});
+	});
+
+	describe('schemas', () => {
+		it('provides the editor schemas for OAS2 and OAS3', () => {
+			const keys = ['operation', 'response', 'schema', 'security', 'securitySchemes', 'servers', 'parameter', 'requestBody'];
+			setCurrentApi(apis, loadFixture('minimalOas3Yaml'));
+			keys.forEach(k => expect(apis.schemas[k], k).toBeTruthy());
+			// the generic editors resolve refs against the root schema
+			expect(apis.resolveObj(apis.schemas.parameter.properties.schema, apis.schemas.root)['x-swadit-swagger-schema']).toBe(true);
+			expect(apis.resolveObj(apis.schemas.parameter.properties.schema, apis.schemas.root).properties.nullable).toBeTruthy();
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'));
+			['operation', 'response', 'schema', 'security', 'securityDefinitions'].forEach(k => expect(apis.schemas[k], k).toBeTruthy());
+		});
 	});
 
 	describe('resolveRef', () => {
-		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreYaml')));
+		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreOas3Yaml')));
 
-		it('resolves local refs in the current API', () => {
-			expect(apis.resolveRef('#/definitions/Pet')).toBe(apis.current.definitions.Pet);
+		it.each([
+			[ 'petstoreOas2Yaml', '#/definitions/Pet', (api: any) => api.definitions.Pet ],
+			[ 'petstoreOas3Yaml', '#/components/schemas/Pet', (api: any) => api.components.schemas.Pet ]
+		] as const)('resolves local refs in the current API (%s)', (fixture, ref, pet) => {
+			setCurrentApi(apis, loadFixture(fixture));
+			expect(apis.resolveRef(ref)).toBe(pet(apis.current));
 		});
 
 		it('resolves refs against a given root schema', () => {
@@ -95,13 +132,13 @@ describe('ApisService', () => {
 
 		it('returns null for unresolvable refs', () => {
 			vi.spyOn(console, 'error').mockImplementation(() => undefined);
-			expect(apis.resolveRef('#/definitions/DoesNotExist')).toBeFalsy();
+			expect(apis.resolveRef('#/components/schemas/DoesNotExist')).toBeFalsy();
 			expect(apis.resolveRef('#/does/not/exist')).toBeNull();
 		});
 	});
 
 	describe('resolveObj', () => {
-		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreYaml')));
+		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreOas3Yaml')));
 
 		it('returns non-ref objects unchanged', () => {
 			const o = { type: 'string' };
@@ -110,16 +147,16 @@ describe('ApisService', () => {
 		});
 
 		it('resolves $ref and keeps x-swadit annotations next to it', () => {
-			const r = apis.resolveObj({ '$ref': '#/definitions/Tag', 'x-swadit-editor-collapse': true });
+			const r = apis.resolveObj({ '$ref': '#/components/schemas/Tag', 'x-swadit-editor-collapse': true });
 			expect(r.properties.name).toBeTruthy();
 			expect(r['x-swadit-editor-collapse']).toBe(true);
 			// the referenced object itself is not modified
-			expect(apis.current.definitions.Tag['x-swadit-editor-collapse']).toBeUndefined();
+			expect(apis.current.components.schemas.Tag['x-swadit-editor-collapse']).toBeUndefined();
 		});
 
 		it('merges allOf schemas', () => {
 			const r = apis.resolveObj({ allOf: [
-				{ '$ref': '#/definitions/Tag' },
+				{ '$ref': '#/components/schemas/Tag' },
 				{ type: 'object', required: ['extra'], properties: { extra: { type: 'string' } } }
 			] });
 			expect(Object.keys(r.properties).sort()).toEqual(['extra', 'id', 'name']);
@@ -128,7 +165,7 @@ describe('ApisService', () => {
 	});
 
 	describe('generateExample', () => {
-		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreYaml')));
+		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreOas3Yaml')));
 
 		it('generates primitive values', () => {
 			expect(apis.generateExample({ type: 'string' }, {})).toBe('string');
@@ -151,20 +188,24 @@ describe('ApisService', () => {
 				.toEqual({ a: 'string' });
 		});
 
-		it('expands nested refs to different definitions', () => {
-			const pet = apis.generateExample({ '$ref': '#/definitions/Pet' }, {});
+		it.each([
+			[ 'petstoreOas2Yaml', '#/definitions/Pet' ],
+			[ 'petstoreOas3Yaml', '#/components/schemas/Pet' ]
+		] as const)('expands nested refs to different definitions (%s)', (fixture, ref) => {
+			setCurrentApi(apis, loadFixture(fixture));
+			const pet = apis.generateExample({ '$ref': ref }, {});
 			expect(pet.category).toEqual({ id: 0, name: 'string' });
 			expect(pet.tags).toEqual([{ id: 0, name: 'string' }]);
 		});
 
 		it('stops on recursive refs', () => {
-			const api = loadFixture('petstoreYaml');
-			api.definitions.Node = { type: 'object', properties: {
+			const api = loadFixture('petstoreOas3Yaml');
+			api.components.schemas.Node = { type: 'object', properties: {
 				name: { type: 'string' },
-				child: { '$ref': '#/definitions/Node' }
+				child: { '$ref': '#/components/schemas/Node' }
 			} };
 			setCurrentApi(apis, api);
-			expect(apis.generateExample({ '$ref': '#/definitions/Node' }, {}))
+			expect(apis.generateExample({ '$ref': '#/components/schemas/Node' }, {}))
 				.toEqual({ name: 'string', child: null });
 		});
 
@@ -291,9 +332,56 @@ describe('ApisService', () => {
 		});
 	});
 
+	describe('paths, methods and parameters (OAS3)', () => {
+		const api = {
+			openapi: '3.0.3',
+			info: { title: 't', version: '1' },
+			components: {
+				parameters: {
+					Q: { name: 'q', in: 'query', schema: { type: 'integer' }, description: 'referenced' }
+				}
+			},
+			paths: {
+				'/a/{id}': {
+					summary: 's',
+					parameters: [
+						{ name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+						{ name: 'q', in: 'query', schema: { type: 'string' }, description: 'path level' },
+						{ name: 'q', in: 'cookie', schema: { type: 'string' } }
+					],
+					servers: [ { url: '/' } ],
+					get: {
+						parameters: [ { '$ref': '#/components/parameters/Q' } ],
+						responses: { default: { description: 'd' } }
+					},
+					trace: { responses: { default: { description: 'd' } } }
+				}
+			}
+		};
+
+		it('getMethods returns only operations, including trace', async () => {
+			await setCurrentApi(apis, api);
+			expect(apis.getMethods('/a/{id}', api).map(m => m['key'])).toEqual(['get', 'trace']);
+			expect(apis.methodKeys).toContain('trace');
+			apis.newFile('oas2');
+			expect(apis.methodKeys).not.toContain('trace');
+		});
+
+		it('getParameters lets (referenced) operation parameters override path parameters of the same location', async () => {
+			await expect(apis.validate(api)).resolves.toBeTruthy();
+			setCurrentApi(apis, api);
+			const params = apis.getParameters(api, '/a/{id}', 'get');
+			expect(params).toEqual([
+				api.paths['/a/{id}'].parameters[0], api.paths['/a/{id}'].parameters[2], { '$ref': '#/components/parameters/Q' }
+			]);
+			expect(apis.getParameters(api, '/a/{id}', 'trace')).toEqual(api.paths['/a/{id}'].parameters);
+			expect(apis.getBodyParameter(api, '/a/{id}', 'get')).toBeNull();
+		});
+	});
+
 	describe('components', () => {
 		it('getComponents maps OAS2 definitions to schemas', () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'));
 			expect(apis.getComponents('schemas')).toBe(apis.current.definitions);
 			expect(apis.getComponents('definitions')).toBe(apis.current.definitions);
 			expect(apis.getComponents('parameters')).toBeNull();
@@ -303,7 +391,7 @@ describe('ApisService', () => {
 		});
 
 		it('getComponents maps OAS2 securityDefinitions to securitySchemes', () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'));
 			expect(apis.getComponents('securitySchemes')).toBe(apis.current.securityDefinitions);
 		});
 
@@ -314,6 +402,57 @@ describe('ApisService', () => {
 			expect(apis.getComponents('examples')).toBeNull();
 			expect(apis.getComponentsCount('schemas')).toBe(2);
 			expect(apis.getDefCategories()).toContain('schemas');
+			expect(apis.getDefCategories()).toContain('requestBodies');
+		});
+
+		it('componentRef returns version specific references', () => {
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'));
+			expect(apis.componentRef('schemas', 'Pet')).toBe('#/definitions/Pet');
+			expect(apis.componentRef('parameters', 'a/b~c')).toBe('#/parameters/a~1b~0c');
+			setCurrentApi(apis, loadFixture('minimalOas3Yaml'));
+			expect(apis.componentRef('schemas', 'Pet')).toBe('#/components/schemas/Pet');
+			expect(apis.componentRef('requestBodies', 'Item')).toBe('#/components/requestBodies/Item');
+		});
+
+		it('getOrCreateComponents creates missing component objects', () => {
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'));
+			expect(apis.getOrCreateComponents('schemas')).toBe(apis.current.definitions);
+			apis.getOrCreateComponents('parameters')['p'] = { name: 'p', in: 'query', type: 'string' };
+			expect(apis.current.parameters).toEqual({ p: { name: 'p', in: 'query', type: 'string' } });
+			expect(apis.getOrCreateComponents('requestBodies')).toBeNull();
+
+			const api = loadFixture('minimalOas3Yaml');
+			delete api.components;
+			setCurrentApi(apis, api);
+			apis.getOrCreateComponents('requestBodies')['b'] = { content: {} };
+			expect(apis.current.components).toEqual({ requestBodies: { b: { content: {} } } });
+			expect(apis.getOrCreateComponents('schemas')).toBe(apis.current.components.schemas);
+			expect(apis.getOrCreateComponents('unknown')).toBeNull();
+		});
+
+		it('cleanUpSecuritySchemes removes the properties of other types and adds required scopes', () => {
+			const schemes: any = {
+				key: { type: 'apiKey', name: 'k', in: 'header', scheme: 'basic', flows: {} },
+				http: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', openIdConnectUrl: 'x', 'x-ext': 1 },
+				oauth: { type: 'oauth2', name: 'n', flows: { password: { tokenUrl: 't' }, implicit: { authorizationUrl: 'a', scopes: { r: 'read' } } } },
+				ref: { '$ref': '#/components/securitySchemes/key' }
+			};
+			apis.cleanUpSecuritySchemes(schemes);
+			expect(schemes).toEqual({
+				key: { type: 'apiKey', name: 'k', in: 'header' },
+				http: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT', 'x-ext': 1 },
+				oauth: { type: 'oauth2', flows: { password: { tokenUrl: 't', scopes: {} }, implicit: { authorizationUrl: 'a', scopes: { r: 'read' } } } },
+				ref: { '$ref': '#/components/securitySchemes/key' }
+			});
+			apis.cleanUpSecuritySchemes(null);
+		});
+
+		it('exampleValue returns the (referenced) value of OAS3 examples', () => {
+			setCurrentApi(apis, loadFixture('featuresOas3Yaml'));
+			expect(apis.exampleValue({ '$ref': '#/components/examples/Item' })).toEqual({ id: 'abc' });
+			expect(apis.exampleValue({ summary: 's', value: 0 })).toBe(0);
+			expect(apis.exampleValue({ externalValue: 'https://example.com/x.json' })).toEqual({ externalValue: 'https://example.com/x.json' });
+			expect(apis.exampleValue('plain')).toBe('plain');
 		});
 	});
 
@@ -327,29 +466,32 @@ describe('ApisService', () => {
 			expect(apis.current.paths['/items/{id}'].get.parameters[0]).toEqual({ '$ref': '#/components/parameters/Debug' });
 		});
 
-		it('updates nested references and escapes special characters', () => {
-			const api = loadFixture('petstoreYaml');
-			api.definitions.Other = { '$ref': '#/definitions/Pet/properties/category' };
-			setCurrentApi(apis, api);
-			apis.renameComponent('definitions', 'Pet', 'a/b~c');
-			expect(apis.current.definitions.Other['$ref']).toBe('#/definitions/a~1b~0c/properties/category');
-			expect(apis.resolveRef(apis.current.definitions.Other['$ref'])).toEqual({ '$ref': '#/definitions/Category' });
+		it.each([
+			[ 'petstoreOas2Yaml', '#/definitions/' ],
+			[ 'petstoreOas3Yaml', '#/components/schemas/' ]
+		] as const)('updates nested references and escapes special characters (%s)', (fixture, prefix) => {
+			setCurrentApi(apis, loadFixture(fixture));
+			const schemas = apis.getComponents('schemas');
+			schemas.Other = { '$ref': prefix + 'Pet/properties/category' };
+			apis.renameComponent('schemas', 'Pet', 'a/b~c');
+			expect(schemas.Other['$ref']).toBe(prefix + 'a~1b~0c/properties/category');
+			expect(apis.resolveRef(schemas.Other['$ref'])).toEqual({ '$ref': prefix + 'Category' });
 			// refs that only start with the same name are not changed
-			apis.renameComponent('definitions', 'Tag', 'T');
-			expect(apis.current.definitions.Pet).toBeUndefined();
+			apis.renameComponent('schemas', 'Tag', 'T');
+			expect(schemas.Pet).toBeUndefined();
 		});
 
 		it('ignores unknown components', () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas3Yaml'));
 			const before = JSON.stringify(apis.current);
-			apis.renameComponent('definitions', 'Unknown', 'X');
+			apis.renameComponent('schemas', 'Unknown', 'X');
 			apis.renameComponent('parameters', 'Unknown', 'X');
 			expect(JSON.stringify(apis.current)).toBe(before);
 		});
 	});
 
 	describe('cleanUp', () => {
-		it('removes empty optional values and keeps required ones', () => {
+		it.each([ 'oas2', 'oas3' ] as const)('removes empty optional values and keeps required ones (%s)', (version) => {
 			const op = {
 				summary: '',
 				description: 'd',
@@ -358,18 +500,24 @@ describe('ApisService', () => {
 				parameters: [],
 				responses: {}
 			};
+			apis.newFile(version);
 			apis.cleanUp(apis.schemas.operation, op);
-			expect(op).toEqual({ description: 'd', responses: {} });
+			if (version == 'oas2') {
+				expect(op).toEqual({ description: 'd', responses: {} });
+			} else {
+				// in OAS3, parameters, request body, responses and security are edited (and cleaned up) separately
+				expect(op).toEqual({ description: 'd', parameters: [], responses: {} });
+			}
 		});
 
 		it('reduces $ref objects to the $ref', () => {
-			const o = { '$ref': '#/definitions/Pet', type: 'object' };
+			const o = { '$ref': '#/components/schemas/Pet', type: 'object' };
 			apis.cleanUp(apis.schemas.schema, o);
-			expect(o).toEqual({ '$ref': '#/definitions/Pet' });
+			expect(o).toEqual({ '$ref': '#/components/schemas/Pet' });
 		});
 
-		it('does not change a complete API document', () => {
-			const api = loadFixture('petstoreYaml');
+		it('does not change a complete API document (OAS2)', () => {
+			const api = loadFixture('petstoreOas2Yaml');
 			setCurrentApi(apis, api);
 			apis.cleanUp(apis.schemas.root, apis.current);
 			expect(apis.current).toEqual(api);
@@ -382,11 +530,39 @@ describe('ApisService', () => {
 			const str = { type: 'string', items: { type: 'string' }, properties: { a: {} }, format: 'date' };
 			apis.cleanUpSwaggerSchema(str);
 			expect(str).toEqual({ type: 'string', format: 'date' });
+			// schemas without type may have properties (e.g. in OAS3)
+			const untyped = { properties: { a: { type: 'string' } } };
+			apis.cleanUpSwaggerSchema(untyped);
+			expect(untyped).toEqual({ properties: { a: { type: 'string' } } });
+		});
+
+		it.each([ 'petstoreOas3Yaml', 'featuresOas3Yaml' ] as const)('does not change a complete OAS3 document (%s)', (fixture) => {
+			setCurrentApi(apis, loadFixture(fixture));
+			const orig = YAML.dump(apis.current);
+			const values = (o: any): any[] => Object.values(o || {}).filter((v: any) => !v['$ref']);
+			// all parts of the document that are edited with the editor schemas
+			for (const path of Object.keys(apis.current.paths)) {
+				values(apis.current.paths[path].parameters).forEach(p => apis.cleanUp(apis.schemas.parameter, p));
+				for (const { obj: op } of apis.getMethods(path) as any[]) {
+					apis.cleanUp(apis.schemas.operation, op);
+					values(op.parameters).forEach(p => apis.cleanUp(apis.schemas.parameter, p));
+					values(op.requestBody ? [ op.requestBody ] : []).forEach(b => apis.cleanUp(apis.schemas.requestBody, b));
+					values(op.responses).forEach(r => apis.cleanUp(apis.schemas.response, r));
+				}
+			}
+			const components = apis.current.components || {};
+			values(components.schemas).forEach(s => apis.cleanUp(apis.schemas.schema, s));
+			values(components.parameters).forEach(p => apis.cleanUp(apis.schemas.parameter, p));
+			values(components.requestBodies).forEach(b => apis.cleanUp(apis.schemas.requestBody, b));
+			values(components.responses).forEach(r => apis.cleanUp(apis.schemas.response, r));
+			apis.cleanUp(apis.schemas.securitySchemes, components.securitySchemes);
+			apis.cleanUp(apis.schemas.servers, apis.current.servers);
+			expect(YAML.dump(apis.current)).toBe(orig);
 		});
 	});
 
 	describe('path selection', () => {
-		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreYaml')));
+		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreOas3Yaml')));
 
 		it('selects, deselects and inverts paths', () => {
 			const all = Object.keys(apis.current.paths);
@@ -406,16 +582,18 @@ describe('ApisService', () => {
 
 		it('resets the selection when another API is loaded', () => {
 			apis.selectAllPaths();
-			setCurrentApi(apis, loadFixture('minimalOas3Yaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'));
 			expect(apis.selectedPaths).toEqual({});
 		});
 	});
 
 	describe('mergeSwagger', () => {
-		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreYaml')));
+		beforeEach(() => setCurrentApi(apis, loadFixture('petstoreOas3Yaml')));
 
-		it('adds and replaces paths and definitions', () => {
+		it('adds and replaces paths and definitions (OAS2)', () => {
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'));
 			apis.mergeSwagger({
+				swagger: '2.0',
 				paths: {
 					'/pet': { get: { responses: { default: { description: 'replaced' } } } },
 					'/new': { get: { responses: { default: { description: 'new' } } } }
@@ -437,6 +615,7 @@ describe('ApisService', () => {
 
 		it('adds the source to operation descriptions only', () => {
 			apis.mergeSwagger({
+				openapi: '3.0.3',
 				paths: {
 					'/new': {
 						parameters: [],
@@ -453,12 +632,39 @@ describe('ApisService', () => {
 		});
 
 		it('works if the current API has no paths', () => {
-			apis.current = { swagger: '2.0', info: { title: 't', version: '1' } };
-			apis.mergeSwagger({ paths: { '/new': { get: { responses: {} } } } });
+			apis.current = { openapi: '3.0.3', info: { title: 't', version: '1' } };
+			apis.mergeSwagger({ openapi: '3.0.3', paths: { '/new': { get: { responses: {} } } } });
 			expect(apis.current.paths['/new']).toBeTruthy();
 		});
 
-		it('merges OAS3 components', () => {
+		it('adds and replaces paths and components (OAS3)', async () => {
+			apis.mergeSwagger({
+				openapi: '3.0.3',
+				paths: {
+					'/pet': { get: { responses: { default: { description: 'replaced' } } } },
+					'/new': { get: { responses: { default: { description: 'new' } } } }
+				},
+				components: {
+					schemas: { Pet: { type: 'string' }, New: { type: 'integer' } },
+					parameters: { P: { name: 'p', in: 'query', schema: { type: 'string' } } },
+					requestBodies: { B: { content: { 'text/plain': {} } } },
+					securitySchemes: { basic: { type: 'http', scheme: 'basic' } }
+				}
+			});
+			expect(apis.current.paths['/pet'].get.responses.default.description).toBe('replaced');
+			expect(apis.current.paths['/new']).toBeTruthy();
+			expect(apis.current.paths['/store/inventory']).toBeTruthy();
+			expect(apis.current.components.schemas.Pet).toEqual({ type: 'string' });
+			expect(apis.current.components.schemas.New).toEqual({ type: 'integer' });
+			expect(apis.current.components.schemas.Tag).toBeTruthy();
+			expect(apis.current.components.parameters.P).toBeTruthy();
+			expect(apis.current.components.requestBodies.B).toBeTruthy();
+			expect(Object.keys(apis.current.components.securitySchemes)).toEqual(['petstore_auth', 'api_key', 'basic']);
+			expect(Object.keys(apis.selectedPaths).sort()).toEqual(['/new', '/pet']);
+			await expect(apis.validate(apis.current)).resolves.toBeTruthy();
+		});
+
+		it('merges OAS3 components into existing component types', () => {
 			setCurrentApi(apis, loadFixture('minimalOas3Yaml'));
 			apis.mergeSwagger({
 				openapi: '3.0.3',
@@ -500,8 +706,8 @@ describe('ApisService', () => {
 			expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/source']);
 		});
 
-		it('swaggerLoaded flags invalid APIs and shows the source', async () => {
-			const api = loadFixture('petstoreYaml');
+		it.each([ 'petstoreOas2Yaml', 'petstoreOas3Yaml' ] as const)('swaggerLoaded flags invalid APIs and shows the source (%s)', async (fixture) => {
+			const api = loadFixture(fixture);
 			api.paths['/pet'].post.responses = 'invalid';
 			setCurrentApi(apis, api);
 			await vi.waitFor(() => expect(apis.hasLoadingErrors).toBe(true));
@@ -509,7 +715,7 @@ describe('ApisService', () => {
 		});
 
 		it('swaggerLoaded ignores validation results of a previously loaded API', async () => {
-			const invalid = loadFixture('petstoreYaml');
+			const invalid = loadFixture('petstoreOas3Yaml');
 			invalid.paths['/pet'].post.responses = 'invalid';
 			setCurrentApi(apis, invalid);
 			await setCurrentApi(apis, loadFixture('minimalOas3Yaml'));
@@ -520,16 +726,21 @@ describe('ApisService', () => {
 
 		it('swaggerLoaded clears the error flag of a previous file', async () => {
 			apis.hasLoadingErrors = true;
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas3Yaml'));
 			await vi.waitFor(() => expect(apis.hasLoadingErrors).toBe(false));
 		});
 
-		it('addFile merges files one after the other', async () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
-			apis.filesToAdd = [
-				file(YAML.dump({ swagger: '2.0', info: { title: 'a', version: '1' }, paths: { '/a': {} } }), 'a.yaml'),
-				file(YAML.dump({ swagger: '2.0', info: { title: 'b', version: '1' }, paths: { '/b': {} } }), 'b.yaml')
-			];
+		const apiFile = (version: any, path: string) =>
+			file(YAML.dump({ ...version, info: { title: path, version: '1' }, paths: { ['/' + path]: {} } }), path + '.yaml');
+		const oas2 = { swagger: '2.0' };
+		const oas3 = { openapi: '3.0.3' };
+
+		it.each([
+			[ 'petstoreOas2Yaml', oas2 ],
+			[ 'petstoreOas3Yaml', oas3 ]
+		] as const)('addFile merges files one after the other (%s)', async (fixture, version) => {
+			setCurrentApi(apis, loadFixture(fixture));
+			apis.filesToAdd = [ apiFile(version, 'a'), apiFile(version, 'b') ];
 			apis.filesToAddIndex = 0;
 			apis.addFile(null, apis.filesToAdd[0]);
 			await vi.waitFor(() => expect(apis.current.paths['/b']).toBeTruthy());
@@ -539,12 +750,9 @@ describe('ApisService', () => {
 		});
 
 		it('addFile keeps the current API if a file cannot be loaded', async () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas3Yaml'));
 			const before = YAML.dump(apis.current);
-			apis.filesToAdd = [
-				file('a: [', 'broken.yaml'),
-				file(YAML.dump({ swagger: '2.0', info: { title: 'b', version: '1' }, paths: { '/b': {} } }), 'b.yaml')
-			];
+			apis.filesToAdd = [ file('a: [', 'broken.yaml'), apiFile(oas3, 'b') ];
 			apis.filesToAddIndex = 0;
 			apis.addFile(null, apis.filesToAdd[0]);
 			// the remaining files are still added
@@ -555,31 +763,40 @@ describe('ApisService', () => {
 			expect(ConfirmComponent.open).toHaveBeenCalledWith(expect.anything(), expect.stringContaining('broken.yaml'), 'Ok', null);
 		});
 
-		it('addFile rejects files with a different spec version', async () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
-			apis.filesToAdd = [ file(fixtures.minimalOas3Yaml, 'mini.yaml') ];
+		it.each([
+			[ 'petstoreOas2Yaml', oas3 ],
+			[ 'petstoreOas3Yaml', oas2 ]
+		] as const)('addFile rejects files with a different spec version (%s)', async (fixture, otherVersion) => {
+			setCurrentApi(apis, loadFixture(fixture));
+			const before = YAML.dump(apis.current);
+			apis.filesToAdd = [ apiFile(otherVersion, 'other') ];
 			apis.filesToAddIndex = 0;
 			apis.addFile(null, apis.filesToAdd[0]);
 			await vi.waitFor(() => expect(ConfirmComponent.open).toHaveBeenCalled());
-			expect(apis.current.paths['/items/{id}']).toBeUndefined();
-			expect(apis.isOas2).toBe(true);
+			expect(apis.current.paths['/other']).toBeUndefined();
+			expect(YAML.dump(apis.current)).toBe(before);
 		});
 
-		it('validateStr resolves with the (not dereferenced) API', async () => {
-			const api: any = await apis.validateStr(fixtures.petstoreYaml);
-			expect(api.paths['/pet'].post.parameters[0].schema).toEqual({ '$ref': '#/definitions/Pet' });
+		it.each([
+			[ 'petstoreOas2Yaml', (api: any) => api.paths['/pet'].post.parameters[0].schema, '#/definitions/Pet' ],
+			[ 'petstoreOas3Yaml', (api: any) => api.paths['/pet'].post.requestBody.content['application/json'].schema, '#/components/schemas/Pet' ]
+		] as const)('validateStr resolves with the (not dereferenced) API (%s)', async (fixture, bodySchema, ref) => {
+			const api: any = await apis.validateStr(fixtures[fixture]);
+			expect(bodySchema(api)).toEqual({ '$ref': ref });
 		});
 
 		it('validateStr rejects YAML and validation errors', async () => {
 			await expect(apis.validateStr('a: [')).rejects.toMatch(/^YAML Error/);
 			await expect(apis.validateStr('swagger: "2.0"')).rejects.toBeTruthy();
+			await expect(apis.validateStr('openapi: 3.0.3')).rejects.toBeTruthy();
+			await expect(apis.validateStr('openapi: 3.0.3\ninfo: { title: t, version: "1" }')).rejects.toBeTruthy();
 			await expect(apis.validateStr('')).rejects.toBeTruthy();
 		});
 
-		it('validate does not modify the given API', async () => {
-			const api = loadFixture('petstoreYaml');
+		it.each([ 'petstoreOas2Yaml', 'petstoreOas3Yaml' ] as const)('validate does not modify the given API (%s)', async (fixture) => {
+			const api = loadFixture(fixture);
 			await apis.validate(api);
-			expect(api).toEqual(loadFixture('petstoreYaml'));
+			expect(api).toEqual(loadFixture(fixture));
 		});
 	});
 
@@ -614,7 +831,7 @@ describe('ApisService', () => {
 
 	describe('modals', () => {
 		it('deleteSelectedPaths deletes the selected paths after confirmation', async () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas3Yaml'));
 			vi.spyOn(ConfirmComponent, 'open').mockResolvedValue('ok');
 			apis.selectPath('/pet', null);
 			apis.selectPath('/store/order', null);
@@ -626,7 +843,7 @@ describe('ApisService', () => {
 		});
 
 		it('deleteSelectedPaths does nothing if cancelled', async () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+			setCurrentApi(apis, loadFixture('petstoreOas3Yaml'));
 			vi.spyOn(ConfirmComponent, 'open').mockRejectedValue('cancel');
 			apis.selectPath('/pet', null);
 			apis.deleteSelectedPaths();
@@ -635,15 +852,18 @@ describe('ApisService', () => {
 			expect(apis.selectedPaths).toEqual({ '/pet': true });
 		});
 
-		it('downloadFileModal offers the current API as YAML', async () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'));
+		it.each([
+			[ 'petstoreOas2Yaml', 'swagger.yaml' ],
+			[ 'petstoreOas3Yaml', 'openapi.yaml' ]
+		] as const)('downloadFileModal offers the current API as YAML (%s)', async (fixture, fileName) => {
+			setCurrentApi(apis, loadFixture(fixture));
 			URL.createObjectURL = vi.fn(() => 'blob:x');
 			URL.revokeObjectURL = vi.fn();
 			const modalRef: any = { componentInstance: {}, result: new Promise(() => undefined) };
 			vi.spyOn(TestBed.inject(NgbModal), 'open').mockReturnValue(modalRef);
 			apis.hasLoadingErrors = false;
 			apis.downloadFileModal();
-			expect(modalRef.componentInstance.fileName).toBe('swagger.yaml');
+			expect(modalRef.componentInstance.fileName).toBe(fileName);
 			expect(await modalRef.componentInstance.blob.text()).toBe(YAML.dump(apis.current));
 			await vi.waitFor(() => expect(modalRef.componentInstance.validationErrors).toBe(false));
 			expect(URL.revokeObjectURL).not.toHaveBeenCalled();
@@ -654,7 +874,7 @@ describe('ApisService', () => {
 
 	describe('convertOas2To3', () => {
 		it('converts the current API and updates the version flags', async () => {
-			setCurrentApi(apis, loadFixture('petstoreYaml'), 'petstore.yaml');
+			setCurrentApi(apis, loadFixture('petstoreOas2Yaml'), 'petstore.yaml');
 			vi.spyOn(ConfirmComponent, 'open').mockResolvedValue('ok');
 			const changed = firstValueFrom(apis.eventApiChanged);
 			apis.convertOas2To3();
@@ -664,6 +884,51 @@ describe('ApisService', () => {
 			expect(apis.isOas2).toBe(false);
 			expect(apis.currentFileName).toBe('petstore.yaml');
 			await expect(apis.validate(apis.current)).resolves.toBeTruthy();
+		});
+
+		it('changes the default file name with the version', async () => {
+			apis.newFile('oas2');
+			expect(apis.currentFileName).toBe('swagger.yaml');
+			vi.spyOn(ConfirmComponent, 'open').mockResolvedValue('ok');
+			const changed = firstValueFrom(apis.eventApiChanged);
+			apis.convertOas2To3();
+			await changed;
+			expect(apis.currentFileName).toBe('openapi.yaml');
+		});
+	});
+
+	describe('convertOas3To2', () => {
+		it('converts the current API, keeps its file name and reports what was lost', async () => {
+			setCurrentApi(apis, loadFixture('featuresOas3Yaml'), 'features.yaml');
+			const open = vi.spyOn(ConfirmComponent, 'open').mockResolvedValue('ok');
+			const changed = firstValueFrom(apis.eventApiChanged);
+			await apis.convertOas3To2();
+			await changed;
+			expect(apis.current.swagger).toBe('2.0');
+			expect(apis.isOas2).toBe(true);
+			expect(apis.currentFileName).toBe('features.yaml');
+			await expect(apis.validate(apis.current)).resolves.toBeTruthy();
+			const text: string = open.mock.calls[0][1];
+			expect(text).toContain('converted to Swagger 2.0');
+			expect(text).toContain('• Callbacks are not supported and were removed.');
+		});
+
+		it('converts the default API without warnings and changes the default file name', async () => {
+			setCurrentApi(apis, loadFixture('petstoreOas3Yaml'));
+			expect(apis.currentFileName).toBe('openapi.yaml');
+			const open = vi.spyOn(ConfirmComponent, 'open').mockResolvedValue('ok');
+			await apis.convertOas3To2();
+			expect(apis.currentFileName).toBe('swagger.yaml');
+			expect(open.mock.calls[0][1]).not.toContain('does not support');
+		});
+
+		it('only converts OpenAPI 3.0', async () => {
+			apis.newFile('oas2');
+			vi.spyOn(console, 'error').mockImplementation(() => undefined);
+			const open = vi.spyOn(ConfirmComponent, 'open');
+			await apis.convertOas3To2();
+			expect(apis.isOas2).toBe(true);
+			expect(open).not.toHaveBeenCalled();
 		});
 	});
 });

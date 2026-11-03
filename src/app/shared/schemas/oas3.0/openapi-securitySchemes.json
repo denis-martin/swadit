@@ -1,0 +1,207 @@
+{
+	"title": "Editor schema for OpenAPI 3.0 security schemes (components.securitySchemes).",
+	"id": "https://spec.openapis.org/oas/3.0/schema/2020-02-25#/definitions/SecurityScheme",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"additionalProperties": {
+		"type": "object",
+		"required": [ "type" ],
+		"x-swadit-editor-grid": [
+			[ "type", "description" ],
+			[ "name", "in" ],
+			[ "scheme", "bearerFormat" ],
+			[ "openIdConnectUrl" ],
+			[ "flows" ]
+		],
+		"x-swadit-editor-grid-cols": {
+			"type": 3,
+			"description": 9,
+			"name": 9,
+			"in": 3,
+			"scheme": 6,
+			"bearerFormat": 6,
+			"openIdConnectUrl": 12,
+			"flows": 12
+		},
+		"x-swadit-editor-collapse": true,
+		"properties": {
+			"type": {
+				"type": "string",
+				"enum": [ "apiKey", "http", "oauth2", "openIdConnect" ]
+			},
+			"description": {
+				"type": "string"
+			},
+			"name": {
+				"type": "string",
+				"description": "Only for security type 'apiKey'"
+			},
+			"in": {
+				"type": "string",
+				"description": "Only for security type 'apiKey'",
+				"enum": [ "header", "query", "cookie" ]
+			},
+			"scheme": {
+				"type": "string",
+				"description": "Only for security type 'http', e.g. basic, bearer"
+			},
+			"bearerFormat": {
+				"type": "string",
+				"description": "Only for security type 'http' with scheme 'bearer', e.g. JWT"
+			},
+			"openIdConnectUrl": {
+				"type": "string",
+				"format": "uri-reference",
+				"description": "Only for security type 'openIdConnect'"
+			},
+			"flows": {
+				"type": "object",
+				"description": "Only for security type 'oauth2'",
+				"x-swadit-editor-collapse": true,
+				"properties": {
+					"implicit": {
+						"type": "object",
+						"x-swadit-editor-card": true,
+						"x-swadit-editor-grid": [
+							[ "authorizationUrl", "refreshUrl" ],
+							[ "scopes" ]
+						],
+						"x-swadit-editor-grid-cols": {
+							"authorizationUrl": 4,
+							"tokenUrl": 4,
+							"refreshUrl": 4,
+							"scopes": 12
+						},
+						"properties": {
+							"authorizationUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Authorization URL"
+							},
+							"refreshUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Refresh URL (optional)"
+							},
+							"scopes": {
+								"type": "object",
+								"description": "Name of a scope",
+								"additionalProperties": {
+									"type": "string",
+									"description": "Description of the scope"
+								}
+							}
+						}
+					},
+					"password": {
+						"type": "object",
+						"x-swadit-editor-card": true,
+						"x-swadit-editor-grid": [
+							[ "tokenUrl", "refreshUrl" ],
+							[ "scopes" ]
+						],
+						"x-swadit-editor-grid-cols": {
+							"authorizationUrl": 4,
+							"tokenUrl": 4,
+							"refreshUrl": 4,
+							"scopes": 12
+						},
+						"properties": {
+							"tokenUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Token URL"
+							},
+							"refreshUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Refresh URL (optional)"
+							},
+							"scopes": {
+								"type": "object",
+								"description": "Name of a scope",
+								"additionalProperties": {
+									"type": "string",
+									"description": "Description of the scope"
+								}
+							}
+						}
+					},
+					"clientCredentials": {
+						"type": "object",
+						"x-swadit-editor-card": true,
+						"x-swadit-editor-grid": [
+							[ "tokenUrl", "refreshUrl" ],
+							[ "scopes" ]
+						],
+						"x-swadit-editor-grid-cols": {
+							"authorizationUrl": 4,
+							"tokenUrl": 4,
+							"refreshUrl": 4,
+							"scopes": 12
+						},
+						"properties": {
+							"tokenUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Token URL"
+							},
+							"refreshUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Refresh URL (optional)"
+							},
+							"scopes": {
+								"type": "object",
+								"description": "Name of a scope",
+								"additionalProperties": {
+									"type": "string",
+									"description": "Description of the scope"
+								}
+							}
+						}
+					},
+					"authorizationCode": {
+						"type": "object",
+						"x-swadit-editor-card": true,
+						"x-swadit-editor-grid": [
+							[ "authorizationUrl", "tokenUrl", "refreshUrl" ],
+							[ "scopes" ]
+						],
+						"x-swadit-editor-grid-cols": {
+							"authorizationUrl": 4,
+							"tokenUrl": 4,
+							"refreshUrl": 4,
+							"scopes": 12
+						},
+						"properties": {
+							"authorizationUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Authorization URL"
+							},
+							"tokenUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Token URL"
+							},
+							"refreshUrl": {
+								"type": "string",
+								"format": "uri-reference",
+								"description": "Refresh URL (optional)"
+							},
+							"scopes": {
+								"type": "object",
+								"description": "Name of a scope",
+								"additionalProperties": {
+									"type": "string",
+									"description": "Description of the scope"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

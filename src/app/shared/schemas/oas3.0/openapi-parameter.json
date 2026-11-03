@@ -1,0 +1,67 @@
+{
+	"title": "Editor schema for OpenAPI 3.0 parameters (content, example and examples are kept as they are).",
+	"id": "https://spec.openapis.org/oas/3.0/schema/2020-02-25#/definitions/Parameter",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"required": [ "name", "in" ],
+	"x-swadit-editor-grid": [
+		[ "name", "in", "required" ],
+		[ "description" ],
+		[ "style", "explode", "deprecated", "allowEmptyValue" ],
+		[ "schema" ]
+	],
+	"x-swadit-editor-grid-cols": {
+		"name": 5,
+		"in": 5,
+		"required": 2,
+		"description": 12,
+		"style": 4,
+		"explode": 2,
+		"deprecated": 2,
+		"allowEmptyValue": 4,
+		"schema": 12
+	},
+	"properties": {
+		"name": {
+			"type": "string",
+			"description": "The name of the parameter."
+		},
+		"in": {
+			"type": "string",
+			"description": "The location of the parameter.",
+			"enum": [ "path", "query", "header", "cookie" ]
+		},
+		"description": {
+			"type": "string",
+			"description": "A brief description of the parameter. CommonMark syntax MAY be used for rich text representation.",
+			"x-swadit-markdown": true,
+			"x-swadit-input-multiline": 4,
+			"x-swadit-input-class": "monospace"
+		},
+		"required": {
+			"type": "boolean",
+			"description": "Determines whether this parameter is mandatory (must be true for path parameters).",
+			"default": false
+		},
+		"deprecated": {
+			"type": "boolean",
+			"default": false
+		},
+		"allowEmptyValue": {
+			"type": "boolean",
+			"description": "Only for query parameters",
+			"default": false
+		},
+		"style": {
+			"type": "string",
+			"description": "Serialization style (optional), e.g. form, simple, matrix, label, spaceDelimited, pipeDelimited, deepObject"
+		},
+		"explode": {
+			"type": "boolean"
+		},
+		"schema": {
+			"$ref": "#/definitions/Schema",
+			"x-swadit-swagger-schema": true
+		}
+	}
+}

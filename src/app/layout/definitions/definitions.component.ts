@@ -17,13 +17,23 @@
 
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NgbModal, ModalDismissReasons, NgbModalRef, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, ModalDismissReasons, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 import { ApisService } from '../../shared/services';
 
 import { DefinitionEditComponent } from '../../shared/modules/editor-modals/definition-edit/definition-edit.component';
 import { ParameterEditComponent } from '../../shared/modules/editor-modals/parameter-edit/parameter-edit.component';
 import { ResponseEditComponent } from '../../shared/modules/editor-modals/response-edit/response-edit.component';
+import { RequestBodyEditComponent } from '../../shared/modules/editor-modals/request-body-edit/request-body-edit.component';
+
+/** the edit dialogs of the component types (see ApisService.getDefCategories()) */
+const editComponents = {
+	'definitions': DefinitionEditComponent,
+	'schemas': DefinitionEditComponent,
+	'parameters': ParameterEditComponent,
+	'responses': ResponseEditComponent,
+	'requestBodies': RequestBodyEditComponent
+};
 
 @Component({
     selector: 'app-definitions',
@@ -77,34 +87,13 @@ export class DefinitionsComponent implements OnInit
 		console.log("edit()", def);
 		if (event) event.stopPropagation();
 
-		let editComponent: any = null;
-		let modalOptions: NgbModalOptions;
-
-		switch (this.defCat) {
-			case 'definitions': {
-				editComponent = DefinitionEditComponent;
-				modalOptions = DefinitionEditComponent.modalOptions;
-				break;
-			}
-			case 'parameters': {
-				editComponent = ParameterEditComponent;
-				modalOptions = ParameterEditComponent.modalOptions;
-				break;
-			}
-			case 'responses': {
-				editComponent = ResponseEditComponent;
-				modalOptions = ResponseEditComponent.modalOptions;
-				break;
-			}
-		}
-
+		const editComponent = editComponents[this.defCat];
 		if (!editComponent) {
 			console.warn("Not yet implemented: edit for components of type " + this.defCat);
 			return;
 		}
 
-		this.editModal = this.modalService.open(editComponent, modalOptions);
-		this.editModal.componentInstance.parent = this.apis.current;
+		this.editModal = this.modalService.open(editComponent, editComponent.modalOptions);
 		this.editModal.componentInstance.key = def;
 		this.editModal.componentInstance.obj = def ? this.apis.getComponents(this.defCat)[def] : {};
 		this.editModal.result.then((result) => {

@@ -13,15 +13,18 @@
               }
               @if (!apis.config.menu.hideItems['new']) {
                 <li>
-                  <a href="javascript:void(0)" (click)="apis.newFile()">
-                    <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a></li>
+                  <a href="javascript:void(0)" (click)="apis.newFile('oas3')">
+                    <i class="fa fa-fw fa-file"></i> {{ 'New (OAS3)' | translate }}</a></li>
+                <li>
+                  <a href="javascript:void(0)" (click)="apis.newFile('oas2')">
+                    <i class="fa fa-fw fa-file"></i> {{ 'New (OAS2)' | translate }}</a></li>
                   }
                   @if (!apis.config.menu.hideItems['open']) {
                     <li>
                       <a href="javascript:void(0)" (click)="apis.openFileModal()">
                         <i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a></li>
                       }
-                      @if (!apis.config.menu.hideItems['add'] && apis.isOas2) {
+                      @if (!apis.config.menu.hideItems['add']) {
                         <li>
                           <a href="javascript:void(0)" (click)="apis.addFilesModal()">
                             <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a></li>

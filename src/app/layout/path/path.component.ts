@@ -24,6 +24,7 @@ import { ApisService } from '../../shared/services';
 import { PathEditComponent } from '../../shared/modules/editor-modals/path-edit/path-edit.component';
 import { ResponseEditComponent } from '../../shared/modules/editor-modals/response-edit/response-edit.component';
 import { ParameterEditComponent } from '../../shared/modules/editor-modals/parameter-edit/parameter-edit.component';
+import { RequestBodyEditComponent } from '../../shared/modules/editor-modals/request-body-edit/request-body-edit.component';
 
 @Component({
     selector: 'app-path',
@@ -42,6 +43,9 @@ export class PathComponent implements OnInit {
 	filterText: string;
 	uncollapsedResponse = {};
 	uncollapsedParameter = {};
+
+	/** OAS3: the operations for which a request body can be added (with defined semantics in HTTP) */
+	readonly requestBodyMethods = [ 'post', 'put', 'patch' ];
 
 	editModal: NgbModalRef;
 
@@ -158,6 +162,24 @@ export class PathComponent implements OnInit {
         });
 	}
 
+	editRequestBody(event) {
+		console.log("editRequestBody()");
+		if (event) event.stopPropagation();
+
+		const operation = this.apis.current['paths'][this.path][this.method];
+		this.editModal = this.modalService.open(RequestBodyEditComponent, RequestBodyEditComponent.modalOptions);
+		this.editModal.componentInstance.pathMode = true;
+		this.editModal.componentInstance.parent = operation;
+		this.editModal.componentInstance.obj = operation['requestBody'] || {};
+		this.editModal.result.then((result) => {
+			console.info("editRequestBody(): " + result);
+			
+        }, (reason) => {
+			console.warn("editRequestBody(): " + reason);
+
+        });
+	}
+
 	editParameter(event, paramObj = null, allMethods = false) {
 		console.log("editParameter()", paramObj);
 		if (event) event.stopPropagation();
@@ -248,7 +270,22 @@ export class PathComponent implements OnInit {
         }
 	}
 
-	generateExample(schema: any): any {
-		return this.apis.toJson(this.apis.generateExample(schema, {}, false, true));
+	/** the type of a parameter (OAS2), or of its schema (OAS3) */
+	paramType(param: any): string {
+		if (!param) return null;
+		if (param['type']) return param['type'];
+		const schema = param['schema'];
+		return schema ? (schema['type'] || schema['$ref'] || null) : null;
+	}
+
+	/** the schema of a response (OAS2), or of its first media type with a schema (OAS3) */
+	responseSchema(response: any): any {
+		if (!response) return null;
+		if (this.apis.isOas3) {
+			const content = response['content'] || {};
+			const mediaType = Object.keys(content).find(k => content[k] && content[k]['schema']);
+			return mediaType ? content[mediaType]['schema'] : null;
+		}
+		return response['schema'];
 	}
 }

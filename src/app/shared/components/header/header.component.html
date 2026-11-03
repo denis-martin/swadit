@@ -10,9 +10,6 @@
           <div class="swadit-copyright">
             <a href="https://froschbach.io/apps/swadit/" target="_blank" style="color: #609444">froschbach.io</a>
           </div>
-          @if (apis.isOas3) {
-            <span style="font-size: 75%; font-weight: bold; color: red" title="OpenAPI 3.0 support is currently limited and should be considered as in 'alpha' state">ALPHA</span>
-          }
         </span>
       }
       @if (apis.config.title) {
@@ -23,6 +20,9 @@
           @if (apis.config.logo || apis.config.title) {
             <span> &ndash;</span>
             } {{apis.current['info']['title']}}
+            @if (apis.specLabel) {
+              <span class="spec-version" title="{{apis.isOas3 ? 'OpenAPI' : 'Swagger'}} {{apis.specVersion}}">{{apis.specLabel}}</span>
+            }
           </span>
         }
       </span>
@@ -43,14 +43,16 @@
                 }
 
                 @if (!apis.config.menu.hideItems['new']) {
-                  <a class="dropdown-item" href="javascript:void(0)" (click)="apis.newFile()">
-                    <i class="fa fa-fw fa-file"></i> {{ 'New' | translate }}</a>
+                  <a class="dropdown-item" href="javascript:void(0)" (click)="apis.newFile('oas3')">
+                    <i class="fa fa-fw fa-file"></i> {{ 'New (OAS3)' | translate }}</a>
+                  <a class="dropdown-item" href="javascript:void(0)" (click)="apis.newFile('oas2')">
+                    <i class="fa fa-fw fa-file"></i> {{ 'New (OAS2)' | translate }}</a>
                   }
                   @if (!apis.config.menu.hideItems['open']) {
                     <a class="dropdown-item" href="javascript:void(0)" (click)="apis.openFileModal()">
                       <i class="fa fa-fw fa-folder-open"></i> {{ 'Open' | translate }}</a>
                     }
-                    @if (apis.isOas2 && !apis.config.menu.hideItems['add']) {
+                    @if (!apis.config.menu.hideItems['add']) {
                       <a class="dropdown-item" href="javascript:void(0)" (click)="apis.addFilesModal()">
                         <i class="fa fa-fw fa-plus"></i> {{ 'Add' | translate }}</a>
                       }
@@ -62,7 +64,11 @@
                         <div class="dropdown-divider"></div>
                         @if (apis.isOas2 && !apis.config.menu.hideItems['convertOas2to3']) {
                           <a class="dropdown-item" style="cursor: pointer" (click)="apis.convertOas2To3()">
-                            <i class="fa fa-fw fa-align-left"></i> {{ 'Convert to OAS 3' | translate }}<span style="vertical-align: super; font-size: 75%; font-weight: bold; color: red" title="OpenAPI 3.0 support is currently limited and should be considered as in 'alpha' state">ALPHA</span></a>
+                            <i class="fa fa-fw fa-align-left"></i> {{ 'Convert to OAS3' | translate }}</a>
+                          }
+                          @if (apis.isOas3 && !apis.config.menu.hideItems['convertOas3to2']) {
+                            <a class="dropdown-item" style="cursor: pointer" (click)="apis.convertOas3To2()">
+                              <i class="fa fa-fw fa-align-left"></i> {{ 'Convert to OAS2' | translate }}</a>
                           }
                           @if (!apis.config.menu.hideItems['source']) {
                             <a class="dropdown-item" [routerLink]="['/source']">

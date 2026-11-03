@@ -56,7 +56,7 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
       </div>
     </div>
     <div class="col-md-1 text-end">
-      @if (!apis.config.readOnly && apis.isOas2) {
+      @if (!apis.config.readOnly) {
         <div class="edit-subsection me-3" style="font-size: 120%" (click)="edit($event)" title="Add item">
           <i class="fa fa-plus"></i>
         </div>
@@ -66,24 +66,28 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 </div>
 
 @for (def of apis.filterList(keys(apis.getComponents(defCat)), filterText, sortItems); track def; let index = $index) {
+  @let component = apis.getComponents(defCat)[def] || {};
   <div
     class="card mb-2">
     <div class="card-header clickable" (click)="uncollapsedDef[def] = !uncollapsedDef[def]">
       <div class="row">
         <div class="col-md-10 preview">
           {{def}}
-          @if (apis.getComponents(defCat)[def]['in']) {
-            <span class="headerType"> in {{apis.getComponents(defCat)[def]['in']}}</span>
+          @if (component['$ref']) {
+            <span class="headerType"> ({{component['$ref']}}) </span>
           }
-          @if (apis.getComponents(defCat)[def]['type']) {
-            <span class="headerType"> ({{apis.getComponents(defCat)[def]['type']}}) </span>
+          @if (component['in']) {
+            <span class="headerType"> in {{component['in']}}</span>
           }
-          @if (apis.getComponents(defCat)[def]['description']) {
-            <span> {{apis.getComponents(defCat)[def]['description']}} </span>
+          @if (component['type'] || (component['schema'] && component['schema']['type'])) {
+            <span class="headerType"> ({{component['type'] || component['schema']['type']}}) </span>
+          }
+          @if (component['description']) {
+            <span> {{component['description']}} </span>
           }
         </div>
         <div class="col-md-2">
-          @if (!apis.config.readOnly && apis.isOas2) {
+          @if (!apis.config.readOnly) {
             <div class="edit-card" (click)="edit($event, def)">
               <i class="fa fa-fw fa-pencil"></i>
             </div>
@@ -94,25 +98,30 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     @if (uncollapsedDef[def]) {
       <div class="card-body">
         <div>
-          @switch (defCat) {
-            @case ('parameters') {
-              <div>
-                <swadit-parameter-view [obj]="apis.getComponents(defCat)[def]">
-                </swadit-parameter-view>
-              </div>
-            }
-            @case ('responses') {
-              <div>
-                <swadit-response-view [obj]="apis.getComponents(defCat)[def]">
-                </swadit-response-view>
-              </div>
-            }
-            @default {
-              <div>
-                <swadit-swagger-schema-view [obj]="apis.getComponents(defCat)[def]" [generateExample]="true">
-                </swadit-swagger-schema-view>
-              </div>
-            }
+          @let resolved = apis.resolveObj(component) || {};
+          @if (component['$ref']) {
+            <p class="headerType">Defined in {{component['$ref']}}:</p>
+          }
+          @if (defCat == 'parameters') {
+            <div>
+              <swadit-parameter-view [obj]="resolved">
+              </swadit-parameter-view>
+            </div>
+          } @else if (defCat == 'responses') {
+            <div>
+              <swadit-response-view [obj]="resolved">
+              </swadit-response-view>
+            </div>
+          } @else if (defCat == 'requestBodies') {
+            <div>
+              <swadit-request-body-view [obj]="resolved">
+              </swadit-request-body-view>
+            </div>
+          } @else {
+            <div>
+              <swadit-swagger-schema-view [obj]="apis.getComponents(defCat)[def]" [generateExample]="true">
+              </swadit-swagger-schema-view>
+            </div>
           }
         </div>
       </div>

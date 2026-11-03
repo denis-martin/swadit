@@ -48,10 +48,10 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
           <div class="mb-3 col-md-6">
             <label for="refKey">Reference</label>
             <select id="refKey" name="refKey"
-              [(ngModel)]="obj['$ref']" class="form-select" title="Reference to #/responses">
+              [(ngModel)]="obj['$ref']" class="form-select" title="Reference to a response definition">
               <option [ngValue]="null || undefined">(none)</option>
-              @for (def of keys(apis.current['responses']); track def) {
-                <option value="#/responses/{{def}}">
+              @for (def of keys(apis.getComponents('responses')); track def) {
+                <option value="{{apis.componentRef('responses', def)}}">
                   {{def}}
                 </option>
               }

@@ -66,12 +66,16 @@ export class SwaggerSchemaViewComponent implements OnInit
 			obj = obj["allOf"][0];
 		}
 		
-		let tp: string = obj['type'] || obj['$ref'];
+		let tp: string = obj['type'] || obj['$ref'] || 
+			(obj['oneOf'] ? 'oneOf' : null) || (obj['anyOf'] ? 'anyOf' : null) || '';
 		if (obj['type'] == 'array' && obj['items']) {
 			tp = tp + " (" + (obj['items']['type'] || obj['items']['$ref']) + ")";
 		}
 		if (obj['format']) {
 			tp = tp + " (" + obj['format'] + ")";
+		}
+		if (obj['nullable']) {
+			tp = tp + " nullable";
 		}
 		if (obj['readOnly']) {
 			tp = tp + " read only";

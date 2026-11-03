@@ -64,48 +64,31 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
     <div>
       <swadit-schema-view
         [schema]="apis.schemas.definitions['Parameter']" [obj]="obj"
-        [skip]="['description', 'required', 'example', 'examples']">
+        [skip]="['description', 'required', 'example', 'examples', 'content']">
       </swadit-schema-view>
-      @if (obj['schema']) {
+      @if (obj['example'] != null) {
         <div>
-          @if (obj['example'] || obj['examples']) {
+          <p>Example:</p>
+          <markdown [data]="apis.toJson(obj['example']) | language: 'json'"></markdown>
+        </div>
+      } @else if (obj['examples']) {
+        <div>
+          <p>Examples:</p>
+          @for (k of apis.keys(obj['examples']); track k) {
             <div>
-              @if (obj['example']) {
-                <div>
-                  <p>Example:</p>
-                  <markdown [data]="apis.toJson(obj['example']) | language: 'json'"></markdown>
-                </div>
-              }
-              <!-- TODO: examples -->
+              <label>{{k}}:</label>
+              <markdown [data]="apis.toJson(apis.exampleValue(obj['examples'][k])) | language: 'json'"></markdown>
             </div>
-          } @else {
-            @if (obj['schema']['example']) {
-              <div>
-                <p>Example:</p>
-                <markdown [data]="apis.toJson(obj['schema']['example']) | language: 'json'"></markdown>
-              </div>
-            }
           }
+        </div>
+      } @else if (obj['schema'] && obj['schema']['example'] != null) {
+        <div>
+          <p>Example:</p>
+          <markdown [data]="apis.toJson(obj['schema']['example']) | language: 'json'"></markdown>
         </div>
       }
       @if (obj['content']) {
-        <div>
-          @for (contentType of apis.keys(obj['content']); track contentType) {
-            <div>
-              <p>{{ contentType }}:</p>
-              <swadit-schema-view
-                [schema]="apis.schemas.definitions['Schema']" [obj]="obj['content'][contentType]['schema']">
-              </swadit-schema-view>
-              @if (obj['content'][contentType]['example']) {
-                <div>
-                  <p>Example:</p>
-                  <markdown [data]="apis.toJson(obj['content'][contentType]['example']) | language: 'json'"></markdown>
-                </div>
-              }
-              <!-- TODO: examples -->
-            </div>
-          }
-        </div>
+        <swadit-content-view [content]="obj['content']"></swadit-content-view>
       }
     </div>
   }

@@ -30,6 +30,7 @@ import { FileModalComponent } from '../components/file-modal/file-modal.componen
 import { ConfirmComponent } from 'app/shared/modules/editor-modals/confirm/confirm.component';
 
 import { convertOas2to3 } from './oas2to3';
+import { convertOas3to2 } from './oas3to2';
 
 import * as JsonSchemaDraft04 from '../schemas/json-schema/draft-04.json';
 
@@ -49,6 +50,12 @@ import * as Oas20SchemaOperation from '../schemas/oas2.0/swagger-operation.json'
 import * as Oas20SchemaHeader from '../schemas/oas2.0/swagger-header.json';
 
 import * as Oas30Schema from '../schemas/oas3.0/schema.json';
+import * as Oas30SchemaOperation from '../schemas/oas3.0/openapi-operation.json';
+import * as Oas30SchemaParameter from '../schemas/oas3.0/openapi-parameter.json';
+import * as Oas30SchemaResponse from '../schemas/oas3.0/openapi-response.json';
+import * as Oas30SchemaRequestBody from '../schemas/oas3.0/openapi-requestBody.json';
+import * as Oas30SchemaServers from '../schemas/oas3.0/openapi-servers.json';
+import * as Oas30SchemaSecuritySchemes from '../schemas/oas3.0/openapi-securitySchemes.json';
 
 const swaggerParserOptions: SwaggerParser.Options = {
 	resolve: {
@@ -72,6 +79,7 @@ class MenuConfig
 		"add": false,
 		"download": false,
 		"convertOas2to3": false,
+		"convertOas3to2": false,
 		"source": false,
 		"printPreview": false,
 		"swaggerUi": false
@@ -135,16 +143,22 @@ export class ApisService
 			tags: Oas30Schema['default']['properties']['tags'],
 			definitions: Oas30Schema['default']['definitions'],
 			schema: Oas30Schema['default']['definitions']['Schema'],
+			operation: Oas30SchemaOperation['default'],
+			parameter: Oas30SchemaParameter['default'],
+			response: Oas30SchemaResponse['default'],
+			requestBody: Oas30SchemaRequestBody['default'],
+			servers: Oas30SchemaServers['default'],
+			securitySchemes: Oas30SchemaSecuritySchemes['default'],
+			// security requirements have the same structure as in OAS2
+			security: Oas20SchemaSecurity['default'],
+			// only the component types that can be edited visually (the others, i.e. headers, examples,
+			// links and callbacks, are edited in the source view); security schemes are edited with the
+			// API info, like the OAS2 security definitions
 			_definitionCategories: [
 				'schemas', 
 				'responses',
 				'parameters',
-				//'examples',
-				//'requestBodies',
-				//'headers',
-				//'securitySchemes',
-				//'links',
-				//'callbacks'
+				'requestBodies'
 			]
 		}
 	};
@@ -164,20 +178,26 @@ export class ApisService
 	public config: SwaditConfig = new SwaditConfig();
 
 	public current: any = { 
-		swagger: "2.0",
+		openapi: "3.0.3",
 		info: { 
 			title: "My new API",
 			version: "1.0"
 		},
 		paths: {}
 	}
-	public currentFileName: string = "swagger.yaml";
+	public currentFileName: string = "openapi.yaml";
 	public lastLoaded: string;
 	public hasLoadingErrors: boolean = false;
 
-	public specVersion = '2.0';
-	public isOas2 = true;
-	public isOas3 = false;
+	public specVersion = '3.0.3';
+	public isOas2 = false;
+	public isOas3 = true;
+
+	/** the major spec version for display ("OAS2" or "OAS3") */
+	get specLabel(): string
+	{
+		return this.isOas2 ? "OAS2" : this.isOas3 ? "OAS3" : "";
+	}
 
 	filesToAdd = [];
 	filesToAddIndex = 0;
@@ -193,9 +213,15 @@ export class ApisService
 	blob: Blob;
 	blobUrl: string;
 
-	methodKeys = ["get", "post", "put", "delete", "options", "head", "patch" ];
+	private readonly oas2MethodKeys = ["get", "post", "put", "delete", "options", "head", "patch" ];
 	// all keys of a path item that are operations ("trace" is OAS3 only)
-	private readonly operationKeys = [ ...this.methodKeys, "trace" ];
+	private readonly operationKeys = [ ...this.oas2MethodKeys, "trace" ];
+
+	/** the operations (HTTP methods) that can be defined for a path in the current spec version */
+	get methodKeys(): string[]
+	{
+		return this.isOas3 ? this.operationKeys : this.oas2MethodKeys;
+	}
 
 	constructor(private modalService: NgbModal, private router: Router, private http: HttpClient) 
 	{
@@ -314,9 +340,21 @@ export class ApisService
 	private setCurrent(api: any, fileName: string = null): void
 	{
 		this.current = api;
-		this.currentFileName = fileName ? fileName : "swagger.yaml";
 		this.selectedPaths = {};
 		this.updateSpecVersion();
+		this.currentFileName = fileName ? fileName : this.defaultFileName();
+	}
+
+	/** the file name of APIs without file name, depending on the spec version */
+	private defaultFileName(): string
+	{
+		return this.isOas2 ? "swagger.yaml" : "openapi.yaml";
+	}
+
+	/** the file name to keep when converting the current API (default file names change with the version) */
+	private convertedFileName(): string
+	{
+		return this.currentFileName == this.defaultFileName() ? null : this.currentFileName;
 	}
 
 	private updateSpecVersion(): void
@@ -382,7 +420,7 @@ export class ApisService
 		console.log("error loading yaml: ", err);
 		this.hasLoadingErrors = true;
 		this.setCurrent({ 
-			swagger: "2.0",
+			openapi: "3.0.3",
 			info: { 
 				title: "Loading Error",
 				version: "1.0"
@@ -579,7 +617,7 @@ export class ApisService
 			delete obj['items'];
 			delete obj['format'];
 
-		} else {
+		} else if (obj['type']) {
 			delete obj['items'];
 			delete obj['properties'];
 
@@ -598,17 +636,16 @@ export class ApisService
 		console.log("Download URL: " + this.blobUrl);
 	}
 
-	newFile(): void
+	newFile(version: 'oas3' | 'oas2' = 'oas3'): void
 	{
 		this.hasLoadingErrors = false;
-		this.setCurrent({ 
-			swagger: "2.0",
-			info: { 
-				title: "My new API",
-				version: "1.0"
-			},
-			paths: {}
-		});
+		const api: any = version == 'oas2' ? { swagger: "2.0" } : { openapi: "3.0.3" };
+		api['info'] = { 
+			title: "My new API",
+			version: "1.0"
+		};
+		api['paths'] = {};
+		this.setCurrent(api);
 		this._eventApiChanged.next(this.currentFileName);
 	}
 
@@ -837,14 +874,21 @@ export class ApisService
 		if (!components || !components.hasOwnProperty(key) || key == newKey) return;
 		this.renameObjectKey(components, key, newKey);
 
-		let base: string;
-		if (this.isOas3) {
-			base = "#/components/" + type + "/";
-		} else {
-			base = "#/" + (type == 'schemas' ? 'definitions' : type) + "/";
-		}
+		this.replaceRefs(this.current, this.componentRef(type, key), this.componentRef(type, newKey));
+	}
+
+	/**
+	 * Returns the reference to a component, e.g. "#/components/schemas/Pet" (OAS3) or
+	 * "#/definitions/Pet" (OAS2). The type is a key of the components, see getComponents().
+	 */
+	componentRef(type: string, key: string): string
+	{
 		const escape = (k: string) => k.replace(/~/g, '~0').replace(/\//g, '~1');
-		this.replaceRefs(this.current, base + escape(key), base + escape(newKey));
+		if (this.isOas3) {
+			return "#/components/" + type + "/" + escape(key);
+		} else {
+			return "#/" + (this.oas2ComponentTypes[type] || type) + "/" + escape(key);
+		}
 	}
 
 	private replaceRefs(obj: any, ref: string, newRef: string): void
@@ -1014,6 +1058,13 @@ export class ApisService
 		return res;
 	}
 
+	/** OAS3: the value of an example object (or the example object itself if it has no inline value) */
+	exampleValue(example: any): any
+	{
+		const resolved = this.resolveObj(example) || example;
+		return resolved && typeof resolved == 'object' && 'value' in resolved ? resolved['value'] : resolved;
+	}
+
 	validateStr(input: string): any
 	{
 		const apis = this;
@@ -1142,35 +1193,60 @@ export class ApisService
 	getComponents(type: string): any
 	{
 		if (this.isOas2) {
-			// OAS3 component types and their OAS2 counterparts
-			const oas2Types = {
-				'schemas': 'definitions',
-				'definitions': 'definitions',
-				'parameters': 'parameters',
-				'responses': 'responses',
-				'securitySchemes': 'securityDefinitions',
-				'securityDefinitions': 'securityDefinitions'
-			};
-			if (oas2Types[type] && this.current[oas2Types[type]]) {
-				return this.current[oas2Types[type]];
+			if (this.oas2ComponentTypes[type] && this.current[this.oas2ComponentTypes[type]]) {
+				return this.current[this.oas2ComponentTypes[type]];
 			}
 		} else if (this.isOas3) {
 			if ('components' in this.current && type in this.current['components']) {
-				if (type == 'schemas' ||
-					type == 'responses' ||
-					type == 'parameters' ||
-					type == 'examples' ||
-					type == 'requestBodies' ||
-					type == 'headers' ||
-					type == 'securitySchemes' ||
-					type == 'links' ||
-					type == 'callbacks')
-				{
+				if (this.oas3ComponentTypes.includes(type)) {
 					return this.current['components'][type];
 				}
 			}
 		}
 		return null;
+	}
+
+	/** Like getComponents(), but creates the (empty) components object of the given type if necessary. */
+	getOrCreateComponents(type: string): any
+	{
+		const components = this.getComponents(type);
+		if (components) return components;
+		if (this.isOas2 && this.oas2ComponentTypes[type]) {
+			return this.current[this.oas2ComponentTypes[type]] = {};
+		} else if (this.isOas3 && this.oas3ComponentTypes.includes(type)) {
+			if (!this.current['components']) {
+				this.current['components'] = {};
+			}
+			return this.current['components'][type] = {};
+		}
+		return null;
+	}
+
+	/**
+	 * Removes the properties that do not apply to the type of an OAS3 security scheme (the
+	 * editor shows the properties of all types) and adds the scopes required by OAuth flows.
+	 */
+	cleanUpSecuritySchemes(securitySchemes: any): void
+	{
+		const typeProperties = {
+			'apiKey': ['name', 'in'],
+			'http': ['scheme', 'bearerFormat'],
+			'oauth2': ['flows'],
+			'openIdConnect': ['openIdConnectUrl']
+		};
+		const allTypeProperties = [].concat(...Object.values(typeProperties));
+		for (const scheme of Object.values<any>(securitySchemes || {})) {
+			if (!scheme || scheme['$ref']) continue;
+			const keep = typeProperties[scheme['type']] || [];
+			allTypeProperties
+				.filter(p => !keep.includes(p))
+				.forEach(p => delete scheme[p]);
+			for (const flow of Object.values<any>(scheme['flows'] || {})) {
+				if (flow && !flow['scopes']) {
+					flow['scopes'] = {};
+				}
+			}
+		}
 	}
 
 	getComponentsCount(type: string): number
@@ -1188,6 +1264,21 @@ export class ApisService
 		return this.schemas._definitionCategories;
 	}
 
+	// OAS3 component types and their OAS2 counterparts
+	private readonly oas2ComponentTypes = {
+		'schemas': 'definitions',
+		'definitions': 'definitions',
+		'parameters': 'parameters',
+		'responses': 'responses',
+		'securitySchemes': 'securityDefinitions',
+		'securityDefinitions': 'securityDefinitions'
+	};
+
+	private readonly oas3ComponentTypes = [
+		'schemas', 'responses', 'parameters', 'examples', 'requestBodies', 
+		'headers', 'securitySchemes', 'links', 'callbacks'
+	];
+
 	convertOas2To3(): void
 	{
 		if (!this.isOas2) {
@@ -1196,12 +1287,11 @@ export class ApisService
 		}
 		convertOas2to3(this.current)
 			.then((result) => {
-				this.setCurrent(result.target, this.currentFileName);
+				this.setCurrent(result.target, this.convertedFileName());
 		
 				if ('openapi' in this.current) {
 					ConfirmComponent.open(this.modalService, 
-						"OpenAPI 3.0 is not yet fully supported by Swadit. " +
-						"Conversion may be incomplete and visual editing is limited. " +
+						"The conversion to OpenAPI 3.0 may be incomplete. " +
 						"Please review the resulting document carefully.", 
 						"Ok", null);
 				}
@@ -1211,6 +1301,31 @@ export class ApisService
 			.catch((err) => {
 				console.error("Error converting Swagger 2.0 file:", err);
 				// TODO: Show hint to user
+			});
+	}
+
+	/** Converts the current OpenAPI 3.0 API to Swagger 2.0 and tells the user what could not be converted. */
+	convertOas3To2(): Promise<void>
+	{
+		if (!this.isOas3) {
+			console.error("Cannot convert non-OpenAPI 3.0 to Swagger 2.0");
+			return Promise.resolve();
+		}
+		return convertOas3to2(this.current)
+			.then((result) => {
+				this.hasLoadingErrors = false;
+				this.setCurrent(result.target, this.convertedFileName());
+				let text = "The API has been converted to Swagger 2.0. Please review the resulting document carefully.";
+				if (result.warnings.length > 0) {
+					text += "\n\nSwagger 2.0 does not support everything of OpenAPI 3.0:\n" + 
+						result.warnings.map(w => "• " + w).join("\n");
+				}
+				ConfirmComponent.open(this.modalService, text, "Ok", null);
+				this._eventApiChanged.next(this.currentFileName);
+			})
+			.catch((err) => {
+				console.error("Error converting OpenAPI 3.0 file:", err);
+				ConfirmComponent.open(this.modalService, "The API could not be converted: " + (err && err.message ? err.message : err), "Ok", null);
 			});
 	}
 }

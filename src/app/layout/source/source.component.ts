@@ -41,6 +41,8 @@ export class SourceComponent implements OnInit
 	// the API shown and whether the user has changed its text
 	private shownApi: any = null;
 	private modified: boolean = false;
+	// only the result of the latest validation is shown (validations of large APIs may finish after later ones)
+	private validationRun: number = 0;
 
 	constructor(public apis: ApisService)
 	{
@@ -85,8 +87,10 @@ export class SourceComponent implements OnInit
 		const self = this;
 		self.validationPassed = null;
 		self.applied = null;
+		const run = ++this.validationRun;
 		this.apis.validateStr(this.text)
 			.then(api => {
+				if (run != self.validationRun) return;
 				self.message = null;
 				self.validationPassed = true;
 				self.applied = true;
@@ -96,6 +100,7 @@ export class SourceComponent implements OnInit
 				self.applying = false;
 			})
 			.catch(msg => {
+				if (run != self.validationRun) return;
 				self.message = msg;
 				self.validationPassed = false;
 				self.applied = null;
@@ -107,12 +112,15 @@ export class SourceComponent implements OnInit
 		const self = this;
 		self.validationPassed = null;
 		self.applied = null;
+		const run = ++this.validationRun;
 		this.apis.validateStr(this.text)
 			.then(api => {
+				if (run != self.validationRun) return;
 				self.message = null;
 				self.validationPassed = true;
 			})
 			.catch(msg => {
+				if (run != self.validationRun) return;
 				self.message = msg;
 				self.validationPassed = false;
 			});

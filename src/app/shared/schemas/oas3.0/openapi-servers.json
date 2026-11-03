@@ -1,0 +1,67 @@
+{
+	"title": "Editor schema for OpenAPI 3.0 server lists.",
+	"id": "https://spec.openapis.org/oas/3.0/schema/2020-02-25#/properties/servers",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "array",
+	"description": "Servers providing connectivity information to the API",
+	"items": {
+		"type": "object",
+		"required": [ "url" ],
+		"x-swadit-editor-grid": [
+			[ "url", "description" ],
+			[ "variables" ]
+		],
+		"x-swadit-editor-grid-cols": {
+			"url": 6,
+			"description": 6,
+			"variables": 12
+		},
+		"properties": {
+			"url": {
+				"type": "string",
+				"description": "URL of the server, may contain {variables}"
+			},
+			"description": {
+				"type": "string",
+				"description": "Description of the server"
+			},
+			"variables": {
+				"type": "object",
+				"description": "Name of a variable used in the URL",
+				"x-swadit-editor-collapse": true,
+				"additionalProperties": {
+					"type": "object",
+					"required": [ "default" ],
+					"x-swadit-editor-grid": [
+						[ "default", "description" ],
+						[
+							"enum"
+						]
+					],
+					"x-swadit-editor-grid-cols": {
+						"default": 4,
+						"description": 8,
+						"enum": 12
+					},
+					"properties": {
+						"default": {
+							"type": "string",
+							"description": "Default value of the variable"
+						},
+						"description": {
+							"type": "string",
+							"description": "Description of the variable"
+						},
+						"enum": {
+							"type": "array",
+							"description": "Allowed values",
+							"items": {
+								"type": "string"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

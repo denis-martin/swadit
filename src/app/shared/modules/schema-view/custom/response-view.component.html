@@ -69,58 +69,10 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 </div>
 }
 
-<!-- OAS3: schema -->
+<!-- OAS3: content -->
 @if (apis.isOas3 && obj['content']) {
-  <div>
-    @for (contentType of apis.keys(obj['content']); track contentType) {
-      <div>
-        <p>
-          Response as {{ contentType }}:
-          @if (obj['content'][contentType]['schema'] && obj['content'][contentType]['schema']['$ref']) {
-            <span class="headerType">{{obj['content'][contentType]['schema']['$ref']}}</span>
-          }
-        </p>
-        @if (obj['content'][contentType]['schema']) {
-          <swadit-swagger-schema-view [obj]="apis.resolveObj(obj['content'][contentType]['schema'])">
-          </swadit-swagger-schema-view>
-        }
-        @if (obj['content'][contentType]['example'] != null) {
-          <div>
-            <p>Example:</p>
-            <p><markdown [data]="apis.toJson(obj['content'][contentType]['example']) | language: 'json'"></markdown></p>
-          </div>
-        }
-        @if (obj['content'][contentType]['examples']) {
-          <div>
-            <p>Examples:</p>
-            @for (k of apis.keys(obj['content'][contentType]['examples']); track k) {
-              <div>
-                <p><label>{{k}}:</label><br>
-                <markdown [data]="apis.toJson(obj['content'][contentType]['examples'][k]) | language: 'json'"></markdown>
-              </p>
-            </div>
-          }
-        </div>
-      }
-      @if (obj['content'][contentType]['schema']) {
-        <div>
-          <p class="clickable" (click)="showGeneratedExample = !showGeneratedExample">
-            Example (generated)@if (showGeneratedExample) {
-            <span>:</span>
-            }@if (!showGeneratedExample) {
-            <span>...</span>
-          }
-        </p>
-        @if (showGeneratedExample) {
-          <markdown
-            [data]="generateExample(obj['content'][contentType]['schema']) | language: 'json'">
-          </markdown>
-        }
-      </div>
-    }
-  </div>
-}
-</div>
+  <swadit-content-view [content]="obj['content']" [label]="'Response as '">
+  </swadit-content-view>
 }
 
 <!-- TODO: headers -->

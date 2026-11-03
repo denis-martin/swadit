@@ -44,6 +44,12 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
 
 @if (!obj['allOf']) {
   <table class="swagger-schema-editor border-left">
+    @if (oas3Composites().length > 0) {
+      <tr>
+        <td class="label-text">{{ oas3Composites().join(', ') }}</td>
+        <td class="headerType">can only be edited in the source view (and are kept as they are)</td>
+      </tr>
+    }
     @if (obj['$ref']) {
       <tr>
         <td class="label-text">$ref</td>
@@ -107,6 +113,15 @@ along with swadit.  If not, see <http://www.gnu.org/licenses/>.
         <td><textarea title="Description (optional)" placeholder="Description (optional)" cols="30" rows="1"
           class="form-control schema-control" fz-elastic
         [(ngModel)]="obj['description']" [ngModelOptions]="{standalone: true}"></textarea></td>
+      </tr>
+    }
+    @if (apis.isOas3 && !obj['$ref']) {
+      <tr>
+        <td class="label-text">nullable</td>
+        <td>
+          <input type="checkbox" class="form-check-input" title="Allows null as value"
+            [ngModel]="!!obj['nullable']" [ngModelOptions]="{standalone: true}" (ngModelChange)="setNullable($event)">
+        </td>
       </tr>
     }
     <!-- TODO: validate field -->

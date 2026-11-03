@@ -1,0 +1,69 @@
+<!--
+Copyright 2017 Denis Martin.  This file is part of swadit.
+
+swadit is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+swadit is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with swadit.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<form (ngSubmit)="ok()" #editForm="ngForm">
+  @if (pathMode) {
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Request body</span>
+    </div>
+  }
+  <div class="modal-body" id="modal-body">
+    @if (!pathMode) {
+      <div class="mb-3">
+        <label for="requestBodyKey">Name of request body definition</label>
+        <input type="text" id="requestBodyKey" name="requestBodyKey" [(ngModel)]="key" required
+          class="form-control" placeholder="Enter name for request body" title="Name of request body">
+      </div>
+    }
+    @if (pathMode) {
+      <div class="mb-3">
+        <label for="refKey">Reference</label>
+        <select id="refKey" name="refKey"
+          [(ngModel)]="obj['$ref']" class="form-select" title="Reference to a request body definition">
+          <option [ngValue]="null || undefined">(none)</option>
+          @for (def of apis.keys(apis.getComponents('requestBodies')); track def) {
+            <option value="{{apis.componentRef('requestBodies', def)}}">
+              {{def}}
+            </option>
+          }
+        </select>
+      </div>
+    }
+    @if (!obj['$ref']) {
+      <div class="mb-3">
+        <swadit-object-editor
+          [schema]="apis.schemas.requestBody" [(obj)]="obj" [title]="false">
+        </swadit-object-editor>
+      </div>
+    }
+  </div>
+  <div class="modal-footer">
+    @if (exists) {
+      <button class="btn btn-danger me-auto" type="button" (click)="deleteRequestBody()" title="Delete request body">
+      Delete</button>
+    }
+    @if (errorStr) {
+      <span style="color: red">
+        {{errorStr}}
+      </span>
+    }
+    <button class="btn btn-primary" type="submit" [disabled]="!editForm.form.valid" title="Apply changes">
+    Apply</button>
+    <button class="btn btn-warning" type="button" (click)="activeModal.dismiss('cancel')" title="Do not apply changes">
+    Cancel</button>
+  </div>
+</form>

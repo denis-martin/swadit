@@ -9,6 +9,7 @@ import { SchemaEditorModule } from '../../modules/schema-editor/schema-editor.mo
 import { DefinitionEditComponent } from './definition-edit/definition-edit.component';
 import { ParameterEditComponent } from './parameter-edit/parameter-edit.component';
 import { ResponseEditComponent } from './response-edit/response-edit.component';
+import { RequestBodyEditComponent } from './request-body-edit/request-body-edit.component';
 import { PathEditComponent } from './path-edit/path-edit.component';
 import { ConfirmComponent } from './confirm/confirm.component';
 import { ModifyComponent } from './modify/modify.component';
@@ -24,6 +25,7 @@ import { ModifyComponent } from './modify/modify.component';
         DefinitionEditComponent,
         ParameterEditComponent,
         ResponseEditComponent,
+        RequestBodyEditComponent,
         PathEditComponent,
         ConfirmComponent,
         ModifyComponent
@@ -32,6 +34,7 @@ import { ModifyComponent } from './modify/modify.component';
         DefinitionEditComponent,
         ParameterEditComponent,
         ResponseEditComponent,
+        RequestBodyEditComponent,
         PathEditComponent,
         ConfirmComponent,
         ModifyComponent

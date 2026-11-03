@@ -3,7 +3,7 @@ import { By } from '@angular/platform-browser';
 
 import { SchemaEditorModule } from './schema-editor.module';
 import { ArrayEditorComponent } from './array-editor.component';
-import { renderComponent } from 'testing/test-helpers';
+import { loadFixture, renderComponent } from 'testing/test-helpers';
 
 @Component({
 	template: `<swadit-array-editor [schema]="schema" [(obj)]="value" [id]="'a'"></swadit-array-editor>`,
@@ -16,8 +16,8 @@ class HostComponent {
 
 describe('ArrayEditorComponent', () => {
 	const event = () => new Event('click');
-	const render = (schema: any, value: any) => {
-		const r = renderComponent(HostComponent, { props: { schema, value } });
+	const render = (schema: any, value: any, api?: any) => {
+		const r = renderComponent(HostComponent, { props: { schema, value }, api });
 		return { ...r, editor: r.fixture.debugElement.query(By.directive(ArrayEditorComponent)).componentInstance as ArrayEditorComponent };
 	};
 
@@ -64,8 +64,11 @@ describe('ArrayEditorComponent', () => {
 		expect(component.value).toEqual(['a']);
 	});
 
-	it('resolves refs to the items schema', () => {
-		const { editor } = render({ type: 'array', items: { '$ref': '#/definitions/tag' } }, []);
+	it.each([
+		[ 'OAS2', 'petstoreOas2Yaml', '#/definitions/tag' ],
+		[ 'OAS3', 'petstoreOas3Yaml', '#/definitions/Tag' ]
+	] as const)('resolves refs to the items schema (%s)', (version, fixture, ref) => {
+		const { editor } = render({ type: 'array', items: { '$ref': ref } }, [], loadFixture(fixture));
 		expect(editor.itemsSchema['type']).toBe('object');
 		expect(editor.itemToAdd).toEqual(expect.objectContaining({ externalDocs: expect.any(Object) }));
 	});

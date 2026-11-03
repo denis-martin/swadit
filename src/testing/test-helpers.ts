@@ -29,16 +29,22 @@ import { cloneDeep as _cloneDeep } from 'lodash-es';
 
 import { ApisService } from 'app/shared/services/apis.service';
 
-import petstoreYaml from '../assets/petstore.yaml' with { loader: 'text' };
+import petstoreOas3Yaml from '../assets/petstore.yaml' with { loader: 'text' };
+import petstoreOas2Yaml from './fixtures/petstore-oas2.yaml' with { loader: 'text' };
 import minimalOas3Yaml from './fixtures/minimal-oas3.yaml' with { loader: 'text' };
 import featuresOas2Yaml from './fixtures/features-oas2.yaml' with { loader: 'text' };
+import featuresOas3Yaml from './fixtures/features-oas3.yaml' with { loader: 'text' };
 
 export const fixtures = {
-	/** the default API shown on startup (Swagger 2.0) */
-	petstoreYaml: petstoreYaml,
+	/** the default API shown on startup (OpenAPI 3.0) */
+	petstoreOas3Yaml: petstoreOas3Yaml,
+	/** the same API in Swagger 2.0 */
+	petstoreOas2Yaml: petstoreOas2Yaml,
 	minimalOas3Yaml: minimalOas3Yaml,
 	/** Swagger 2.0 API using many features (for conversion tests) */
-	featuresOas2Yaml: featuresOas2Yaml
+	featuresOas2Yaml: featuresOas2Yaml,
+	/** OpenAPI 3.0 API using many features (servers, security schemes, request bodies, all component types) */
+	featuresOas3Yaml: featuresOas3Yaml
 };
 
 /** Returns a fresh (deep-copied) parsed fixture. */
@@ -117,7 +123,7 @@ export interface RenderOptions<T>
 	/** components to declare (if they are not declared by an imported module) */
 	declarations?: Array<any>;
 	providers?: Array<Provider | EnvironmentProviders>;
-	/** API document to load before the component is created (default: petstore) */
+	/** API document to load before the component is created (default: the OpenAPI 3.0 petstore) */
 	api?: any;
 	/** properties/inputs to set before the first change detection */
 	props?: Partial<T>;
@@ -137,7 +143,7 @@ export function renderComponent<T>(type: Type<T>, options: RenderOptions<T> = {}
 		providers: [ ...provideApisServiceTesting(), provideActiveModalMock(), ...(options.providers || []) ]
 	});
 	const apis = createApisService();
-	const validated = setCurrentApi(apis, options.api !== undefined ? options.api : loadFixture('petstoreYaml'));
+	const validated = setCurrentApi(apis, options.api !== undefined ? options.api : loadFixture('petstoreOas3Yaml'));
 	const fixture = TestBed.createComponent(type);
 	Object.assign(fixture.componentInstance, options.props || {});
 	if (options.detectChanges !== false) {
